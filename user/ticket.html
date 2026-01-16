@@ -5,42 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แจ้งปัญหา - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <nav>
         <div class="nav-links">
-            <b style="color: var(--primary-green); margin-right: 15px;">Sale Support System</b>
-            <a href="ticket.html" class="active" style="border-bottom: 2px solid var(--primary-green); padding-bottom: 5px;">📝 แจ้งเรื่องใหม่</a>
+            <b style="color: var(--primary-green); font-size: 1.2rem; margin-right: 20px;">Sale Portal</b>
+            <a href="ticket.html" class="active" style="color: var(--primary-green); border-bottom: 2px solid var(--primary-green);">📝 แจ้งเรื่องใหม่</a>
         </div>
         <div class="nav-links">
-            <span id="userDisplay" style="font-size: 0.85rem; color: #666; margin-right: 10px;"></span>
+            <span id="userEmail" style="font-size: 0.85rem; color: #666; margin-right: 15px;"></span>
             <button class="btn btn-outline" id="logoutBtn">ออกจากระบบ</button>
         </div>
     </nav>
 
     <div class="container" style="max-width: 800px;">
-        <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-            
-            <div style="flex: 1; min-width: 300px;">
-                <h3 style="color: var(--primary-green); margin-top: 0;">➕ ส่งคำขอการจัดการ</h3>
-                <form id="ticketForm">
-                    <label>หัวข้อปัญหา</label>
-                    <select id="issueType" class="input-field" required>
-                        <option value="">-- กำลังโหลดหัวข้อ --</option>
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h2 style="color: var(--primary-green); margin-top: 0;">➕ ส่งคำขอการจัดการ Case</h2>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 25px;">
+
+            <form id="ticketForm">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">1. เลือกหัวข้อปัญหา:</label>
+                    <select id="issueType" class="input-field" required style="height: 45px;">
+                        <option value="">-- กำลังโหลดหัวข้อปัญหา --</option>
                     </select>
+                </div>
 
-                    <label>หมายเลข Internet (10 หลัก)</label>
-                    <input type="text" id="internetNo" class="input-field" placeholder="ตัวอย่าง: 8801234567" required pattern="[0-9]{10}">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">2. หมายเลข Internet (10 หลัก):</label>
+                    <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}" maxlength="10">
+                </div>
 
-                    <label>รายละเอียดเพิ่มเติม</label>
-                    <textarea id="details" class="input-field" rows="4" placeholder="ระบุสิ่งที่ต้องการให้ Supervisor ดำเนินการ..." required></textarea>
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">3. รายละเอียดเพิ่มเติม:</label>
+                    <textarea id="details" class="input-field" rows="5" placeholder="ระบุรายละเอียดเพื่อให้ Supervisor ทำงานได้รวดเร็วขึ้น..." required></textarea>
+                </div>
 
-                    <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; padding: 12px;">ส่งเรื่องแจ้งซ่อม</button>
-                </form>
-            </div>
+                <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; height: 50px; font-size: 1.1rem;">
+                    ส่งข้อมูลแจ้งเรื่อง
+                </button>
+            </form>
+        </div>
+    </div>
 
-            <div style="flex: 0.8; background: #F9FAFB; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-green);">
-                <h4 style="margin-top: 0;">💡 คำแนะนำ</h4>
-                <ul style="font-size: 0.85rem; padding-left: 20px; line-height: 1.6; color: #555;">
-                    <li>กรุณาตรวจสอบหมายเลข <b>Internet</b> ให้ถูกต้อง
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "../index.html";
+        } else {
+            document.getElementById('userEmail').innerText = user.email;
+            loadIssueOptions(); // โหลดหัวข้อทันทีที่เข้าหน้า
+        }
+    });
+
+    // ฟังก์ชันดึงหัวข้อจากหน้า Admin แบบ Real-time
+    function loadIssueOptions() {
+        const issueSelect = document.getElementById('issueType');
+        onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
+            if (snap.exists()) {
+                const options = snap.data().options || [];
+                let html = '<option value="">-- เลือกหัวข้อปัญหา --</option>';
+                options.forEach(opt => {
+                    html += `<option value="${opt}">${opt}</option>`;
+                });
+                issueSelect.innerHTML = html;
+            } else {
+                issueSelect.innerHTML = '<option value="">ยังไม่ได้กำหนดหัวข้อ (ติดต่อ Admin)</option>';
+            }
+        });
+    }
+
+    // ฟังก์ชันส่งฟอร์ม
+    document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "กำลังส่งข้อมูล...";
+
+        try {
+            await addDoc(collection(db, "tickets"), {
+                internetNo: document.getElementById('internetNo').value,
+                issueType: document.getElementById('issueType').value,
+                details: document.getElementById('details').value,
+                status: "Open", // ค่าเริ่มต้น
+                email: auth.currentUser.email,
+                createdAt: serverTimestamp(),
+                comment: "" // เตรียมไว้ให้ Supervisor ใส่
+            });
+
+            alert("ส่งเรื่องแจ้งปัญหาสำเร็จ!");
+            document.getElementById('ticketForm').reset();
+        } catch (error) {
+            alert("เกิดข้อผิดพลาด: " + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "ส่งข้อมูลแจ้งเรื่อง";
+        }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href = "../index.html"));
+</script>
+</body>
+</html>
