@@ -5,12 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แจ้งปัญหา - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; color: white; font-weight: bold; }
+        .bg-open { background-color: #ef4444; }
+        .bg-process { background-color: #f59e0b; }
+        .bg-closed { background-color: #10B981; }
+        .comment-box { font-size: 0.8rem; color: #666; background: #f9f9f9; padding: 5px; border-left: 3px solid var(--primary-green); margin-top: 5px; }
+    </style>
 </head>
 <body>
 
     <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
         <span style="font-weight: bold;">Sale Support System</span>
-        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; border-radius: 4px; padding: 5px 10px; cursor: pointer;">ออกจากระบบ</button>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span id="userEmail" style="font-size: 0.8rem;"></span>
+            <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; border-radius: 4px; padding: 5px 10px; cursor: pointer;">ออกจากระบบ</button>
+        </div>
     </nav>
 
     <div class="green-container" style="max-width: 600px; margin-top: 30px;">
@@ -18,31 +28,28 @@
         <form id="ticketForm">
             <label>หัวข้อปัญหา</label>
             <select id="issueType" class="input-field" required>
-                <option value="">-- เลือกหัวข้อ --</option>
-                <option value="อินเทอร์เน็ตใช้งานไม่ได้">อินเทอร์เน็ตใช้งานไม่ได้</option>
-                <option value="ความเร็วไม่ตรงตามแพ็กเกจ">ความเร็วไม่ตรงตามแพ็กเกจ</option>
-                <option value="อุปกรณ์มีปัญหา">อุปกรณ์มีปัญหา</option>
+                <option value="">-- กำลังโหลดหัวข้อ --</option>
             </select>
 
             <label>หมายเลข Internet (10 หลัก)</label>
             <input type="text" id="internetNo" class="input-field" placeholder="88xxxxxxxx" required pattern="[0-9]{10}">
 
             <label>รายละเอียดที่ต้องการแก้ไข</label>
-            <textarea id="details" class="input-field" rows="4" required></textarea>
+            <textarea id="details" class="input-field" rows="4" placeholder="ระบุรายละเอียดปัญหาของคุณ..." required></textarea>
 
-            <button type="submit" class="btn-green" id="submitBtn">ส่งข้อมูล</button>
+            <button type="submit" class="btn-green" id="submitBtn">ส่งข้อมูลการแจ้งซ่อม</button>
         </form>
     </div>
 
     <div class="green-container" style="max-width: 600px; margin-top: 20px; border-top: 6px solid #fbbf24;">
-        <h4>📋 สถานะงานของคุณ</h4>
+        <h4 style="margin-top: 0;">📋 ประวัติการแจ้งเรื่องของคุณ</h4>
         <div id="ticketList">กำลังโหลดข้อมูล...</div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
@@ -57,20 +64,40 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ตรวจสอบสิทธิ์เข้าหน้า
+    // 1. ตรวจสอบการ Login และดึงข้อมูล
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = "../index.html";
         } else {
-            loadMyTickets(user.uid);
+            document.getElementById('userEmail').innerText = user.email;
+            loadIssueOptions(); // โหลดหัวข้อจาก Admin
+            loadMyTickets(user.uid); // โหลดงานของตัวเอง
         }
     });
 
-    // ส่ง Ticket
+    // 2. ฟังก์ชันโหลดหัวข้อปัญหา (Dropdown) จากตาราง Settings ของ Admin
+    function loadIssueOptions() {
+        const issueSelect = document.getElementById('issueType');
+        onSnapshot(doc(db, "settings", "issueOptions"), (docSnap) => {
+            if (docSnap.exists()) {
+                const options = docSnap.data().options;
+                let html = '<option value="">-- เลือกหัวข้อ --</option>';
+                options.forEach(opt => {
+                    html += `<option value="${opt}">${opt}</option>`;
+                });
+                issueSelect.innerHTML = html;
+            } else {
+                issueSelect.innerHTML = '<option value="">ยังไม่ได้ตั้งค่าหัวข้อ</option>';
+            }
+        });
+    }
+
+    // 3. ฟังก์ชันส่ง Ticket ใหม่
     document.getElementById('ticketForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
+        btn.innerText = "กำลังส่งข้อมูล...";
 
         try {
             await addDoc(collection(db, "tickets"), {
@@ -80,33 +107,59 @@
                 internetNo: document.getElementById('internetNo').value,
                 details: document.getElementById('details').value,
                 status: "Open",
+                comment: "", // เว้นไว้ให้ Supervisor ตอบ
                 createdAt: serverTimestamp()
             });
-            alert("ส่งเรื่องสำเร็จ!");
+            alert("ส่งเรื่องแจ้งปัญหาเรียบร้อยแล้ว!");
             document.getElementById('ticketForm').reset();
-        } catch (e) {
-            alert("เกิดข้อผิดพลาด: " + e.message);
+        } catch (error) {
+            alert("เกิดข้อผิดพลาด: " + error.message);
         }
         btn.disabled = false;
+        btn.innerText = "ส่งข้อมูลการแจ้งซ่อม";
     });
 
-    // โหลดข้อมูลแบบ Real-time
+    // 4. ฟังก์ชันโหลดรายการงานของตัวเองแบบ Real-time
     function loadMyTickets(uid) {
-        const q = query(collection(db, "tickets"), where("uid", "==", uid), orderBy("createdAt", "desc"));
+        const q = query(
+            collection(db, "tickets"), 
+            where("uid", "==", uid), 
+            orderBy("createdAt", "desc")
+        );
+
         onSnapshot(q, (snapshot) => {
-            let html = '<table style="width:100%">';
-            snapshot.forEach(doc => {
-                const t = doc.data();
-                html += `<tr style="border-bottom:1px solid #eee">
-                    <td>${t.internetNo}<br><small>${t.issueType}</small></td>
-                    <td style="text-align:right"><b>${t.status}</b></td>
+            const listDiv = document.getElementById('ticketList');
+            if (snapshot.empty) {
+                listDiv.innerHTML = "<p style='text-align:center; color:#999;'>ยังไม่มีประวัติการแจ้งเรื่อง</p>";
+                return;
+            }
+
+            let html = '<table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">';
+            snapshot.forEach(docSnap => {
+                const t = docSnap.data();
+                const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
+                const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
+                
+                html += `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px 0;">
+                        <div style="font-weight:bold; color:var(--primary-green);">${t.internetNo}</div>
+                        <div style="font-size:0.8rem;">${t.issueType}</div>
+                        <div style="font-size:0.7rem; color:#999;">เมื่อ: ${date}</div>
+                        ${t.comment ? `<div class="comment-box"><b>ตอบกลับ:</b> ${t.comment}</div>` : ''}
+                    </td>
+                    <td style="text-align:right; vertical-align:top; padding-top:10px;">
+                        <span class="status-badge ${statusClass}">${t.status}</span>
+                    </td>
                 </tr>`;
             });
-            document.getElementById('ticketList').innerHTML = snapshot.empty ? "ยังไม่มีข้อมูล" : html + '</table>';
+            listDiv.innerHTML = html + '</table>';
         });
     }
 
-    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = "../index.html");
+    });
 </script>
 </body>
 </html>
