@@ -3,30 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบ - Sale Support</title>
+    <title>เข้าสู่ระบบ - Sale Support System</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .brand-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
-<div class="green-container">
-    <h2 style="text-align: center; color: var(--primary-green);">Sale Support System</h2>
-    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">เข้าสู่ระบบด้วยอีเมล</p>
-    
-    <form id="loginForm">
-        <label>อีเมลผู้ใช้งาน</label>
-        <input type="email" id="email" class="input-field" placeholder="example@mail.com" required>
+    <div class="login-card">
+        <span class="brand-logo">Sale Support</span>
+        <h3 style="margin-bottom: 25px; color: #4B5563;">เข้าสู่ระบบใช้งาน</h3>
         
-        <label>รหัสผ่าน</label>
-        <input type="password" id="password" class="input-field" placeholder="••••••••" required>
-        
-        <button type="submit" class="btn-green" id="loginBtn">เข้าสู่ระบบ</button>
-    </form>
-    
-    <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-        <a href="forgot-password.html" class="text-link">ลืมรหัสผ่าน?</a>
-        <a href="register.html" class="text-link" style="font-weight: bold;">ลงทะเบียนใหม่</a>
+        <form id="loginForm">
+            <div style="text-align: left;">
+                <label>อีเมลผู้ใช้งาน</label>
+                <input type="email" id="email" class="input-field" placeholder="example@email.com" required>
+                
+                <label>รหัสผ่าน</label>
+                <input type="password" id="password" class="input-field" placeholder="******" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="loginBtn" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 10px;">
+                เข้าสู่ระบบ
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; font-size: 0.9rem; color: #6B7280;">
+            ยังไม่มีบัญชี? <a href="register.html" style="color: var(--primary-green); text-decoration: none; font-weight: bold;">ลงทะเบียนที่นี่</a>
+        </div>
     </div>
-</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -56,25 +85,33 @@
         btn.innerText = "กำลังตรวจสอบ...";
 
         try {
+            // 1. ตรวจสอบ Username/Password
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // ตรวจสอบสิทธิ์จาก Firestore
+            // 2. ดึงข้อมูล Role จาก Firestore
             const userDoc = await getDoc(doc(db, "users", user.uid));
-            
+
             if (userDoc.exists()) {
-                const userData = userDoc.data();
-                localStorage.setItem('userRole', userData.role);
+                const role = userDoc.data().role;
                 
-                // แยกหน้าตาม Role
-                if (userData.role === 'admin') window.location.href = 'admin/dashboard.html';
-                else if (userData.role === 'supervisor') window.location.href = 'supervisor/main.html';
-                else window.location.href = 'user/ticket.html';
+                // 3. แยกเส้นทางตามสิทธิ์
+                if (role === 'admin') {
+                    window.location.href = 'admin/dashboard.html';
+                } else if (role === 'supervisor') {
+                    window.location.href = 'supervisor/main.html';
+                } else {
+                    window.location.href = 'user/ticket.html';
+                }
             } else {
-                alert("ไม่พบข้อมูลสิทธิ์ในระบบ กรุณาติดต่อ Admin");
+                alert("ไม่พบข้อมูลสิทธิ์ผู้ใช้งาน กรุณาติดต่อ Admin");
             }
+
         } catch (error) {
-            alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+            let message = "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
+            if (error.code === 'auth/wrong-password') message = "รหัสผ่านไม่ถูกต้อง";
+            if (error.code === 'auth/user-not-found') message = "ไม่พบอีเมลนี้ในระบบ";
+            alert(message);
             btn.disabled = false;
             btn.innerText = "เข้าสู่ระบบ";
         }
