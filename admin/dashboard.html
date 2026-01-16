@@ -5,50 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        .stats-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+        .stat-card { flex: 1; min-width: 200px; padding: 20px; border-radius: 8px; text-align: center; color: #fff; }
+        .bg-total { background: #10B981; }
+        .bg-pending { background: #F59E0B; }
+        .role-select { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
+        .issue-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+        .btn-delete { color: #ef4444; cursor: pointer; border: none; background: none; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between;">
-        <span style="font-weight: bold;">Admin Management</span>
-        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; cursor: pointer;">ออกจากระบบ</button>
+    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: bold;">Admin Dashboard (Real-time)</span>
+        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; padding: 5px 10px; cursor: pointer; border-radius: 4px;">ออกจากระบบ</button>
     </nav>
 
-    <div class="green-container" style="max-width: 1000px; margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 200px; background: #ECFDF5; padding: 20px; border-radius: 8px; text-align: center;">
-            <h4 style="margin: 0; color: #064E3B;">งานทั้งหมด</h4>
-            <h2 id="totalTickets" style="margin: 10px 0;">0</h2>
+    <div class="stats-grid" style="max-width: 1000px; margin: 20px auto; padding: 0 20px;">
+        <div class="stat-card bg-total">
+            <h4 style="margin: 0;">งานทั้งหมดในระบบ</h4>
+            <h2 id="totalTickets" style="margin: 10px 0; font-size: 2.5rem;">0</h2>
+        </div>
+        <div class="stat-card bg-pending">
+            <h4 style="margin: 0;">งานที่กำลังดำเนินการ (Open/In Progress)</h4>
+            <h2 id="pendingTickets" style="margin: 10px 0; font-size: 2.5rem;">0</h2>
         </div>
     </div>
 
     <div class="green-container" style="max-width: 1000px; margin-top: 20px;">
-        <h3 style="color: var(--primary-green);">⚙️ จัดการหัวข้อปัญหา (Issue Types)</h3>
+        <h3 style="color: var(--primary-green); margin-top: 0;">⚙️ ตั้งค่าหัวข้อปัญหา (Issue Types)</h3>
         <div style="display: flex; gap: 10px;">
-            <input type="text" id="newIssue" class="input-field" placeholder="เพิ่มหัวข้อใหม่ เช่น ย้ายอุปกรณ์">
+            <input type="text" id="newIssue" class="input-field" placeholder="ตัวอย่าง: ย้ายจุดติดตั้ง">
             <button id="addIssueBtn" class="btn-green" style="width: 150px;">เพิ่มหัวข้อ</button>
         </div>
-        <ul id="issueList" style="margin-top: 15px; list-style: none; padding: 0;"></ul>
+        <div id="issueList" style="margin-top: 15px;">
+            กำลังโหลดหัวข้อ...
+        </div>
     </div>
 
     <div class="green-container" style="max-width: 1000px; margin-top: 20px; border-top: 6px solid #3B82F6;">
-        <h3 style="color: #1E40AF;">👥 จัดการผู้ใช้งาน (User Management)</h3>
+        <h3 style="color: #1E40AF; margin-top: 0;">👥 จัดการสิทธิ์ผู้ใช้งาน</h3>
         <div style="overflow-x: auto;">
             <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
                 <thead>
                     <tr style="background: #f4f4f4; text-align: left;">
-                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Email</th>
-                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Role</th>
-                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">เปลี่ยนสิทธิ์</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Email</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Role</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">จัดการสิทธิ์</th>
                     </tr>
                 </thead>
-                <tbody id="userTableBody"></tbody>
+                <tbody id="userTableBody">
+                    <tr><td colspan="3" style="text-align:center; padding:20px;">กำลังโหลดรายชื่อ...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // --- Firebase Config ---
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -62,78 +80,98 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // --- ฟังก์ชันจัดการหัวข้อปัญหา ---
-    async function loadIssueTypes() {
-        const docRef = doc(db, "settings", "issueOptions");
-        const docSnap = await getDoc(docRef);
-        const list = document.getElementById('issueList');
-        list.innerHTML = "";
-        
-        if (docSnap.exists()) {
-            docSnap.data().options.forEach(opt => {
-                const li = document.createElement('li');
-                li.style = "display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee;";
-                li.innerHTML = `${opt} <button style="color:red; cursor:pointer; border:none; background:none;" onclick="window.removeIssue('${opt}')">ลบ</button>`;
-                list.appendChild(li);
-            });
+    // เช็คสิทธิ์ Admin
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "../index.html";
         } else {
-            // ถ้ายังไม่มี Document ให้สร้างรอไว้เลย
-            await setDoc(docRef, { options: ["อินเทอร์เน็ตใช้งานไม่ได้"] });
-            loadIssueTypes();
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().role === 'admin') {
+                initRealtimeUpdates();
+            } else {
+                alert("เฉพาะ Admin เท่านั้น");
+                window.location.href = "../index.html";
+            }
         }
-    }
-
-    window.removeIssue = async (val) => {
-        const docRef = doc(db, "settings", "issueOptions");
-        await updateDoc(docRef, { options: arrayRemove(val) });
-        loadIssueTypes();
-    };
-
-    document.getElementById('addIssueBtn').addEventListener('click', async () => {
-        const val = document.getElementById('newIssue').value;
-        if(!val) return;
-        const docRef = doc(db, "settings", "issueOptions");
-        await updateDoc(docRef, { options: arrayUnion(val) });
-        document.getElementById('newIssue').value = "";
-        loadIssueTypes();
     });
 
-    // --- ฟังก์ชันจัดการ User ---
-    async function loadAllUsers() {
-        const querySnapshot = await getDocs(collection(db, "users"));
-        const tbody = document.getElementById('userTableBody');
-        tbody.innerHTML = "";
-        querySnapshot.forEach((uDoc) => {
-            const u = uDoc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="padding:10px;">${u.email}</td>
-                <td style="padding:10px;">${u.role}</td>
-                <td style="padding:10px;">
-                    <select onchange="window.updateRole('${uDoc.id}', this.value)">
-                        <option value="">เปลี่ยนสิทธิ์</option>
-                        <option value="user">User</option>
-                        <option value="supervisor">Supervisor</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </td>
-            `;
-            tbody.appendChild(tr);
+    function initRealtimeUpdates() {
+        // 1. ติดตามตัวเลขสถิติ (Real-time)
+        onSnapshot(collection(db, "tickets"), (snapshot) => {
+            document.getElementById('totalTickets').innerText = snapshot.size;
+            let pending = 0;
+            snapshot.forEach(doc => {
+                const status = doc.data().status;
+                if (status === 'Open' || status === 'In Progress') pending++;
+            });
+            document.getElementById('pendingTickets').innerText = pending;
+        });
+
+        // 2. ติดตามหัวข้อปัญหา
+        onSnapshot(doc(db, "settings", "issueOptions"), async (docSnap) => {
+            const listDiv = document.getElementById('issueList');
+            if (docSnap.exists()) {
+                let html = '';
+                docSnap.data().options.forEach(opt => {
+                    html += `<div class="issue-item">${opt} <span class="btn-delete" onclick="window.removeIssue('${opt}')">ลบ</span></div>`;
+                });
+                listDiv.innerHTML = html || 'ไม่มีหัวข้อปัญหา';
+            } else {
+                // ถ้ายังไม่มีก้อนข้อมูล ให้สร้างตั้งต้นไว้
+                await setDoc(doc(db, "settings", "issueOptions"), { options: ["อินเทอร์เน็ตใช้งานไม่ได้"] });
+            }
+        });
+
+        // 3. ติดตามรายชื่อ User
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const tbody = document.getElementById('userTableBody');
+            let html = '';
+            snapshot.forEach(uDoc => {
+                const u = uDoc.data();
+                html += `
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding:12px;">${u.email}</td>
+                        <td style="padding:12px;"><b>${u.role}</b></td>
+                        <td style="padding:12px;">
+                            <select class="role-select" onchange="window.updateRole('${uDoc.id}', this.value)">
+                                <option value="">เปลี่ยนเป็น...</option>
+                                <option value="user">User (Sale)</option>
+                                <option value="supervisor">Supervisor</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </td>
+                    </tr>`;
+            });
+            tbody.innerHTML = html;
         });
     }
 
-    window.updateRole = async (uid, role) => {
-        if(!role) return;
-        await updateDoc(doc(db, "users", uid), { role: role });
-        alert("เปลี่ยนสิทธิ์สำเร็จ!");
-        loadAllUsers();
+    // ฟังก์ชันช่วยสำหรับการคลิก (Global window)
+    window.removeIssue = async (val) => {
+        if(confirm(`ยืนยันลบหัวข้อ: ${val}?`)) {
+            await updateDoc(doc(db, "settings", "issueOptions"), { options: arrayRemove(val) });
+        }
     };
 
-    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href="../index.html"));
+    window.updateRole = async (uid, newRole) => {
+        if(!newRole) return;
+        if(confirm(`เปลี่ยนสิทธิ์ User นี้เป็น ${newRole}?`)) {
+            await updateDoc(doc(db, "users", uid), { role: newRole });
+            alert("อัปเดตสิทธิ์สำเร็จ");
+        }
+    };
 
-    // รันฟังก์ชัน
-    loadIssueTypes();
-    loadAllUsers();
+    document.getElementById('addIssueBtn').addEventListener('click', async () => {
+        const val = document.getElementById('newIssue').value.trim();
+        if(!val) return;
+        await updateDoc(doc(db, "settings", "issueOptions"), { options: arrayUnion(val) });
+        document.getElementById('newIssue').value = "";
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = "../index.html");
+    });
+
 </script>
 </body>
 </html>
