@@ -1,103 +1,62 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Sale Support</title>
-    <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between;">
-        <span style="font-weight: bold;">Admin Management</span>
-        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; cursor: pointer;">ออกจากระบบ</button>
-    </nav>
-
-    <div class="green-container" style="max-width: 1000px; margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 200px; background: #ECFDF5; padding: 20px; border-radius: 8px; text-align: center;">
-            <h4 style="margin: 0; color: #064E3B;">งานทั้งหมด (6 เดือน)</h4>
-            <h2 id="totalTickets" style="margin: 10px 0;">0</h2>
-        </div>
-        <div style="flex: 1; min-width: 200px; background: #FFFBEB; padding: 20px; border-radius: 8px; text-align: center;">
-            <h4 style="margin: 0; color: #92400E;">รอดำเนินการ</h4>
-            <h2 id="openTickets" style="margin: 10px 0;">0</h2>
-        </div>
+<div class="green-container" style="max-width: 1000px; margin-top: 20px; border-top: 6px solid #3B82F6;">
+    <h3 style="color: #1E40AF;">👥 จัดการผู้ใช้งาน (User Management)</h3>
+    <div style="overflow-x: auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
+            <thead>
+                <tr style="background: #f4f4f4; text-align: left;">
+                    <th style="padding: 10px; border-bottom: 2px solid #ddd;">Email</th>
+                    <th style="padding: 10px; border-bottom: 2px solid #ddd;">Role ปัจจุบัน</th>
+                    <th style="padding: 10px; border-bottom: 2px solid #ddd;">เปลี่ยนสิทธิ์เป็น</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <tr><td colspan="3" style="text-align:center; padding:20px;">กำลังโหลดรายชื่อ...</td></tr>
+            </tbody>
+        </table>
     </div>
-
-    <div class="green-container" style="max-width: 1000px; margin-top: 20px;">
-        <h3 style="color: var(--primary-green);">⚙️ ตั้งค่าหัวข้อปัญหา (Issue Types)</h3>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="newIssue" class="input-field" placeholder="เพิ่มหัวข้อใหม่ เช่น ย้ายอุปกรณ์">
-            <button id="addIssueBtn" class="btn-green" style="width: 150px;">เพิ่มหัวข้อ</button>
-        </div>
-        <ul id="issueList" style="margin-top: 15px; list-style: none; padding: 0;"></ul>
-    </div>
+</div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    // (ใช้ Firebase Config และ Import ชุดเดิมของคุณ)
+    // ... 
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    // 1. โหลดข้อมูล Dashboard
-    async function loadStats() {
-        const querySnapshot = await getDocs(collection(db, "tickets"));
-        document.getElementById('totalTickets').innerText = querySnapshot.size;
+    // 3. ฟังก์ชันโหลดรายชื่อ User ทั้งหมด
+    async function loadAllUsers() {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = "";
         
-        let openCount = 0;
-        querySnapshot.forEach(doc => {
-            if(doc.data().status === 'Open') openCount++;
+        querySnapshot.forEach((userDoc) => {
+            const userData = userDoc.data();
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = "1px solid #eee";
+            tr.innerHTML = `
+                <td style="padding: 10px;">${userData.email}</td>
+                <td style="padding: 10px;"><span class="role-badge">${userData.role}</span></td>
+                <td style="padding: 10px;">
+                    <select onchange="window.updateUserRole('${userDoc.id}', this.value)" style="padding:5px; border-radius:4px;">
+                        <option value="">-- เลือกเพื่อเปลี่ยน --</option>
+                        <option value="user">User (Sale)</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
-        document.getElementById('openTickets').innerText = openCount;
     }
 
-    // 2. จัดการหัวข้อปัญหา
-    async function loadIssueTypes() {
-        const docRef = doc(db, "settings", "issueOptions");
-        const docSnap = await getDoc(docRef);
-        const list = document.getElementById('issueList');
-        list.innerHTML = "";
-        
-        if (docSnap.exists()) {
-            docSnap.data().options.forEach(opt => {
-                const li = document.createElement('li');
-                li.style = "display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee;";
-                li.innerHTML = `${opt} <button style="color:red; cursor:pointer; border:none; background:none;" onclick="removeIssue('${opt}')">ลบ</button>`;
-                list.appendChild(li);
-            });
+    // 4. ฟังก์ชันอัปเดต Role
+    window.updateUserRole = async (uid, newRole) => {
+        if(!newRole) return;
+        if(confirm(`ยืนยันการเปลี่ยนสิทธิ์เป็น ${newRole} ?`)) {
+            const userRef = doc(db, "users", uid);
+            await updateDoc(userRef, { role: newRole });
+            alert("อัปเดตสิทธิ์เรียบร้อย!");
+            loadAllUsers();
         }
-    }
-
-    window.removeIssue = async (val) => {
-        const docRef = doc(db, "settings", "issueOptions");
-        await updateDoc(docRef, { options: arrayRemove(val) });
-        loadIssueTypes();
     };
 
-    document.getElementById('addIssueBtn').addEventListener('click', async () => {
-        const val = document.getElementById('newIssue').value;
-        if(!val) return;
-        const docRef = doc(db, "settings", "issueOptions");
-        await updateDoc(docRef, { options: arrayUnion(val) });
-        document.getElementById('newIssue').value = "";
-        loadIssueTypes();
-    });
-
-    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href="../index.html"));
-
-    loadStats();
-    loadIssueTypes();
+    // เรียกใช้งานเมื่อโหลดหน้า
+    loadAllUsers();
 </script>
-</body>
-</html>
