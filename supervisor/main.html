@@ -10,18 +10,16 @@
         /* สไตล์สำหรับกระดิ่งแจ้งเตือน */
         .notif-wrapper {
             position: relative;
-            cursor: pointer !important; /* บังคับให้เป็นรูปมือ */
+            cursor: pointer !important;
             margin-right: 20px;
             display: flex;
             align-items: center;
-            z-index: 999; /* ให้อยู่บนสุดเสมอ */
+            z-index: 1001;
             padding: 5px;
             transition: transform 0.2s ease;
         }
-        .notif-wrapper:hover { transform: scale(1.15); }
-        
+        .notif-wrapper:hover { transform: scale(1.1); }
         .notif-icon { font-size: 26px; color: #4b5563; }
-        
         .notif-badge-icon {
             position: absolute;
             top: -2px;
@@ -36,16 +34,60 @@
             border: 2px solid white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+
+        /* Dropdown รายการแจ้งเตือน */
+        .notif-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: none; /* ซ่อนไว้ก่อน */
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .notif-dropdown.show { display: block; animation: slideDown 0.3s ease-out; }
         
-        /* เอฟเฟกต์กระดิ่งสั่น */
+        .notif-header {
+            padding: 12px 15px;
+            background: #f9fafb;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .notif-list { max-height: 400px; overflow-y: auto; }
+        
+        .notif-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .notif-item:hover { background: #f0fdf4; }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item .notif-title { font-weight: 600; color: #10b981; font-size: 0.9rem; }
+        .notif-item .notif-desc { font-size: 0.8rem; color: #6b7280; }
+        .notif-item .notif-time { font-size: 0.7rem; color: #9ca3af; text-align: right; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .shake { animation: shake-animation 0.5s ease-in-out; }
         @keyframes shake-animation {
-            0% { transform: rotate(0); }
-            20% { transform: rotate(15deg); }
-            40% { transform: rotate(-15deg); }
-            60% { transform: rotate(10deg); }
-            80% { transform: rotate(-10deg); }
-            100% { transform: rotate(0); }
+            0%, 100% { transform: rotate(0); }
+            20%, 60% { transform: rotate(15deg); }
+            40%, 80% { transform: rotate(-15deg); }
         }
     </style>
 </head>
@@ -61,11 +103,25 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px; height: 70px;">
-            <div class="notif-wrapper" id="notifBell">
-                <span class="notif-icon">🔔</span>
-                <span class="notif-badge-icon" id="notifCountIcon">0</span>
+        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px; height: 70px; position: relative;">
+            
+            <div style="position: relative;">
+                <div class="notif-wrapper" id="notifBell">
+                    <span class="notif-icon">🔔</span>
+                    <span class="notif-badge-icon" id="notifCountIcon">0</span>
+                </div>
+
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>งานใหม่รอดำเนินการ</span>
+                        <span id="notifTotal" style="color:#ef4444;">0</span>
+                    </div>
+                    <div class="notif-list" id="notifList">
+                        <div style="padding: 20px; text-align: center; color: #9ca3af; font-size: 0.9rem;">ไม่มีการแจ้งเตือนใหม่</div>
+                    </div>
+                </div>
             </div>
+
             <span id="supEmail" style="font-weight: 600; color: #4B5563;">กำลังโหลด...</span>
         </div>
 
@@ -118,31 +174,32 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // เช็คสิทธิ์การเข้าใช้งาน
     onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "../index.html";
-        } else {
+        if (!user) window.location.href = "../index.html";
+        else {
             document.getElementById('supEmail').innerText = "Supervisor: " + user.email;
             loadActiveJobs();
         }
     });
 
-    // ฟังก์ชันเมื่อกดกระดิ่ง
+    // เปิด-ปิด Dropdown เมื่อกดกระดิ่ง
     const bellBtn = document.getElementById('notifBell');
-    bellBtn.addEventListener('click', () => {
-        const target = document.getElementById('jobSection');
-        target.scrollIntoView({ behavior: 'smooth' });
-        
-        // เพิ่มลูกเล่นให้ Card กระพริบเพื่อให้รู้ว่าเลื่อนมาดูตรงนี้
-        target.style.transition = "0.5s";
-        target.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.4)";
-        setTimeout(() => { target.style.boxShadow = ""; }, 1500);
+    const dropdown = document.getElementById('notifDropdown');
+    
+    bellBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
     });
+
+    // ปิด Dropdown เมื่อคลิกที่อื่น
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
 
     function loadActiveJobs() {
         const listBody = document.getElementById('allTicketsList');
         const badge = document.getElementById('notifCountIcon');
+        const notifList = document.getElementById('notifList');
+        const notifTotal = document.getElementById('notifTotal');
+
         const q = query(
             collection(db, "tickets"), 
             where("status", "in", ["Open", "In Progress"]),
@@ -152,14 +209,29 @@
         let firstLoad = true;
 
         onSnapshot(q, (snapshot) => {
-            const openJobsCount = snapshot.docs.filter(d => d.data().status === "Open").length;
+            const allDocs = snapshot.docs;
+            const openJobs = allDocs.filter(d => d.data().status === "Open");
             
-            // อัปเดต Badge
-            if (openJobsCount > 0) {
-                badge.innerText = openJobsCount;
+            // 1. จัดการระบบ Notification (เฉพาะสถานะ Open)
+            if (openJobs.length > 0) {
+                badge.innerText = openJobs.length;
                 badge.style.display = 'block';
+                notifTotal.innerText = openJobs.length;
                 
-                // แจ้งเตือนเมื่อมีงานใหม่ (ไม่ใช่การโหลดครั้งแรก)
+                let notifHtml = '';
+                openJobs.forEach(docSnap => {
+                    const t = docSnap.data();
+                    const time = t.createdAt ? t.createdAt.toDate().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '';
+                    notifHtml += `
+                        <div class="notif-item" onclick="goToManage('${docSnap.id}')">
+                            <span class="notif-title">📌 ใหม่: ${t.internetNo}</span>
+                            <span class="notif-desc">${t.issueType || 'ไม่ได้ระบุหัวข้อ'}</span>
+                            <span class="notif-time">${time} น.</span>
+                        </div>
+                    `;
+                });
+                notifList.innerHTML = notifHtml;
+
                 if (!firstLoad) {
                     bellBtn.classList.add('shake');
                     setTimeout(() => bellBtn.classList.remove('shake'), 500);
@@ -167,42 +239,39 @@
                 }
             } else {
                 badge.style.display = 'none';
+                notifTotal.innerText = "0";
+                notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: #9ca3af; font-size: 0.9rem;">ไม่มีงานใหม่</div>';
             }
 
+            // 2. จัดการตารางหลัก (ทั้ง Open และ In Progress)
             document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
-            firstLoad = false;
-
+            
             if (snapshot.empty) {
                 listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้าง</td></tr>';
-                return;
+            } else {
+                let tableHtml = '';
+                allDocs.forEach(docSnap => {
+                    const t = docSnap.data();
+                    const date = t.createdAt ? t.createdAt.toDate().toLocaleDateString('th-TH', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : '-';
+                    const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
+                    tableHtml += `
+                        <tr>
+                            <td><small>${date}</small></td>
+                            <td><small>${t.email.split('@')[0]}</small></td>
+                            <td><b>${t.internetNo}</b></td>
+                            <td>${t.issueType || 'ทั่วไป'}</td>
+                            <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-manage" onclick="goToManage('${docSnap.id}')">จัดการ</button>
+                            </td>
+                        </tr>`;
+                });
+                listBody.innerHTML = tableHtml;
             }
-
-            let html = '';
-            snapshot.forEach(docSnap => {
-                const t = docSnap.data();
-                const date = t.createdAt ? t.createdAt.toDate().toLocaleDateString('th-TH', { 
-                    day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' 
-                }) : '-';
-                
-                const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
-                
-                html += `
-                    <tr>
-                        <td><small>${date}</small></td>
-                        <td><small>${t.email.split('@')[0]}</small></td>
-                        <td><b>${t.internetNo}</b></td>
-                        <td>${t.issueType || 'ทั่วไป'}</td>
-                        <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                        <td style="text-align: center;">
-                            <button class="btn-manage" onclick="goToManage('${docSnap.id}')">จัดการ</button>
-                        </td>
-                    </tr>`;
-            });
-            listBody.innerHTML = html;
+            firstLoad = false;
         });
     }
 
-    // ฟังก์ชันย้ายไปหน้าจัดการ (ทำเป็น Global เพื่อให้ปุ่มในตารางเรียกได้)
     window.goToManage = (id) => {
         localStorage.setItem('currentTicketId', id);
         window.location.href = 'manage-job.html';
@@ -210,7 +279,7 @@
 
     function playAlertSound() {
         const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(() => {}); // ป้องกัน error ถ้า browser บล็อกเสียง
+        audio.play().catch(() => {});
     }
 
     document.getElementById('logoutBtn').onclick = (e) => {
@@ -218,21 +287,5 @@
         signOut(auth).then(() => window.location.href = "../index.html");
     };
 </script>
-
-<style>
-    /* สไตล์ปุ่มจัดการเพิ่มเติม */
-    .btn-manage {
-        background: #10B981;
-        color: white;
-        border: none;
-        padding: 5px 15px;
-        border-radius: 15px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: 0.2s;
-    }
-    .btn-manage:hover { background: #059669; }
-</style>
 </body>
 </html>
