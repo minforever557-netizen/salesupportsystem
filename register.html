@@ -8,69 +8,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            margin: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); margin: 0;
         }
         .register-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 450px;
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2); width: 100%; max-width: 450px;
         }
         .step-info {
-            background: #ecfdf5;
-            color: #065f46;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary-green);
+            background: #ecfdf5; color: #065f46; padding: 12px; border-radius: 8px;
+            font-size: 0.85rem; margin-bottom: 20px; border-left: 4px solid #10b981;
         }
     </style>
 </head>
 <body>
 
     <div class="register-card">
-        <h2 style="color: var(--primary-green); margin: 0 0 10px 0; text-align: center;">สร้างบัญชีใหม่</h2>
+        <h2 style="color: #10b981; margin: 0 0 10px 0; text-align: center;">สร้างบัญชีใหม่</h2>
         <div class="step-info">
-            📌 เมื่อลงทะเบียนแล้ว บัญชีของคุณจะมีสิทธิ์เป็น <b>User (Sale)</b> โดยอัตโนมัติ หากต้องการสิทธิ์อื่นกรุณาติดต่อ Admin
+            📌 เมื่อลงทะเบียนแล้ว บัญชีของคุณจะมีสิทธิ์เป็น <b>User (Sale)</b> โดยอัตโนมัติ
         </div>
         
         <form id="registerForm">
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom: 5px; font-weight: 600;">อีเมลพนักงาน</label>
-                <input type="email" id="regEmail" class="input-field" placeholder="name@company.com" required style="margin:0;">
+                <input type="email" id="regEmail" class="input-field" placeholder="name@company.com" required>
             </div>
             
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom: 5px; font-weight: 600;">รหัสผ่าน</label>
-                <input type="password" id="regPassword" class="input-field" placeholder="กำหนดรหัสผ่าน 6 ตัวขึ้นไป" required minlength="6" style="margin:0;">
+                <input type="password" id="regPassword" class="input-field" placeholder="กำหนดรหัสผ่าน 6 ตัวขึ้นไป" required minlength="6">
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display:block; margin-bottom: 5px; font-weight: 600;">ยืนยันรหัสผ่านอีกครั้ง</label>
-                <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านให้ตรงกัน" required style="margin:0;">
+                <label style="display:block; margin-bottom: 5px; font-weight: 600;">ยืนยันรหัสผ่าน</label>
+                <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านให้ตรงกัน" required>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="regBtn" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 600;">
+            <button type="submit" class="btn-login" id="regBtn" style="width: 100%; background:#10b981; color:white; border:none; padding:14px; border-radius:10px; cursor:pointer; font-weight:600;">
                 ลงทะเบียนเข้าใช้งาน
             </button>
         </form>
 
         <div style="margin-top: 25px; text-align: center; font-size: 0.9rem; color: #6B7280;">
-            มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="index.html" style="color: var(--primary-green); text-decoration: none; font-weight: bold;">กลับไปหน้าเข้าสู่ระบบ</a>
+            มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="index.html" style="color: #10b981; text-decoration: none; font-weight: bold;">กลับไปหน้าเข้าสู่ระบบ</a>
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -88,7 +75,6 @@
 
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const email = document.getElementById('regEmail').value;
         const password = document.getElementById('regPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
@@ -103,27 +89,28 @@
         btn.innerText = "⏳ กำลังสร้างบัญชี...";
 
         try {
-            // 1. สร้างบัญชีใน Firebase Authentication
+            // 1. สร้างบัญชีใน Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 2. บันทึกข้อมูลสิทธิ์ (Role) ลง Firestore ทันที
-            // สำคัญ: ต้องทำขั้นตอนนี้เพื่อให้หน้า index.html รู้ว่าคนนี้คือใคร
+            // 2. บันทึกข้อมูลลง Firestore (รวม password ตามที่คุณต้องการให้ Admin ดูได้)
             await setDoc(doc(db, "users", user.uid), {
                 email: email,
-                role: "user", // ตั้งค่าเริ่มต้นเป็น user เสมอ
-                createdAt: serverTimestamp(),
-                uid: user.uid
+                password: password, // บันทึกแบบ Plain Text เพื่อให้ Admin ดูได้ในหน้า Manage User
+                role: "user",
+                createdAt: serverTimestamp()
             });
 
-            alert("✅ ลงทะเบียนสำเร็จ! บัญชีของคุณพร้อมใช้งานแล้ว");
+            // 3. Logout ทันทีเพื่อให้ไป Login ใหม่ตามระบบความปลอดภัยที่คุณตั้งไว้
+            await signOut(auth);
+
+            alert("✅ ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบอีกครั้ง");
             window.location.href = 'index.html';
 
         } catch (error) {
             console.error(error);
             let msg = "เกิดข้อผิดพลาด";
             if (error.code === 'auth/email-already-in-use') msg = "อีเมลนี้ถูกใช้งานไปแล้ว";
-            if (error.code === 'auth/invalid-email') msg = "รูปแบบอีเมลไม่ถูกต้อง";
             alert("❌ " + msg);
             btn.disabled = false;
             btn.innerText = "ลงทะเบียนเข้าใช้งาน";
