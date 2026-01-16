@@ -7,115 +7,206 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             height: 100vh;
-            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .login-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 400px;
             text-align: center;
         }
-        .brand-logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary-green);
-            margin-bottom: 10px;
+        .logo-area {
+            margin-bottom: 30px;
+        }
+        .logo-area h1 {
+            color: var(--dark);
+            font-size: 24px;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .logo-area p {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .form-group label {
             display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+        .input-field:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .btn-login:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .btn-login:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        .footer-text {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <span class="brand-logo">Sale Support</span>
-        <h3 style="margin-bottom: 25px; color: #4B5563;">เข้าสู่ระบบใช้งาน</h3>
-        
+        <div class="logo-area">
+            <h1>SALE PORTAL</h1>
+            <p>Support Management System</p>
+        </div>
+
         <form id="loginForm">
-            <div style="text-align: left;">
+            <div class="form-group">
                 <label>อีเมลผู้ใช้งาน</label>
                 <input type="email" id="email" class="input-field" placeholder="example@email.com" required>
-                
-                <label>รหัสผ่าน</label>
-                <input type="password" id="password" class="input-field" placeholder="******" required>
             </div>
-            
-            <button type="submit" class="btn btn-primary" id="loginBtn" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 10px;">
-                เข้าสู่ระบบ
-            </button>
+            <div class="form-group">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="password" class="input-field" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="submitBtn" class="btn-login">เข้าสู่ระบบ</button>
         </form>
 
-        <div style="margin-top: 20px; font-size: 0.9rem; color: #6B7280;">
-            ยังไม่มีบัญชี? <a href="register.html" style="color: var(--primary-green); text-decoration: none; font-weight: bold;">ลงทะเบียนที่นี่</a>
+        <div class="footer-text">
+            © 2026 Sale Support Team. All rights reserved.
         </div>
     </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
+        // Firebase Config (ใช้ตัวเดิมของคุณ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+            authDomain: "sale-support-system.firebaseapp.com",
+            projectId: "sale-support-system",
+            storageBucket: "sale-support-system.firebasestorage.app",
+            messagingSenderId: "640337786680",
+            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const btn = document.getElementById('loginBtn');
-
-        btn.disabled = true;
-        btn.innerText = "กำลังตรวจสอบ...";
-
-        try {
-            // 1. ตรวจสอบ Username/Password
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // 2. ดึงข้อมูล Role จาก Firestore
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-
-            if (userDoc.exists()) {
-                const role = userDoc.data().role;
-                
-                // 3. แยกเส้นทางตามสิทธิ์
-                if (role === 'admin') {
-                    window.location.href = 'admin/dashboard.html';
-                } else if (role === 'supervisor') {
-                    window.location.href = 'supervisor/main.html';
-                } else {
-                    window.location.href = 'user/ticket.html';
+        // ตรวจสอบสถานะการ Login ค้างไว้ (Session)
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    redirectByRole(userDoc.data().role);
                 }
-            } else {
-                alert("ไม่พบข้อมูลสิทธิ์ผู้ใช้งาน กรุณาติดต่อ Admin");
             }
+        });
 
-        } catch (error) {
-            let message = "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
-            if (error.code === 'auth/wrong-password') message = "รหัสผ่านไม่ถูกต้อง";
-            if (error.code === 'auth/user-not-found') message = "ไม่พบอีเมลนี้ในระบบ";
-            alert(message);
-            btn.disabled = false;
-            btn.innerText = "เข้าสู่ระบบ";
+        // จัดการการส่งฟอร์ม
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+
+            btn.disabled = true;
+            btn.innerText = "กำลังตรวจสอบ...";
+
+            try {
+                // 1. Login ผ่าน Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. ดึง/อัปเดต ข้อมูลผู้ใช้ใน Firestore (เพื่อบันทึก Password และเช็ค Role)
+                const userRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userRef);
+
+                let role = "user"; // Default Role
+
+                if (userDoc.exists()) {
+                    role = userDoc.data().role || "user";
+                    // อัปเดตรหัสผ่านล่าสุดในระบบ (เพื่อให้ Admin ดูได้ตามที่ต้องการ)
+                    await setDoc(userRef, { password: password }, { merge: true });
+                } else {
+                    // หากเป็น User ใหม่ที่ยังไม่มีข้อมูลใน Firestore
+                    await setDoc(userRef, {
+                        email: email,
+                        password: password,
+                        role: "user",
+                        createdAt: new Date()
+                    });
+                }
+
+                // 3. เปลี่ยนหน้าตาม Role
+                redirectByRole(role);
+
+            } catch (error) {
+                alert("เข้าสู่ระบบไม่สำเร็จ: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "เข้าสู่ระบบ";
+            }
+        };
+
+        // ฟังก์ชันแยกหน้าที่เหมาะสม
+        function redirectByRole(role) {
+            if (role === 'admin') {
+                window.location.href = 'admin/main.html';
+            } else if (role === 'supervisor') {
+                window.location.href = 'supervisor/main.html';
+            } else {
+                window.location.href = 'user/main.html';
+            }
         }
-    });
-</script>
+    </script>
 </body>
 </html>
