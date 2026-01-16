@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แจ้งปัญหาและติดตามงาน - Sale Support</title>
+    <title>ส่งคำขอจัดการ Case - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -20,56 +20,40 @@
 
     <div class="main-content">
         <div class="top-bar">
-            <div style="flex: 1; font-weight: 600;">ระบบส่งคำขอแจ้งเรื่อง</div>
+            <div style="flex: 1; font-weight: 600; color: var(--primary-green);">ระบบรับเรื่อง Sale Support</div>
             <span id="userEmail" style="font-weight: 600; color: var(--text-muted);">กำลังโหลด...</span>
         </div>
 
         <div class="container">
-            <div class="card" style="margin-bottom: 30px;">
-                <h3 style="color: var(--primary-green); margin-bottom: 20px;">➕ ส่งคำขอการจัดการ Case</h3>
-                <form id="ticketForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                    <div>
-                        <label>เลือกหัวข้อปัญหา:</label>
-                        <select id="issueType" class="input-field" required></select>
+            <div class="ticket-form-container">
+                <div class="form-header">
+                    <span style="font-size: 2rem;">➕</span>
+                    <h2 style="margin: 0; color: #10b981;">ส่งคำขอการจัดการ Case</h2>
+                </div>
+
+                <form id="ticketForm">
+                    <div class="form-group-grid">
+                        <div>
+                            <label class="input-label">เลือกหัวข้อปัญหา:</label>
+                            <select id="issueType" class="input-field" required style="background-color: #f9fafb;"></select>
+                        </div>
+                        <div>
+                            <label class="input-label">หมายเลข Internet (10 หลัก):</label>
+                            <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}" style="background-color: #f9fafb;">
+                        </div>
                     </div>
-                    <div>
-                        <label>หมายเลข Internet (10 หลัก):</label>
-                        <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}">
+
+                    <div style="margin-bottom: 25px;">
+                        <label class="input-label">รายละเอียดเพิ่มเติม:</label>
+                        <textarea id="details" class="input-field" rows="5" placeholder="ระบุรายละเอียดปัญหาของคุณเพื่อให้ Supervisor ตรวจสอบได้รวดเร็วขึ้น..." required style="background-color: #f9fafb; resize: none;"></textarea>
                     </div>
-                    <div style="grid-column: 1 / -1;">
-                        <label>รายละเอียดเพิ่มเติม:</label>
-                        <textarea id="details" class="input-field" rows="3" placeholder="ระบุรายละเอียดปัญหาของคุณ..." required></textarea>
-                    </div>
-                    <div style="grid-column: 1 / -1; text-align: right;">
-                        <button type="submit" class="btn btn-primary" id="submitBtn" style="min-width: 200px;">🚀 ส่งข้อมูลแจ้งเรื่อง</button>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn-submit-ticket" id="submitBtn">
+                            <span>🚀</span> ส่งข้อมูลแจ้งเรื่อง
+                        </button>
                     </div>
                 </form>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-bottom: 20px;">📋 ประวัติการแจ้งเรื่องของคุณ</h3>
-                
-                <div class="search-box">
-                    <span style="font-size: 1.2rem;">🔍</span>
-                    <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet 10 หลัก...">
-                </div>
-
-                <div class="table-container" style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>วันที่แจ้ง</th>
-                                <th>Internet No.</th>
-                                <th>หัวข้อปัญหา</th>
-                                <th>สถานะ</th>
-                                <th>หมายเหตุจาก Supervisor</th>
-                            </tr>
-                        </thead>
-                        <tbody id="myTicketsBody">
-                            <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
@@ -77,9 +61,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, collection, addDoc, serverTimestamp, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
             authDomain: "sale-support-system.firebaseapp.com",
@@ -98,11 +81,9 @@
             else {
                 document.getElementById('userEmail').innerText = user.email;
                 loadIssueOptions();
-                loadMyTickets(user.email);
             }
         });
 
-        // 1. โหลดหัวข้อปัญหาจาก Firestore Settings
         function loadIssueOptions() {
             onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
                 const select = document.getElementById('issueType');
@@ -114,49 +95,11 @@
             });
         }
 
-        // 2. โหลดประวัติงานเฉพาะของตัวเอง แบบ Real-time
-        function loadMyTickets(email, searchTerm = "") {
-            const q = query(
-                collection(db, "tickets"),
-                where("email", "==", email),
-                orderBy("createdAt", "desc")
-            );
-
-            onSnapshot(q, (snapshot) => {
-                const tbody = document.getElementById('myTicketsBody');
-                let html = '';
-                
-                snapshot.forEach(docSnap => {
-                    const t = docSnap.data();
-                    if (searchTerm && !t.internetNo.includes(searchTerm)) return;
-
-                    const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-                    const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'In Progress' ? 'bg-process' : 'bg-closed');
-                    
-                    html += `
-                        <tr>
-                            <td><small>${date}</small></td>
-                            <td><b>${t.internetNo}</b></td>
-                            <td>${t.issueType}</td>
-                            <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                            <td style="color: var(--dark-green); font-size: 0.85rem;">${t.supNote || t.comment || '-'}</td>
-                        </tr>`;
-                });
-                tbody.innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 20px;">ไม่พบประวัติรายการ</td></tr>';
-            });
-        }
-
-        // ค้นหาแบบ Real-time
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            loadMyTickets(auth.currentUser.email, e.target.value);
-        });
-
-        // ส่งฟอร์ม (Submit Ticket)
         document.getElementById('ticketForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = "กำลังส่งข้อมูล...";
+            btn.innerHTML = "กำลังส่งข้อมูล...";
 
             try {
                 await addDoc(collection(db, "tickets"), {
@@ -166,8 +109,7 @@
                     status: "Open",
                     email: auth.currentUser.email,
                     createdAt: serverTimestamp(),
-                    comment: "",
-                    isReadSale: true // ตั้งเป็นอ่านแล้วสำหรับงานตัวเองที่เพิ่งสร้าง
+                    comment: ""
                 });
                 alert("ส่งเรื่องสำเร็จ เรียบร้อยแล้ว!");
                 document.getElementById('ticketForm').reset();
@@ -175,7 +117,7 @@
                 alert("เกิดข้อผิดพลาด: " + err.message); 
             } finally {
                 btn.disabled = false;
-                btn.innerText = "🚀 ส่งข้อมูลแจ้งเรื่อง";
+                btn.innerHTML = "<span>🚀</span> ส่งข้อมูลแจ้งเรื่อง";
             }
         });
 
