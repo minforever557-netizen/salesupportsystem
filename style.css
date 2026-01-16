@@ -352,3 +352,35 @@ td { padding: 15px; border-bottom: 1px solid #E5E7EB; font-size: 0.95rem; }
     margin-bottom: 0; /* ลบ margin ล่างออกเพื่อให้ระนาบเดียวกับปุ่ม */
     flex: 1;
 }
+/* คอนเทนเนอร์ของช่องค้นหา */
+.search-wrapper {
+    position: relative;
+    max-width: 400px;
+    margin-bottom: 25px;
+}
+
+/* ปรับแต่ง Input ให้มี Icon */
+.search-wrapper .input-field {
+    padding-left: 45px; /* เว้นที่ให้ Icon */
+    border-radius: 50px; /* ทำขอบมนแบบ Modern */
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+}
+
+.search-wrapper .input-field:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* วาง Icon แว่นขยาย */
+.search-wrapper::before {
+    content: '🔍';
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    z-index: 1;
+    opacity: 0.5;
+}
