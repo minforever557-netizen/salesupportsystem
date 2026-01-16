@@ -5,161 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แจ้งปัญหา - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
-    <style>
-        .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; color: white; font-weight: bold; }
-        .bg-open { background-color: #ef4444; }
-        .bg-process { background-color: #f59e0b; }
-        .bg-closed { background-color: #10B981; }
-        .comment-box { font-size: 0.8rem; color: #666; background: #f9f9f9; padding: 5px; border-left: 3px solid var(--primary-green); margin-top: 5px; }
-    </style>
 </head>
 <body>
 
-    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold;">Sale Support System</span>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <span id="userEmail" style="font-size: 0.8rem;"></span>
-            <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; border-radius: 4px; padding: 5px 10px; cursor: pointer;">ออกจากระบบ</button>
+    <nav>
+        <div class="nav-links">
+            <b style="color: var(--primary-green); margin-right: 15px;">Sale Support System</b>
+            <a href="ticket.html" class="active" style="border-bottom: 2px solid var(--primary-green); padding-bottom: 5px;">📝 แจ้งเรื่องใหม่</a>
+        </div>
+        <div class="nav-links">
+            <span id="userDisplay" style="font-size: 0.85rem; color: #666; margin-right: 10px;"></span>
+            <button class="btn btn-outline" id="logoutBtn">ออกจากระบบ</button>
         </div>
     </nav>
 
-    <div class="green-container" style="max-width: 600px; margin-top: 30px;">
-        <h3 style="color: var(--primary-green); margin-top: 0;">➕ แจ้งเรื่องใหม่</h3>
-        <form id="ticketForm">
-            <label>หัวข้อปัญหา</label>
-            <select id="issueType" class="input-field" required>
-                <option value="">-- กำลังโหลดหัวข้อ --</option>
-            </select>
+    <div class="container" style="max-width: 800px;">
+        <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+            
+            <div style="flex: 1; min-width: 300px;">
+                <h3 style="color: var(--primary-green); margin-top: 0;">➕ ส่งคำขอการจัดการ</h3>
+                <form id="ticketForm">
+                    <label>หัวข้อปัญหา</label>
+                    <select id="issueType" class="input-field" required>
+                        <option value="">-- กำลังโหลดหัวข้อ --</option>
+                    </select>
 
-            <label>หมายเลข Internet (10 หลัก)</label>
-            <input type="text" id="internetNo" class="input-field" placeholder="88xxxxxxxx" required pattern="[0-9]{10}">
+                    <label>หมายเลข Internet (10 หลัก)</label>
+                    <input type="text" id="internetNo" class="input-field" placeholder="ตัวอย่าง: 8801234567" required pattern="[0-9]{10}">
 
-            <label>รายละเอียดที่ต้องการแก้ไข</label>
-            <textarea id="details" class="input-field" rows="4" placeholder="ระบุรายละเอียดปัญหาของคุณ..." required></textarea>
+                    <label>รายละเอียดเพิ่มเติม</label>
+                    <textarea id="details" class="input-field" rows="4" placeholder="ระบุสิ่งที่ต้องการให้ Supervisor ดำเนินการ..." required></textarea>
 
-            <button type="submit" class="btn-green" id="submitBtn">ส่งข้อมูลการแจ้งซ่อม</button>
-        </form>
-    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; padding: 12px;">ส่งเรื่องแจ้งซ่อม</button>
+                </form>
+            </div>
 
-    <div class="green-container" style="max-width: 600px; margin-top: 20px; border-top: 6px solid #fbbf24;">
-        <h4 style="margin-top: 0;">📋 ประวัติการแจ้งเรื่องของคุณ</h4>
-        <div id="ticketList">กำลังโหลดข้อมูล...</div>
-    </div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // 1. ตรวจสอบการ Login และดึงข้อมูล
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "../index.html";
-        } else {
-            document.getElementById('userEmail').innerText = user.email;
-            loadIssueOptions(); // โหลดหัวข้อจาก Admin
-            loadMyTickets(user.uid); // โหลดงานของตัวเอง
-        }
-    });
-
-    // 2. ฟังก์ชันโหลดหัวข้อปัญหา (Dropdown) จากตาราง Settings ของ Admin
-    function loadIssueOptions() {
-        const issueSelect = document.getElementById('issueType');
-        onSnapshot(doc(db, "settings", "issueOptions"), (docSnap) => {
-            if (docSnap.exists()) {
-                const options = docSnap.data().options;
-                let html = '<option value="">-- เลือกหัวข้อ --</option>';
-                options.forEach(opt => {
-                    html += `<option value="${opt}">${opt}</option>`;
-                });
-                issueSelect.innerHTML = html;
-            } else {
-                issueSelect.innerHTML = '<option value="">ยังไม่ได้ตั้งค่าหัวข้อ</option>';
-            }
-        });
-    }
-
-    // 3. ฟังก์ชันส่ง Ticket ใหม่
-    document.getElementById('ticketForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerText = "กำลังส่งข้อมูล...";
-
-        try {
-            await addDoc(collection(db, "tickets"), {
-                uid: auth.currentUser.uid,
-                email: auth.currentUser.email,
-                issueType: document.getElementById('issueType').value,
-                internetNo: document.getElementById('internetNo').value,
-                details: document.getElementById('details').value,
-                status: "Open",
-                comment: "", // เว้นไว้ให้ Supervisor ตอบ
-                createdAt: serverTimestamp()
-            });
-            alert("ส่งเรื่องแจ้งปัญหาเรียบร้อยแล้ว!");
-            document.getElementById('ticketForm').reset();
-        } catch (error) {
-            alert("เกิดข้อผิดพลาด: " + error.message);
-        }
-        btn.disabled = false;
-        btn.innerText = "ส่งข้อมูลการแจ้งซ่อม";
-    });
-
-    // 4. ฟังก์ชันโหลดรายการงานของตัวเองแบบ Real-time
-    function loadMyTickets(uid) {
-        const q = query(
-            collection(db, "tickets"), 
-            where("uid", "==", uid), 
-            orderBy("createdAt", "desc")
-        );
-
-        onSnapshot(q, (snapshot) => {
-            const listDiv = document.getElementById('ticketList');
-            if (snapshot.empty) {
-                listDiv.innerHTML = "<p style='text-align:center; color:#999;'>ยังไม่มีประวัติการแจ้งเรื่อง</p>";
-                return;
-            }
-
-            let html = '<table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">';
-            snapshot.forEach(docSnap => {
-                const t = docSnap.data();
-                const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
-                const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-                
-                html += `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 10px 0;">
-                        <div style="font-weight:bold; color:var(--primary-green);">${t.internetNo}</div>
-                        <div style="font-size:0.8rem;">${t.issueType}</div>
-                        <div style="font-size:0.7rem; color:#999;">เมื่อ: ${date}</div>
-                        ${t.comment ? `<div class="comment-box"><b>ตอบกลับ:</b> ${t.comment}</div>` : ''}
-                    </td>
-                    <td style="text-align:right; vertical-align:top; padding-top:10px;">
-                        <span class="status-badge ${statusClass}">${t.status}</span>
-                    </td>
-                </tr>`;
-            });
-            listDiv.innerHTML = html + '</table>';
-        });
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth).then(() => window.location.href = "../index.html");
-    });
-</script>
-</body>
-</html>
+            <div style="flex: 0.8; background: #F9FAFB; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-green);">
+                <h4 style="margin-top: 0;">💡 คำแนะนำ</h4>
+                <ul style="font-size: 0.85rem; padding-left: 20px; line-height: 1.6; color: #555;">
+                    <li>กรุณาตรวจสอบหมายเลข <b>Internet</b> ให้ถูกต้อง
