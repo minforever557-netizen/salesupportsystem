@@ -1,90 +1,26 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <title>ส่ง Ticket ใหม่ - Sale Support</title>
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-header">SALE PORTAL</div>
-        <div class="sidebar-menu">
-            <a href="main.html">🏠 <span>หน้าหลัก</span></a>
-            <a href="ticket.html" class="active">📝 <span>ส่ง Ticket ใหม่</span></a>
-            <a href="history.html">🔍 <span>ค้นหา/ติดตามงาน</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+<div class="container">
+    <div class="card">
+        <h3>📝 รายการ Ticket ของคุณ</h3>
+        
+        <div class="search-box">
+            <span style="font-size: 1.2rem;">🔍</span>
+            <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet...">
+            <button class="btn btn-primary" onclick="loadTickets()">ค้นหา</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>เลขที่</th>
+                        <th>หัวข้อ</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketList">
+                    </tbody>
+            </table>
         </div>
     </div>
-
-    <div class="main-content">
-        <div class="top-bar"><span id="userEmailTop"></span></div>
-        <div class="container" style="max-width: 800px;">
-            <div class="card">
-                <h2 style="color: var(--primary-green);">📝 ส่งคำขอจัดการ Case ใหม่</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
-                <form id="ticketForm">
-                    <label>หัวข้อปัญหา:</label>
-                    <select id="issueType" class="input-field" required>
-                        <option value="">-- กำลังโหลดหัวข้อ --</option>
-                    </select>
-
-                    <label>หมายเลข Internet (10 หลัก):</label>
-                    <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}">
-
-                    <label>รายละเอียดเพิ่มเติม:</label>
-                    <textarea id="details" class="input-field" rows="5" placeholder="ระบุรายละเอียด..." required></textarea>
-
-                    <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; margin-top: 10px;">ส่งข้อมูลแจ้งเรื่อง</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = { /* ใช้ของคุณ */ apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw", authDomain: "sale-support-system.firebaseapp.com", projectId: "sale-support-system", storageBucket: "sale-support-system.firebasestorage.app", messagingSenderId: "640337786680", appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "../index.html";
-            else {
-                document.getElementById('userEmailTop').innerText = user.email;
-                onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
-                    if (snap.exists()) {
-                        const opts = snap.data().options || [];
-                        document.getElementById('issueType').innerHTML = '<option value="">-- เลือกหัวข้อ --</option>' + opts.map(o => `<option value="${o}">${o}</option>`).join('');
-                    }
-                });
-            }
-        });
-
-        document.getElementById('ticketForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "กำลังส่ง...";
-            try {
-                await addDoc(collection(db, "tickets"), {
-                    internetNo: document.getElementById('internetNo').value,
-                    issueType: document.getElementById('issueType').value,
-                    details: document.getElementById('details').value,
-                    status: "Open",
-                    email: auth.currentUser.email,
-                    createdAt: serverTimestamp(),
-                    comment: ""
-                });
-                alert("ส่งเรื่องสำเร็จ!");
-                document.getElementById('ticketForm').reset();
-            } catch (err) { alert(err.message); }
-            btn.disabled = false; btn.innerText = "ส่งข้อมูลแจ้งเรื่อง";
-        };
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
-    </script>
-</body>
-</html>
+</div>
