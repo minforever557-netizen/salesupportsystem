@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supervisor Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="sidebar">
@@ -18,35 +19,34 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px;">
-            <div class="notif-wrapper" id="notifBell">
-                <span class="notif-icon">🔔</span>
-                <span class="notif-badge-icon" id="notifCountIcon">0</span>
-                <div class="notif-dropdown" id="notifDropdown">
-                    <div class="notif-header">งานใหม่รอดำเนินการ</div>
-                    <div id="notifList">
-                        <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">ไม่มีงานใหม่</div>
-                    </div>
-                </div>
-            </div>
-            <span id="supEmail" style="font-weight: 600; color: #6B7280;">...</span>
+        <div class="top-bar">
+            <span id="supEmail" style="font-weight: 600; color: #6B7280;">กำลังโหลด...</span>
         </div>
-
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <div><h2 style="margin:0;">📋 รายการงานค้าง</h2></div>
-                <div id="jobCount" style="background: #10B981; color: white; padding: 5px 15px; border-radius: 20px;">0 เคส</div>
+                <div>
+                    <h2 style="margin:0;">📋 รายการงานค้าง</h2>
+                    <p style="color: #6B7280; margin:0;">จัดการเคสที่สถานะ Open และ In Progress</p>
+                </div>
+                <div id="jobCount" style="background: #10B981; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">0 เคส</div>
             </div>
+
             <div class="card">
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
                             <tr>
-                                <th>วันที่แจ้ง</th><th>ผู้แจ้ง</th><th>หมายเลข INTERNET</th>
-                                <th>หัวข้อ</th><th>สถานะ</th><th style="text-align: center;">จัดการ</th>
+                                <th>วันที่แจ้ง</th>
+                                <th>ผู้แจ้ง</th>
+                                <th>หมายเลข INTERNET</th>
+                                <th>หัวข้อ</th>
+                                <th>สถานะ</th>
+                                <th style="text-align: center;">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="allTicketsList"></tbody>
+                        <tbody id="allTicketsList">
+                            <tr><td colspan="6" style="text-align: center; padding: 40px;">กำลังดึงข้อมูลงาน...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -58,6 +58,7 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // ใส่ Config ของคุณที่นี่
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -71,91 +72,70 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ฟังก์ชันเปิด/ปิด Dropdown
-    const bell = document.getElementById('notifBell');
-    const dropdown = document.getElementById('notifDropdown');
-    bell.onclick = (e) => {
-        e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    };
-    window.onclick = () => dropdown.style.display = 'none';
-
     onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "../index.html";
-        else {
-            document.getElementById('supEmail').innerText = "Supervisor: " + user.email;
+        if (!user) {
+            window.location.href = "../index.html";
+        } else {
+            document.getElementById('supEmail').innerText = user.email;
             loadActiveJobs();
         }
     });
 
     function loadActiveJobs() {
-        const listBody = document.getElementById('allTicketsList');
-        const notifList = document.getElementById('notifList');
-        const q = query(collection(db, "tickets"), where("status", "in", ["Open", "In Progress"]), orderBy("createdAt", "desc"));
-
-        let firstLoad = true;
+        const q = query(
+            collection(db, "tickets"), 
+            where("status", "in", ["Open", "In Progress"]),
+            orderBy("createdAt", "desc")
+        );
 
         onSnapshot(q, (snapshot) => {
-            const openJobs = snapshot.docs.filter(d => d.data().status === "Open");
-            const badge = document.getElementById('notifCountIcon');
+            const listBody = document.getElementById('allTicketsList');
+            document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
             
-            // 1. จัดการตัวเลข Badge และ Dropdown List
-            if (openJobs.length > 0) {
-                badge.innerText = openJobs.length;
-                badge.style.display = 'block';
-                
-                let notifHtml = '';
-                openJobs.forEach(doc => {
-                    const data = doc.data();
-                    notifHtml += `
-                        <div class="notif-item" onclick="goToManage('${doc.id}')">
-                            <b>📌 ${data.internetNo}</b>
-                            <small>${data.topic || 'งานใหม่เข้ามา'}</small>
-                            <small>${data.createdAt?.toDate().toLocaleString('th-TH')}</small>
-                        </div>`;
-                });
-                notifList.innerHTML = notifHtml;
-
-                if (!firstLoad) {
-                    bell.classList.add('shake');
-                    setTimeout(() => bell.classList.remove('shake'), 500);
-                    new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(()=>{});
-                }
-            } else {
-                badge.style.display = 'none';
-                notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">ไม่มีงานใหม่</div>';
+            if (snapshot.empty) {
+                listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้างในระบบ</td></tr>';
+                return;
             }
 
-            // 2. แสดงตารางหลัก (เหมือนเดิม)
-            document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
-            let tableHtml = '';
+            let html = '';
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
+                const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
                 const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
-                tableHtml += `
+
+                html += `
                     <tr>
-                        <td><small>${t.createdAt?.toDate().toLocaleString('th-TH')}</small></td>
+                        <td><small>${date}</small></td>
                         <td><small>${t.email}</small></td>
                         <td><b>${t.internetNo}</b></td>
-                        <td>${t.topic || t.issueType}</td>
+                        <td>${t.issueType}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                         <td style="text-align: center;">
-                            <button class="btn-manage" onclick="goToManage('${docSnap.id}')" style="padding: 5px 12px; border-radius:15px; background:#10B981; border:none; color:white; cursor:pointer;">จัดการ</button>
+                            <button class="btn btn-primary btn-manage" data-id="${docSnap.id}" style="padding: 5px 12px; font-size: 0.85rem;">จัดการ</button>
                         </td>
                     </tr>`;
             });
-            listBody.innerHTML = tableHtml || '<tr><td colspan="6" style="text-align: center; padding: 40px;">ไม่มีงานค้าง</td></tr>';
-            firstLoad = false;
+            listBody.innerHTML = html;
+
+            // เพิ่ม Event Listener ให้ปุ่มจัดการ (วิธีนี้ปลอดภัยกว่า onclick บน GitHub)
+            document.querySelectorAll('.btn-manage').forEach(btn => {
+                btn.onclick = () => {
+                    localStorage.setItem('currentTicketId', btn.getAttribute('data-id'));
+                    window.location.href = 'manage-job.html';
+                };
+            });
+        }, (error) => {
+            console.error("Error loading jobs:", error);
+            if(error.code === 'failed-precondition') {
+                listBody.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">ต้องสร้าง Index ใน Firebase ก่อน</td></tr>';
+            }
         });
     }
 
-    // ฟังก์ชันย้ายไปหน้าจัดการ
-    window.goToManage = (id) => {
-        localStorage.setItem('currentTicketId', id);
-        window.location.href = 'manage-job.html';
+    document.getElementById('logoutBtn').onclick = (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => window.location.href = "../index.html");
     };
-
-    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
 </script>
 </body>
 </html>
