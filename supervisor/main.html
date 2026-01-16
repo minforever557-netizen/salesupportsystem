@@ -6,6 +6,44 @@
     <title>Supervisor Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* สไตล์สำหรับกระดิ่งแจ้งเตือน */
+        .notif-wrapper {
+            position: relative;
+            cursor: pointer;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .notif-icon {
+            font-size: 22px;
+            color: #64748b;
+        }
+        .notif-badge-icon {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            display: none; /* ซ่อนไว้ถ้าไม่มีงาน */
+        }
+        /* เอฟเฟกต์กระดิ่งสั่น */
+        .shake {
+            animation: shake-animation 0.5s ease-in-out;
+        }
+        @keyframes shake-animation {
+            0% { transform: rotate(0); }
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-15deg); }
+            60% { transform: rotate(10deg); }
+            80% { transform: rotate(-10deg); }
+            100% { transform: rotate(0); }
+        }
+    </style>
 </head>
 <body>
     <div class="sidebar">
@@ -19,9 +57,14 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar">
-            <span id="supEmail" style="font-weight: 600; color: #6B7280;">กำลังโหลด...</span>
+        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px;">
+            <div class="notif-wrapper" id="notifBell">
+                <span class="notif-icon">🔔</span>
+                <span class="notif-badge-icon" id="notifCountIcon">0</span>
+            </div>
+            <span id="supEmail" style="font-weight: 600; color: #6B7280;">...</span>
         </div>
+
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <div>
@@ -58,7 +101,6 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ใส่ Config ของคุณที่นี่
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -76,22 +118,44 @@
         if (!user) {
             window.location.href = "../index.html";
         } else {
-            document.getElementById('supEmail').innerText = user.email;
+            document.getElementById('supEmail').innerText = "Supervisor: " + user.email;
             loadActiveJobs();
+            // ขอสิทธิ์ Browser Notification
+            if ("Notification" in window) Notification.requestPermission();
         }
     });
 
     function loadActiveJobs() {
+        const listBody = document.getElementById('allTicketsList');
         const q = query(
             collection(db, "tickets"), 
             where("status", "in", ["Open", "In Progress"]),
             orderBy("createdAt", "desc")
         );
 
+        let firstLoad = true;
+
         onSnapshot(q, (snapshot) => {
-            const listBody = document.getElementById('allTicketsList');
-            document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
+            const openJobs = snapshot.docs.filter(d => d.data().status === "Open").length;
             
+            // อัปเดตตัวเลขแจ้งเตือนบน Icon กระดิ่ง
+            const badge = document.getElementById('notifCountIcon');
+            if (openJobs > 0) {
+                badge.innerText = openJobs;
+                badge.style.display = 'block';
+                // ถ้ามีงานใหม่เพิ่มเข้ามา (ไม่ใช่การโหลดครั้งแรก) ให้สั่นกระดิ่ง
+                if (!firstLoad) {
+                    document.getElementById('notifBell').classList.add('shake');
+                    setTimeout(() => document.getElementById('notifBell').classList.remove('shake'), 500);
+                    playAlertSound();
+                }
+            } else {
+                badge.style.display = 'none';
+            }
+
+            document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
+            firstLoad = false;
+
             if (snapshot.empty) {
                 listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้างในระบบ</td></tr>';
                 return;
@@ -100,36 +164,35 @@
             let html = '';
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
-                const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
+                const date = t.createdAt ? t.createdAt.toDate().toLocaleString('th-TH') : '-';
                 const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
-
+                
                 html += `
                     <tr>
                         <td><small>${date}</small></td>
                         <td><small>${t.email}</small></td>
                         <td><b>${t.internetNo}</b></td>
-                        <td>${t.issueType}</td>
+                        <td>${t.topic || t.issueType || 'ทั่วไป'}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                         <td style="text-align: center;">
-                            <button class="btn btn-primary btn-manage" data-id="${docSnap.id}" style="padding: 5px 12px; font-size: 0.85rem;">จัดการ</button>
+                            <button class="btn btn-primary btn-manage" data-id="${docSnap.id}" style="padding: 5px 12px; font-size: 0.85rem; border-radius:15px; background:#10B981; border:none; color:white; cursor:pointer;">จัดการ</button>
                         </td>
                     </tr>`;
             });
             listBody.innerHTML = html;
 
-            // เพิ่ม Event Listener ให้ปุ่มจัดการ (วิธีนี้ปลอดภัยกว่า onclick บน GitHub)
             document.querySelectorAll('.btn-manage').forEach(btn => {
                 btn.onclick = () => {
                     localStorage.setItem('currentTicketId', btn.getAttribute('data-id'));
                     window.location.href = 'manage-job.html';
                 };
             });
-        }, (error) => {
-            console.error("Error loading jobs:", error);
-            if(error.code === 'failed-precondition') {
-                listBody.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">ต้องสร้าง Index ใน Firebase ก่อน</td></tr>';
-            }
         });
+    }
+
+    function playAlertSound() {
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        audio.play().catch(e => {});
     }
 
     document.getElementById('logoutBtn').onclick = (e) => {
