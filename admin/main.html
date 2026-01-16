@@ -12,6 +12,19 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
         .close-btn { cursor: pointer; font-size: 24px; color: #666; }
         .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+        .notif-badge {
+    position: relative;
+    cursor: pointer;
+    background: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #e2e8f0;
+}
+.notif-badge:hover { background: #e2e8f0; }
     </style>
 </head>
 <body>
@@ -212,6 +225,72 @@
     };
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
+    // --- ระบบแจ้งเตือนงานใหม่สำหรับ Admin ---
+
+// 1. ฟังก์ชันขออนุญาตแจ้งเตือนบน Browser
+async function requestNotificationPermission() {
+    if ("Notification" in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+            console.log("ระบบแจ้งเตือนเปิดใช้งานแล้ว");
+        }
+    }
+}
+
+// 2. ฟังก์ชันแสดงหน้าต่างแจ้งเตือน
+function showNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        const notif = new Notification(title, {
+            body: body,
+            icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png" // ใส่ URL ไอคอนตามใจชอบ
+        });
+        
+        // เมื่อกดที่แจ้งเตือน ให้เด้งมาที่หน้าเว็บ
+        notif.onclick = () => {
+            window.focus();
+        };
+    }
+}
+
+// 3. ตั้งค่า Listener ตรวจสอบงานใหม่ (Open)
+function watchNewTickets() {
+    const q = query(
+        collection(db, "tickets"), 
+        where("status", "==", "Open")
+    );
+
+    let isFirstLoad = true; // ตัวแปรป้องกันการแจ้งเตือนงานเก่าตอนโหลดหน้าครั้งแรก
+
+    onSnapshot(q, (snap) => {
+        if (isFirstLoad) {
+            isFirstLoad = false;
+            return; // ข้ามการแจ้งเตือนงานที่มีอยู่แล้วในระบบตอนเปิดหน้าเว็บครั้งแรก
+        }
+
+        snap.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                const data = change.doc.data();
+                // แสดงการแจ้งเตือน
+                showNotification(
+                    "🆕 มีงานใหม่เข้ามา!", 
+                    `เลขอินเทอร์เน็ต: ${data.internetNo}\nปัญหา: ${data.topic}`
+                );
+                
+                // (Optional) เล่นเสียงแจ้งเตือน
+                const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                audio.play();
+            }
+        });
+    });
+}
+
+// เรียกใช้ฟังก์ชันตอนโหลดหน้า
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        requestNotificationPermission(); // ขอสิทธิ์
+        watchNewTickets(); // เริ่มเฝ้าดูงานใหม่
+    }
+});
 </script>
 </body>
 </html>
