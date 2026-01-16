@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียน - Sale Support</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="green-container">
+    <h2 style="text-align: center; color: var(--primary-green);">ลงทะเบียนใหม่</h2>
+    <form id="regForm">
+        <label>อีเมล</label>
+        <input type="email" id="regEmail" class="input-field" placeholder="example@mail.com" required>
+        
+        <label>รหัสผ่าน (6 ตัวขึ้นไป)</label>
+        <input type="password" id="regPassword" class="input-field" placeholder="••••••••" required>
+        
+        <label>ยืนยันรหัสผ่าน</label>
+        <input type="password" id="confirmPassword" class="input-field" placeholder="••••••••" required>
+        
+        <button type="submit" class="btn-green" id="regBtn">สร้างบัญชี</button>
+    </form>
+    <div style="margin-top:15px; text-align:center;">
+        <a href="index.html" class="text-link">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</a>
+    </div>
+</div>
+
+<script type="module">
+    // นำเข้า Firebase Functions ที่จำเป็น
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Firebase Config ของคุณ
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById('regForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('regEmail').value;
+        const pass = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        const btn = document.getElementById('regBtn');
+
+        if(pass !== confirm) return alert("รหัสผ่านไม่ตรงกัน");
+
+        btn.disabled = true;
+        btn.innerText = "กำลังสร้างบัญชี...";
+
+        try {
+            // 1. สร้าง User ใน Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            const user = userCredential.user;
+
+            // 2. เก็บข้อมูล Role 'user' เริ่มต้นไว้ใน Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                email: email,
+                role: "user", // ค่าเริ่มต้นให้เป็น User เสมอ
+                createdAt: serverTimestamp()
+            });
+
+            alert("ลงทะเบียนสำเร็จ!");
+            window.location.href = "index.html"; // กลับไปหน้า Login
+        } catch (error) {
+            alert("ผิดพลาด: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "สร้างบัญชี";
+        }
+    });
+</script>
+</body>
+</html>
