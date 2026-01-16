@@ -5,39 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supervisor Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* ส่วนของกระดิ่ง */
-        .notif-wrapper { position: relative; cursor: pointer; margin-right: 20px; }
-        .notif-icon { font-size: 22px; color: #64748b; }
-        .notif-badge-icon {
-            position: absolute; top: -5px; right: -8px;
-            background: #ef4444; color: white; border-radius: 50%;
-            padding: 2px 6px; font-size: 10px; font-weight: bold; display: none;
-        }
-
-        /* เมนู Dropdown เมื่อกดกระดิ่ง */
-        .notif-dropdown {
-            position: absolute; top: 40px; right: 0; width: 300px;
-            background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0; z-index: 1000; display: none; overflow: hidden;
-        }
-        .notif-header { padding: 10px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 600; font-size: 14px; background: #f8fafc; }
-        .notif-item { 
-            padding: 12px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .notif-item:hover { background: #f0fdf4; }
-        .notif-item b { color: #1e293b; font-size: 13px; }
-        .notif-item small { color: #64748b; font-size: 11px; }
-
-        .shake { animation: shake-animation 0.5s ease-in-out; }
-        @keyframes shake-animation {
-            0% { transform: rotate(0); } 20% { transform: rotate(15deg); }
-            40% { transform: rotate(-15deg); } 60% { transform: rotate(10deg); }
-            80% { transform: rotate(-10deg); } 100% { transform: rotate(0); }
-        }
-    </style>
 </head>
 <body>
     <div class="sidebar">
