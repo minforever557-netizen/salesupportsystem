@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - Sale Support</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="green-container">
+    <h2 style="text-align: center; color: var(--primary-green);">Sale Support System</h2>
+    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">เข้าสู่ระบบด้วยอีเมล</p>
+    
+    <form id="loginForm">
+        <label>อีเมลผู้ใช้งาน</label>
+        <input type="email" id="email" class="input-field" placeholder="example@mail.com" required>
+        
+        <label>รหัสผ่าน</label>
+        <input type="password" id="password" class="input-field" placeholder="••••••••" required>
+        
+        <button type="submit" class="btn-green" id="loginBtn">เข้าสู่ระบบ</button>
+    </form>
+    
+    <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+        <a href="forgot-password.html" class="text-link">ลืมรหัสผ่าน?</a>
+        <a href="register.html" class="text-link" style="font-weight: bold;">ลงทะเบียนใหม่</a>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('loginBtn');
+
+        btn.disabled = true;
+        btn.innerText = "กำลังตรวจสอบ...";
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // ตรวจสอบสิทธิ์จาก Firestore
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                localStorage.setItem('userRole', userData.role);
+                
+                // แยกหน้าตาม Role
+                if (userData.role === 'admin') window.location.href = 'admin/dashboard.html';
+                else if (userData.role === 'supervisor') window.location.href = 'supervisor/main.html';
+                else window.location.href = 'user/ticket.html';
+            } else {
+                alert("ไม่พบข้อมูลสิทธิ์ในระบบ กรุณาติดต่อ Admin");
+            }
+        } catch (error) {
+            alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+            btn.disabled = false;
+            btn.innerText = "เข้าสู่ระบบ";
+        }
+    });
+</script>
+</body>
+</html>
