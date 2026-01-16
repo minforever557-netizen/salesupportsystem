@@ -2,46 +2,51 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Case - Supervisor</title>
+    <title>Manage Job - Supervisor</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <nav>
-        <div class="nav-links">
-            <a href="main.html" style="text-decoration: none; color: #4B5563; font-weight: 600;">⬅️ กลับหน้ารายการงาน</a>
+    <div class="sidebar">
+        <div class="sidebar-header">SUPERVISOR</div>
+        <div class="sidebar-menu">
+            <a href="main.html" class="active">📥 <span>งานรอดำเนินการ</span></a>
+            <a href="history_all.html">📊 <span>ประวัติงานทั้งหมด</span></a>
+            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
+            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
         </div>
-    </nav>
+    </div>
 
-    <div class="container" style="max-width: 700px;">
-        <h2 style="color: var(--primary-green); margin-bottom: 25px;">🛠️ ดำเนินการจัดการงาน (Action)</h2>
-        
-        <div id="jobDetailBox" style="background: #F3F4F6; padding: 25px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #E5E7EB;">
-            กำลังดึงรายละเอียด...
+    <div class="main-content">
+        <div class="top-bar">
+            <a href="main.html" style="text-decoration:none; color:var(--primary-green); font-weight:600;">⬅️ กลับหน้ารายการ</a>
         </div>
-
-        <form id="actionForm">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px;">อัปเดตสถานะงาน:</label>
-                <select id="statusSelect" class="input-field" style="height: 45px; font-size: 1rem;">
-                    <option value="Open">🔴 Open (รับเรื่องแล้ว/รอคิว)</option>
-                    <option value="In Progress">🟡 In Progress (กำลังแก้ไข)</option>
-                    <option value="Closed">🟢 Closed (ปิดงานสำเร็จ)</option>
-                </select>
+        <div class="container" style="max-width: 800px;">
+            <h2 style="margin-bottom: 25px;">🛠️ ดำเนินการจัดการเคส</h2>
+            
+            <div class="card" id="jobDetailBox" style="background: #f9fafb; border: 1px dashed #ccc;">
+                กำลังโหลดรายละเอียดงาน...
             </div>
 
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px;">ระบุข้อความถึง Sale (Comment):</label>
-                <textarea id="supComment" class="input-field" rows="6" placeholder="ระบุรายละเอียดการแก้ไข..."></textarea>
-            </div>
+            <div class="card">
+                <form id="actionForm">
+                    <label>อัปเดตสถานะงาน:</label>
+                    <select id="statusSelect" class="input-field" required>
+                        <option value="Open">🔴 Open (รับเรื่องแล้ว)</option>
+                        <option value="In Progress">🟡 In Progress (กำลังแก้ไข)</option>
+                        <option value="Closed">🟢 Closed (ปิดงานสำเร็จ)</option>
+                    </select>
 
-            <div style="display: flex; gap: 15px;">
-                <button type="submit" class="btn btn-primary" id="saveBtn" style="flex: 2; height: 50px;">บันทึกและอัปเดต</button>
-                <button type="button" class="btn btn-outline" onclick="location.href='main.html'" style="flex: 1;">ยกเลิก</button>
+                    <label>ระบุข้อความตอบกลับถึง Sale:</label>
+                    <textarea id="supComment" class="input-field" rows="5" placeholder="ใส่รายละเอียดการแก้ไข หรือหมายเหตุที่นี่..." required></textarea>
+
+                    <div style="display: flex; gap: 15px; margin-top: 10px;">
+                        <button type="submit" class="btn btn-primary" id="saveBtn" style="flex: 2;">บันทึกและอัปเดต</button>
+                        <button type="button" class="btn btn-outline" onclick="location.href='main.html'" style="flex: 1;">ยกเลิก</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 
 <script type="module">
@@ -61,23 +66,28 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     const ticketId = localStorage.getItem('currentTicketId');
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) loadJobData();
+        else window.location.href = "../index.html";
+    });
 
     async function loadJobData() {
         if(!ticketId) { window.location.href = 'main.html'; return; }
-        
-        const docRef = doc(db, "tickets", ticketId);
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(doc(db, "tickets", ticketId));
 
         if (docSnap.exists()) {
             const data = docSnap.data();
             document.getElementById('jobDetailBox').innerHTML = `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div><small style="color:#6B7280;">หมายเลข Internet</small><br><b>${data.internetNo}</b></div>
-                    <div><small style="color:#6B7280;">หัวข้อปัญหา</small><br><b>${data.issueType}</b></div>
-                    <div style="grid-column: span 2;"><small style="color:#6B7280;">รายละเอียดจาก Sale</small><br><div style="background:white; padding:10px; border-radius:6px; margin-top:5px; border:1px solid #ddd;">${data.details}</div></div>
-                    <div style="grid-column: span 2;"><small style="color:#6B7280;">ผู้แจ้งงาน</small><br><b>${data.email}</b></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><small style="color:gray;">Internet No:</small><br><b>${data.internetNo}</b></div>
+                    <div><small style="color:gray;">หัวข้อ:</small><br><b>${data.issueType}</b></div>
+                    <div style="grid-column: span 2; margin-top:10px;">
+                        <small style="color:gray;">รายละเอียดจาก Sale:</small><br>
+                        <div style="padding:10px; background:white; border-radius:5px; margin-top:5px; border:1px solid #eee;">${data.details}</div>
+                    </div>
+                    <div style="margin-top:10px;"><small style="color:gray;">ผู้แจ้ง:</small><br><small>${data.email}</small></div>
                 </div>
             `;
             document.getElementById('statusSelect').value = data.status;
@@ -85,16 +95,10 @@
         }
     }
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) loadJobData();
-        else window.location.href = "../index.html";
-    });
-
-    document.getElementById('actionForm').addEventListener('submit', async (e) => {
+    document.getElementById('actionForm').onsubmit = async (e) => {
         e.preventDefault();
         const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = true;
-        saveBtn.innerText = "🔄 กำลังบันทึก...";
+        saveBtn.disabled = true; saveBtn.innerText = "กำลังบันทึก...";
 
         try {
             await updateDoc(doc(db, "tickets", ticketId), {
@@ -103,13 +107,13 @@
                 updatedAt: serverTimestamp(),
                 processedBy: auth.currentUser.email
             });
-            alert("✅ อัปเดตข้อมูลสำเร็จ!");
+            alert("✅ อัปเดตงานเรียบร้อย!");
             window.location.href = 'main.html';
         } catch (err) {
-            alert("❌ เกิดข้อผิดพลาด: " + err.message);
+            alert("Error: " + err.message);
             saveBtn.disabled = false;
         }
-    });
+    };
 </script>
 </body>
 </html>
