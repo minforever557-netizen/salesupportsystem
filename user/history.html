@@ -19,7 +19,7 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar"><span id="userEmail"></span></div>
+        <div class="top-bar"><span id="userEmail" style="font-weight: 600;">กำลังตรวจสอบผู้ใช้...</span></div>
         <div class="container">
             <div class="card">
                 <h3>🔍 ค้นหาและติดตามสถานะงาน</h3>
@@ -39,7 +39,7 @@
                             </tr>
                         </thead>
                         <tbody id="historyBody">
-                            <tr><td colspan="5" style="text-align:center;">กำลังโหลดข้อมูล...</td></tr>
+                            <tr><td colspan="5" style="text-align:center; padding: 20px;">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -52,45 +52,84 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = { /* ใส่ค่า Config ของคุณที่นี่ */ };
+        // Firebase Configuration ที่คุณให้มา
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+            authDomain: "sale-support-system.firebaseapp.com",
+            projectId: "sale-support-system",
+            storageBucket: "sale-support-system.firebasestorage.app",
+            messagingSenderId: "640337786680",
+            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "../index.html";
-            else {
+            if (!user) {
+                window.location.href = "../index.html";
+            } else {
                 document.getElementById('userEmail').innerText = user.email;
                 loadHistory(user.email);
             }
         });
 
-        function loadHistory(email, search = "") {
-            const q = query(collection(db, "tickets"), where("email", "==", email), orderBy("createdAt", "desc"));
+        function loadHistory(userEmail, search = "") {
+            const tbody = document.getElementById('historyBody');
+            
+            // ใช้ query กรองเฉพาะ email และเรียงลำดับ
+            const ticketsRef = collection(db, "tickets");
+            const q = query(
+                ticketsRef, 
+                where("email", "==", userEmail),
+                orderBy("createdAt", "desc")
+            );
+
             onSnapshot(q, (snap) => {
-                const tbody = document.getElementById('historyBody');
                 let html = '';
-                snap.forEach(doc => {
-                    const t = doc.data();
-                    if (search && !t.internetNo.includes(search)) return;
+                if (snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">ไม่พบประวัติการแจ้งเรื่องของคุณ</td></tr>';
+                    return;
+                }
+
+                snap.forEach(docSnap => {
+                    const t = docSnap.data();
                     
+                    // Filter ค้นหาในฝั่งหน้าจอ
+                    if (search && !t.internetNo.includes(search)) return;
+
                     const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
                     const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'In Progress' ? 'bg-process' : 'bg-closed');
-                    
+
                     html += `<tr>
                         <td><small>${date}</small></td>
                         <td><b>${t.internetNo}</b></td>
                         <td>${t.issueType}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                        <td style="color:var(--dark-green); font-size:0.9rem;">${t.comment || '-'}</td>
+                        <td style="color:#059669; font-size:0.9rem;">${t.comment || '-'}</td>
                     </tr>`;
                 });
-                tbody.innerHTML = html || '<tr><td colspan="5" style="text-align:center;">ไม่พบข้อมูล</td></tr>';
+                tbody.innerHTML = html;
+            }, (error) => {
+                console.error("Firebase Error: ", error);
+                // ถ้าติดเรื่อง Index จะแสดง Link ให้กดสร้างที่นี่
+                if (error.code === 'failed-precondition') {
+                    tbody.innerHTML = `<tr><td colspan="5" style="color:red; padding:20px;">กรุณาสร้าง Index ใน Firebase Console (ดูรายละเอียดใน Console F12)</td></tr>`;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" style="color:red; padding:20px;">Error: ${error.message}</td></tr>`;
+                }
             });
         }
 
-        document.getElementById('searchInput').oninput = (e) => loadHistory(auth.currentUser.email, e.target.value);
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
+        document.getElementById('searchInput').oninput = (e) => {
+            loadHistory(auth.currentUser.email, e.target.value);
+        };
+
+        document.getElementById('logoutBtn').onclick = (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => window.location.href = "../index.html");
+        };
     </script>
 </body>
 </html>
