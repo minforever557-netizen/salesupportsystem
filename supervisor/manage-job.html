@@ -34,11 +34,11 @@
 
             <div style="margin-bottom: 25px;">
                 <label style="display: block; font-weight: 600; margin-bottom: 8px;">ระบุข้อความถึง Sale (Comment):</label>
-                <textarea id="supComment" class="input-field" rows="6" placeholder="ระบุรายละเอียดการแก้ไข หรือสิ่งที่ต้องการให้ Sale ดำเนินการต่อ..."></textarea>
+                <textarea id="supComment" class="input-field" rows="6" placeholder="ระบุรายละเอียดการแก้ไข..."></textarea>
             </div>
 
             <div style="display: flex; gap: 15px;">
-                <button type="submit" class="btn btn-primary" id="saveBtn" style="flex: 2; height: 50px; font-size: 1.1rem;">บันทึกข้อมูลและอัปเดต</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn" style="flex: 2; height: 50px;">บันทึกและอัปเดต</button>
                 <button type="button" class="btn btn-outline" onclick="location.href='main.html'" style="flex: 1;">ยกเลิก</button>
             </div>
         </form>
@@ -97,8 +97,7 @@
         saveBtn.innerText = "🔄 กำลังบันทึก...";
 
         try {
-            const docRef = doc(db, "tickets", ticketId);
-            await updateDoc(docRef, {
+            await updateDoc(doc(db, "tickets", ticketId), {
                 status: document.getElementById('statusSelect').value,
                 comment: document.getElementById('supComment').value,
                 updatedAt: serverTimestamp(),
@@ -109,7 +108,6 @@
         } catch (err) {
             alert("❌ เกิดข้อผิดพลาด: " + err.message);
             saveBtn.disabled = false;
-            saveBtn.innerText = "บันทึกข้อมูลและอัปเดต";
         }
     });
 </script>
