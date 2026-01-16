@@ -2,9 +2,9 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ส่งคำขอจัดการ Case - Sale Support</title>
+    <title>ส่ง Ticket ใหม่ - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="sidebar">
@@ -19,40 +19,24 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar">
-            <div style="flex: 1; font-weight: 600; color: var(--primary-green);">ระบบรับเรื่อง Sale Support</div>
-            <span id="userEmail" style="font-weight: 600; color: var(--text-muted);">กำลังโหลด...</span>
-        </div>
-
-        <div class="container">
-            <div class="ticket-form-container">
-                <div class="form-header">
-                    <span style="font-size: 2rem;">➕</span>
-                    <h2 style="margin: 0; color: #10b981;">ส่งคำขอการจัดการ Case</h2>
-                </div>
-
+        <div class="top-bar"><span id="userEmailTop"></span></div>
+        <div class="container" style="max-width: 800px;">
+            <div class="card">
+                <h2 style="color: var(--primary-green);">📝 ส่งคำขอจัดการ Case ใหม่</h2>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
                 <form id="ticketForm">
-                    <div class="form-group-grid">
-                        <div>
-                            <label class="input-label">เลือกหัวข้อปัญหา:</label>
-                            <select id="issueType" class="input-field" required style="background-color: #f9fafb;"></select>
-                        </div>
-                        <div>
-                            <label class="input-label">หมายเลข Internet (10 หลัก):</label>
-                            <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}" style="background-color: #f9fafb;">
-                        </div>
-                    </div>
+                    <label>หัวข้อปัญหา:</label>
+                    <select id="issueType" class="input-field" required>
+                        <option value="">-- กำลังโหลดหัวข้อ --</option>
+                    </select>
 
-                    <div style="margin-bottom: 25px;">
-                        <label class="input-label">รายละเอียดเพิ่มเติม:</label>
-                        <textarea id="details" class="input-field" rows="5" placeholder="ระบุรายละเอียดปัญหาของคุณเพื่อให้ Supervisor ตรวจสอบได้รวดเร็วขึ้น..." required style="background-color: #f9fafb; resize: none;"></textarea>
-                    </div>
+                    <label>หมายเลข Internet (10 หลัก):</label>
+                    <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}">
 
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button type="submit" class="btn-submit-ticket" id="submitBtn">
-                            <span>🚀</span> ส่งข้อมูลแจ้งเรื่อง
-                        </button>
-                    </div>
+                    <label>รายละเอียดเพิ่มเติม:</label>
+                    <textarea id="details" class="input-field" rows="5" placeholder="ระบุรายละเอียด..." required></textarea>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; margin-top: 10px;">ส่งข้อมูลแจ้งเรื่อง</button>
                 </form>
             </div>
         </div>
@@ -63,15 +47,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-            authDomain: "sale-support-system.firebaseapp.com",
-            projectId: "sale-support-system",
-            storageBucket: "sale-support-system.firebasestorage.app",
-            messagingSenderId: "640337786680",
-            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-        };
-
+        const firebaseConfig = { /* ใช้ของคุณ */ apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw", authDomain: "sale-support-system.firebaseapp.com", projectId: "sale-support-system", storageBucket: "sale-support-system.firebasestorage.app", messagingSenderId: "640337786680", appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -79,28 +55,20 @@
         onAuthStateChanged(auth, (user) => {
             if (!user) window.location.href = "../index.html";
             else {
-                document.getElementById('userEmail').innerText = user.email;
-                loadIssueOptions();
+                document.getElementById('userEmailTop').innerText = user.email;
+                onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
+                    if (snap.exists()) {
+                        const opts = snap.data().options || [];
+                        document.getElementById('issueType').innerHTML = '<option value="">-- เลือกหัวข้อ --</option>' + opts.map(o => `<option value="${o}">${o}</option>`).join('');
+                    }
+                });
             }
         });
 
-        function loadIssueOptions() {
-            onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
-                const select = document.getElementById('issueType');
-                if (snap.exists()) {
-                    const options = snap.data().options || [];
-                    select.innerHTML = '<option value="">-- เลือกหัวข้อ --</option>' + 
-                        options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-                }
-            });
-        }
-
-        document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+        document.getElementById('ticketForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = "กำลังส่งข้อมูล...";
-
+            btn.disabled = true; btn.innerText = "กำลังส่ง...";
             try {
                 await addDoc(collection(db, "tickets"), {
                     internetNo: document.getElementById('internetNo').value,
@@ -111,16 +79,11 @@
                     createdAt: serverTimestamp(),
                     comment: ""
                 });
-                alert("ส่งเรื่องสำเร็จ เรียบร้อยแล้ว!");
+                alert("ส่งเรื่องสำเร็จ!");
                 document.getElementById('ticketForm').reset();
-            } catch (err) { 
-                alert("เกิดข้อผิดพลาด: " + err.message); 
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "<span>🚀</span> ส่งข้อมูลแจ้งเรื่อง";
-            }
-        });
-
+            } catch (err) { alert(err.message); }
+            btn.disabled = false; btn.innerText = "ส่งข้อมูลแจ้งเรื่อง";
+        };
         document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
     </script>
 </body>
