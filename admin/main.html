@@ -2,10 +2,17 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* สไตล์สำหรับหน้าต่างแก้ไข (Modal) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .close-btn { cursor: pointer; font-size: 24px; color: #666; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+    </style>
 </head>
 <body>
     <div class="sidebar">
@@ -19,22 +26,22 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar"><span id="adminEmail" style="font-weight: 600;">Admin Loading...</span></div>
+        <div class="top-bar"><span id="adminEmail" style="font-weight: 600;">กำลังโหลด...</span></div>
         <div class="container">
-            <h2>📊 ระบบจัดการหลังบ้าน</h2>
+            <h2>📊 ระบบจัดการหลังบ้าน (Admin Control)</h2>
             
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0;">
-                <div class="card" style="background: #1e293b; color: white; text-align: center;">
-                    <small>Ticket ทั้งหมด</small><div id="totalTicket" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                <div class="card" style="background: #111827; color: white; text-align: center;">
+                    <small>Ticket ทั้งหมด</small><div id="totalTicket" style="font-size: 2rem; font-weight: 600;">0</div>
                 </div>
-                <div class="card" style="background: #ef4444; color: white; text-align: center;">
-                    <small>Open</small><div id="totalOpen" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                <div class="card" style="background: #EF4444; color: white; text-align: center;">
+                    <small>Open</small><div id="totalOpen" style="font-size: 2rem; font-weight: 600;">0</div>
                 </div>
-                <div class="card" style="background: #f59e0b; color: white; text-align: center;">
-                    <small>In Progress</small><div id="totalProcess" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                <div class="card" style="background: #F59E0B; color: white; text-align: center;">
+                    <small>In Progress</small><div id="totalProcess" style="font-size: 2rem; font-weight: 600;">0</div>
                 </div>
-                <div class="card" style="background: #10b981; color: white; text-align: center;">
-                    <small>Closed</small><div id="totalClosed" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                <div class="card" style="background: #10B981; color: white; text-align: center;">
+                    <small>Closed</small><div id="totalClosed" style="font-size: 2rem; font-weight: 600;">0</div>
                 </div>
             </div>
 
@@ -43,19 +50,19 @@
                     <h3>🛠️ จัดการหัวข้อปัญหา</h3>
                     <div style="display: flex; gap: 5px; margin-bottom: 15px;">
                         <input type="text" id="newIssueInput" class="input-field" placeholder="ชื่อหัวข้อใหม่..." style="margin:0;">
-                        <button id="addIssueBtn" class="btn btn-primary">เพิ่ม</button>
+                        <button id="addIssueBtn" class="btn btn-primary" style="background:#10B981;">เพิ่ม</button>
                     </div>
                     <div id="issueList" style="max-height: 300px; overflow-y: auto;"></div>
                 </div>
 
                 <div class="card">
-                    <h3>👁️ งานล่าสุดในระบบ (ทุกสถานะ)</h3>
+                    <h3>👁️ งานล่าสุดในระบบ</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Sale ผู้แจ้ง</th>
-                                    <th>หมายเลข Internet</th>
+                                    <th>SALE</th>
+                                    <th>หมายเลข INTERNET</th>
                                     <th>สถานะ</th>
                                     <th>จัดการ</th>
                                 </tr>
@@ -68,11 +75,36 @@
         </div>
     </div>
 
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">แก้ไขงาน: </h3>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody">
+                <div style="margin-bottom: 15px;">
+                    <label class="form-label">เปลี่ยนสถานะงาน</label>
+                    <select id="editStatus" class="input-field">
+                        <option value="Open">Open (รอรับงาน)</option>
+                        <option value="In Progress">In Progress (กำลังดำเนินการ)</option>
+                        <option value="Closed">Closed (เรียบร้อยแล้ว)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label class="form-label">หมายเหตุการดำเนินงาน (Admin/Sup)</label>
+                    <textarea id="editNote" class="input-field" rows="4" placeholder="ระบุรายละเอียดผลการแก้ไข..."></textarea>
+                </div>
+                <button id="saveBtn" class="btn btn-primary" style="width: 100%; background: #10B981;">บันทึกการแก้ไข</button>
+            </div>
+        </div>
+    </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, collection, onSnapshot, updateDoc, arrayUnion, arrayRemove, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, collection, onSnapshot, updateDoc, arrayUnion, arrayRemove, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // ** สำคัญ: หากอัปโหลด GitHub ไม่ผ่าน ให้ก๊อปปี้ค่า API Key มาจากไฟล์ที่รันได้ปกติครับ **
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -86,16 +118,18 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    let currentEditId = null;
+
     onAuthStateChanged(auth, (user) => {
         if (!user) window.location.href = "../index.html";
         else {
             document.getElementById('adminEmail').innerText = "Admin: " + user.email;
-            loadDashboard();
+            initAdminDashboard();
         }
     });
 
-    function loadDashboard() {
-        // ดึงงานทั้งหมด (ทุก Status)
+    function initAdminDashboard() {
+        // ดึงงานทั้งหมด
         onSnapshot(query(collection(db, "tickets"), orderBy("createdAt", "desc")), (snap) => {
             let stats = { all: snap.size, open: 0, process: 0, closed: 0 };
             let html = '';
@@ -107,46 +141,74 @@
 
                 const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
                 html += `<tr>
-                    <td><small>${t.email}</small></td>
+                    <td><small>${t.email.split('@')[0]}</small></td>
                     <td><b>${t.internetNo}</b></td>
                     <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                    <td><button class="btn btn-primary" onclick="editJob('${docSnap.id}')" style="padding:4px 8px; font-size:0.75rem;">แก้ไข</button></td>
+                    <td><button class="btn btn-primary" onclick="openEditModal('${docSnap.id}', '${t.internetNo}')" style="background:#10B981; padding:5px 15px;">แก้ไข</button></td>
                 </tr>`;
             });
             document.getElementById('totalTicket').innerText = stats.all;
             document.getElementById('totalOpen').innerText = stats.open;
             document.getElementById('totalProcess').innerText = stats.process;
             document.getElementById('totalClosed').innerText = stats.closed;
-            document.getElementById('recentTickets').innerHTML = html;
+            document.getElementById('recentTickets').innerHTML = html || '<tr><td colspan="4">ไม่มีข้อมูล</td></tr>';
         });
 
-        // จัดการหัวข้อ
+        // จัดการหัวข้อปัญหา (Settings)
         const settingsRef = doc(db, "settings", "issueOptions");
-        onSnapshot(settingsRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const options = docSnap.data().options || [];
+        onSnapshot(settingsRef, (s) => {
+            if(s.exists()){
+                const options = s.data().options || [];
                 document.getElementById('issueList').innerHTML = options.map(opt => `
-                    <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
                         <span>${opt}</span>
-                        <button onclick="deleteIssue('${opt}')" style="color:red; border:none; background:none; cursor:pointer;">ลบ</button>
+                        <button onclick="deleteIssue('${opt}')" style="background:#EF4444; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer;">ลบ</button>
                     </div>
                 `).join('');
             }
         });
 
-        window.deleteIssue = async (val) => {
-            if (confirm('ลบหัวข้อ: ' + val)) await updateDoc(settingsRef, { options: arrayRemove(val) });
-        };
         document.getElementById('addIssueBtn').onclick = async () => {
             const input = document.getElementById('newIssueInput');
             if (input.value) await updateDoc(settingsRef, { options: arrayUnion(input.value) });
             input.value = '';
         };
+        window.deleteIssue = async (v) => { if(confirm('ลบหัวข้อ: '+v)) await updateDoc(settingsRef, { options: arrayRemove(v) }); };
     }
 
-    window.editJob = (id) => {
-        localStorage.setItem('currentTicketId', id);
-        window.location.href = '../supervisor/manage-job.html';
+    // ฟังก์ชันเปิด Modal แก้ไข
+    window.openEditModal = async (id, internetNo) => {
+        currentEditId = id;
+        document.getElementById('modalTitle').innerText = "จัดการงาน: " + internetNo;
+        
+        // ดึงข้อมูลเดิมมาแสดง
+        const docSnap = await getDoc(doc(db, "tickets", id));
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('editStatus').value = data.status || 'Open';
+            document.getElementById('editNote').value = data.supNote || '';
+        }
+        document.getElementById('editModal').style.display = 'block';
+    };
+
+    window.closeModal = () => { document.getElementById('editModal').style.display = 'none'; };
+
+    // บันทึกการแก้ไขจาก Modal
+    document.getElementById('saveBtn').onclick = async () => {
+        if (!currentEditId) return;
+        const newStatus = document.getElementById('editStatus').value;
+        const newNote = document.getElementById('editNote').value;
+
+        try {
+            await updateDoc(doc(db, "tickets", currentEditId), {
+                status: newStatus,
+                supNote: newNote,
+                processedBy: auth.currentUser.email,
+                updatedAt: new Date()
+            });
+            alert("บันทึกสำเร็จ!");
+            closeModal();
+        } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
     };
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
