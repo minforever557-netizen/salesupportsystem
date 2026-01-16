@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ประวัติงานทั้งหมด - Supervisor</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .view-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            background: white;
+            color: #4B5563;
+        }
+        .filter-btn.active {
+            background: #111827;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">SUPERVISOR</div>
+        <div class="sidebar-menu">
+            <a href="main.html">📥 <span>งานรอดำเนินการ</span></a>
+            <a href="history_all.html" class="active">📊 <span>ประวัติงานทั้งหมด</span></a>
+            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
+            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar"><span id="supEmail" style="font-weight: 600;"></span></div>
+        <div class="container">
+            <div class="card">
+                <h3>📊 ประวัติการจัดการเคสทั้งหมด</h3>
+                
+                <div class="view-filter">
+                    <button id="viewAllBtn" class="filter-btn active">🌐 งานทั้งหมด (Closed)</button>
+                    <button id="viewMineBtn" class="filter-btn">👤 งานที่ฉันปิดเคส</button>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet..." style="margin:0;">
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>วันที่ปิดงาน</th>
+                                <th>หมายเลข Internet</th>
+                                <th>Sale ผู้แจ้ง</th>
+                                <th>Supervisor ผู้ดูแล</th>
+                                <th>สถานะ</th>
+                                <th>หมายเหตุที่ตอบกลับ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="6" style="text-align:center; padding: 20px;">กำลังโหลดประวัติงาน...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+            authDomain: "sale-support-system.firebaseapp.com",
+            projectId: "sale-support-system",
+            storageBucket: "sale-support-system.firebasestorage.app",
+            messagingSenderId: "640337786680",
+            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentView = 'all'; 
+        let currentSupEmail = "";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "../index.html";
+            } else {
+                currentSupEmail = user.email;
+                document.getElementById('supEmail').innerText = currentSupEmail;
+                loadHistory();
+            }
+        });
+
+        function loadHistory() {
+            const tbody = document.getElementById('historyBody');
+            const searchText = document.getElementById('searchInput').value;
+            const ticketsRef = collection(db, "tickets");
+            let q;
+
+            if (currentView === 'all') {
+                // ดูงานที่สถานะเป็น Closed ทั้งหมด
+                q = query(ticketsRef, where("status", "==", "Closed"), orderBy("updatedAt", "desc"));
+            } else {
+                // ดูเฉพาะงานที่ Supervisor คนนี้เป็นคนทำ (เช็คจากฟิลด์ processedBy)
+                q = query(
+                    ticketsRef, 
+                    where("processedBy", "==", currentSupEmail),
+                    where("status", "==", "Closed"),
+                    orderBy("updatedAt", "desc")
+                );
+            }
+
+            onSnapshot(q, (snapshot) => {
+                let html = '';
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">ไม่มีประวัติงานที่ปิดแล้ว</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const t = docSnap.data();
+                    if (searchText && !t.internetNo.includes(searchText)) return;
+
+                    const date = t.updatedAt?.toDate().toLocaleDateString('th-TH') || '-';
+                    
+                    html += `<tr>
+                        <td><small>${date}</small></td>
+                        <td><b>${t.internetNo}</b></td>
+                        <td><small>${t.email}</small></td>
+                        <td><small>${t.processedBy || '-'}</small></td>
+                        <td><span class="status-badge bg-closed">Closed</span></td>
+                        <td style="color:#059669; font-size:0.85rem;">${t.comment || '-'}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding: 20px;">ไม่พบข้อมูลที่ค้นหา</td></tr>';
+            }, (error) => {
+                console.error(error);
+                if (error.code === 'failed-precondition') {
+                    tbody.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">กรุณาสร้าง Index ใน Firebase Console (กด F12 เพื่อดูลิงก์)</td></tr>';
+                }
+            });
+        }
+
+        document.getElementById('viewAllBtn').onclick = () => {
+            currentView = 'all';
+            document.getElementById('viewAllBtn').classList.add('active');
+            document.getElementById('viewMineBtn').classList.remove('active');
+            loadHistory();
+        };
+
+        document.getElementById('viewMineBtn').onclick = () => {
+            currentView = 'mine';
+            document.getElementById('viewMineBtn').classList.add('active');
+            document.getElementById('viewAllBtn').classList.remove('active');
+            loadHistory();
+        };
+
+        document.getElementById('searchInput').oninput = () => loadHistory();
+        document.getElementById('logoutBtn').onclick = (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => window.location.href = "../index.html");
+        };
+    </script>
+</body>
+</html>
