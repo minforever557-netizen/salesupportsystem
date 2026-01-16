@@ -322,3 +322,33 @@ td { padding: 15px; border-bottom: 1px solid #E5E7EB; font-size: 0.95rem; }
     max-width: 250px;
     word-wrap: break-word;
 }
+/* --- Status Badges (Global) --- */
+.status-badge { 
+    padding: 5px 12px; 
+    border-radius: 20px; 
+    font-size: 0.75rem; 
+    color: white; 
+    font-weight: 600; 
+    display: inline-block;
+    text-align: center;
+}
+.bg-open { background-color: var(--danger); }
+.bg-process { background-color: var(--warning); }
+.bg-closed { background-color: var(--primary-green); }
+
+/* --- Search & Filter Box --- */
+.search-box { 
+    margin-bottom: 20px; 
+    display: flex; 
+    gap: 12px; 
+    align-items: center; 
+    background: #f8fafc; 
+    padding: 15px; 
+    border-radius: 12px; 
+    border: 1px solid #e5e7eb; 
+}
+
+.search-box .input-field {
+    margin-bottom: 0; /* ลบ margin ล่างออกเพื่อให้ระนาบเดียวกับปุ่ม */
+    flex: 1;
+}
