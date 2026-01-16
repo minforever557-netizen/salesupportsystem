@@ -3,70 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Sale Support</title>
+    <title>Admin Dashboard - Sale Support System</title>
     <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        .stats-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
-        .stat-card { flex: 1; min-width: 200px; padding: 20px; border-radius: 8px; text-align: center; color: #fff; }
-        .bg-total { background: #10B981; }
-        .bg-pending { background: #F59E0B; }
-        .role-select { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
-        .issue-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
-        .btn-delete { color: #ef4444; cursor: pointer; border: none; background: none; font-weight: bold; }
+        .admin-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .role-badge { padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; color: white; font-weight: bold; }
+        .bg-admin { background: #7c3aed; }
+        .bg-sup { background: #2563eb; }
+        .bg-user { background: #6b7280; }
+        .tag { display: inline-flex; align-items: center; background: #e0f2fe; color: #0369a1; padding: 5px 10px; border-radius: 5px; margin: 5px; font-size: 0.85rem; }
+        .btn-delete { color: #ef4444; cursor: pointer; margin-left: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold;">Admin Dashboard (Real-time)</span>
-        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; padding: 5px 10px; cursor: pointer; border-radius: 4px;">ออกจากระบบ</button>
+
+    <nav>
+        <div class="nav-links">
+            <b style="color: var(--primary-green); font-size: 1.2rem; margin-right: 20px;">Admin Management</b>
+            <a href="dashboard.html" class="active">🏠 หน้าหลัก</a>
+        </div>
+        <button class="btn btn-outline" id="logoutBtn">ออกจากระบบ</button>
     </nav>
 
-    <div class="stats-grid" style="max-width: 1000px; margin: 20px auto; padding: 0 20px;">
-        <div class="stat-card bg-total">
-            <h4 style="margin: 0;">งานทั้งหมดในระบบ</h4>
-            <h2 id="totalTickets" style="margin: 10px 0; font-size: 2.5rem;">0</h2>
+    <div class="container">
+        <div class="admin-card">
+            <h3 style="margin-top: 0; color: var(--primary-green);">⚙️ ตั้งค่าหัวข้อปัญหา (Issue Options)</h3>
+            <p style="font-size: 0.85rem; color: #666;">หัวข้อที่เพิ่มที่นี่จะไปปรากฏในหน้าแจ้งซ่อมของ Sale ทันที</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="newOption" class="input-field" style="margin:0;" placeholder="เพิ่มหัวข้อใหม่ เช่น เปลี่ยนอุปกรณ์, ย้ายจุดติดตั้ง">
+                <button class="btn btn-primary" onclick="window.addOption()">เพิ่มหัวข้อ</button>
+            </div>
+            <div id="optionsContainer" style="min-height: 50px; border: 1px dashed #ccc; padding: 10px; border-radius: 8px;">
+                กำลังโหลดหัวข้อ...
+            </div>
         </div>
-        <div class="stat-card bg-pending">
-            <h4 style="margin: 0;">งานที่กำลังดำเนินการ (Open/In Progress)</h4>
-            <h2 id="pendingTickets" style="margin: 10px 0; font-size: 2.5rem;">0</h2>
-        </div>
-    </div>
 
-    <div class="green-container" style="max-width: 1000px; margin-top: 20px;">
-        <h3 style="color: var(--primary-green); margin-top: 0;">⚙️ ตั้งค่าหัวข้อปัญหา (Issue Types)</h3>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="newIssue" class="input-field" placeholder="ตัวอย่าง: ย้ายจุดติดตั้ง">
-            <button id="addIssueBtn" class="btn-green" style="width: 150px;">เพิ่มหัวข้อ</button>
-        </div>
-        <div id="issueList" style="margin-top: 15px;">
-            กำลังโหลดหัวข้อ...
-        </div>
-    </div>
-
-    <div class="green-container" style="max-width: 1000px; margin-top: 20px; border-top: 6px solid #3B82F6;">
-        <h3 style="color: #1E40AF; margin-top: 0;">👥 จัดการสิทธิ์ผู้ใช้งาน</h3>
-        <div style="overflow-x: auto;">
-            <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
-                <thead>
-                    <tr style="background: #f4f4f4; text-align: left;">
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Email</th>
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Role</th>
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">จัดการสิทธิ์</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <tr><td colspan="3" style="text-align:center; padding:20px;">กำลังโหลดรายชื่อ...</td></tr>
-                </tbody>
-            </table>
+        <div class="admin-card">
+            <h3 style="margin-top: 0; color: var(--primary-green);">👥 จัดการสิทธิ์ผู้ใช้งาน</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr style="text-align: left; background: #f9fafb;">
+                            <th style="padding: 12px;">Email</th>
+                            <th style="padding: 12px;">Role ปัจจุบัน</th>
+                            <th style="padding: 12px;">เปลี่ยนสิทธิ์เป็น</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userListBody">
+                        <tr><td colspan="3" style="text-align: center; padding: 20px;">กำลังโหลดรายชื่อ...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, setDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // --- Firebase Config ---
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -77,64 +73,62 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // เช็คสิทธิ์ Admin
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = "../index.html";
-        } else {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists() && userDoc.data().role === 'admin') {
-                initRealtimeUpdates();
-            } else {
-                alert("เฉพาะ Admin เท่านั้น");
-                window.location.href = "../index.html";
-            }
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "../index.html";
+        else {
+            loadOptions();
+            loadUsers();
         }
     });
 
-    function initRealtimeUpdates() {
-        // 1. ติดตามตัวเลขสถิติ (Real-time)
-        onSnapshot(collection(db, "tickets"), (snapshot) => {
-            document.getElementById('totalTickets').innerText = snapshot.size;
-            let pending = 0;
-            snapshot.forEach(doc => {
-                const status = doc.data().status;
-                if (status === 'Open' || status === 'In Progress') pending++;
-            });
-            document.getElementById('pendingTickets').innerText = pending;
-        });
-
-        // 2. ติดตามหัวข้อปัญหา
-        onSnapshot(doc(db, "settings", "issueOptions"), async (docSnap) => {
-            const listDiv = document.getElementById('issueList');
-            if (docSnap.exists()) {
-                let html = '';
-                docSnap.data().options.forEach(opt => {
-                    html += `<div class="issue-item">${opt} <span class="btn-delete" onclick="window.removeIssue('${opt}')">ลบ</span></div>`;
-                });
-                listDiv.innerHTML = html || 'ไม่มีหัวข้อปัญหา';
+    // --- จัดการหัวข้อปัญหา ---
+    function loadOptions() {
+        onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
+            const container = document.getElementById('optionsContainer');
+            if (snap.exists()) {
+                const options = snap.data().options || [];
+                container.innerHTML = options.map(opt => `
+                    <span class="tag">${opt} <span class="btn-delete" onclick="window.removeOption('${opt}')">×</span></span>
+                `).join('');
             } else {
-                // ถ้ายังไม่มีก้อนข้อมูล ให้สร้างตั้งต้นไว้
-                await setDoc(doc(db, "settings", "issueOptions"), { options: ["อินเทอร์เน็ตใช้งานไม่ได้"] });
+                container.innerHTML = "ยังไม่มีหัวข้อ";
             }
         });
+    }
 
-        // 3. ติดตามรายชื่อ User
+    window.addOption = async () => {
+        const input = document.getElementById('newOption');
+        if (!input.value) return;
+        const ref = doc(db, "settings", "issueOptions");
+        await setDoc(ref, { options: arrayUnion(input.value) }, { merge: true });
+        input.value = "";
+    };
+
+    window.removeOption = async (opt) => {
+        if (confirm(`ลบหัวข้อ "${opt}" ใช่หรือไม่?`)) {
+            const ref = doc(db, "settings", "issueOptions");
+            await updateDoc(ref, { options: arrayRemove(opt) });
+        }
+    };
+
+    // --- จัดการผู้ใช้งาน ---
+    function loadUsers() {
         onSnapshot(collection(db, "users"), (snapshot) => {
-            const tbody = document.getElementById('userTableBody');
+            const tbody = document.getElementById('userListBody');
             let html = '';
-            snapshot.forEach(uDoc => {
-                const u = uDoc.data();
+            snapshot.forEach(userDoc => {
+                const u = userDoc.data();
+                const roleClass = u.role === 'admin' ? 'bg-admin' : (u.role === 'supervisor' ? 'bg-sup' : 'bg-user');
                 html += `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding:12px;">${u.email}</td>
-                        <td style="padding:12px;"><b>${u.role}</b></td>
-                        <td style="padding:12px;">
-                            <select class="role-select" onchange="window.updateRole('${uDoc.id}', this.value)">
-                                <option value="">เปลี่ยนเป็น...</option>
+                    <tr>
+                        <td style="padding: 12px;">${u.email}</td>
+                        <td style="padding: 12px;"><span class="role-badge ${roleClass}">${u.role}</span></td>
+                        <td style="padding: 12px;">
+                            <select onchange="window.changeRole('${userDoc.id}', this.value)" style="padding: 5px; border-radius: 4px;">
+                                <option value="" disabled selected>เลือกเพื่อเปลี่ยนสิทธิ์</option>
                                 <option value="user">User (Sale)</option>
                                 <option value="supervisor">Supervisor</option>
                                 <option value="admin">Admin</option>
@@ -146,32 +140,14 @@
         });
     }
 
-    // ฟังก์ชันช่วยสำหรับการคลิก (Global window)
-    window.removeIssue = async (val) => {
-        if(confirm(`ยืนยันลบหัวข้อ: ${val}?`)) {
-            await updateDoc(doc(db, "settings", "issueOptions"), { options: arrayRemove(val) });
-        }
-    };
-
-    window.updateRole = async (uid, newRole) => {
-        if(!newRole) return;
-        if(confirm(`เปลี่ยนสิทธิ์ User นี้เป็น ${newRole}?`)) {
+    window.changeRole = async (uid, newRole) => {
+        if (confirm(`ยืนยันการเปลี่ยนสิทธิ์เป็น ${newRole}?`)) {
             await updateDoc(doc(db, "users", uid), { role: newRole });
-            alert("อัปเดตสิทธิ์สำเร็จ");
+            alert("อัปเดตสิทธิ์เรียบร้อย");
         }
     };
 
-    document.getElementById('addIssueBtn').addEventListener('click', async () => {
-        const val = document.getElementById('newIssue').value.trim();
-        if(!val) return;
-        await updateDoc(doc(db, "settings", "issueOptions"), { options: arrayUnion(val) });
-        document.getElementById('newIssue').value = "";
-    });
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth).then(() => window.location.href = "../index.html");
-    });
-
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href = "../index.html"));
 </script>
 </body>
 </html>
