@@ -3,27 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor - รายการงาน</title>
+    <title>รายการงาน - Supervisor</title>
     <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; color: white; font-weight: 600; text-transform: uppercase; }
+        .bg-open { background-color: #EF4444; }
+        .bg-process { background-color: #F59E0B; }
+        .btn-manage { background: var(--primary-green); color: white; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        .btn-manage:hover { background: var(--dark-green); transform: translateY(-1px); }
+    </style>
 </head>
 <body>
 
     <nav>
         <div class="nav-links">
-            <b style="color: var(--primary-green); margin-right: 15px;">Supervisor Mode</b>
-            <a href="main.html" class="active">📥 รายการงานค้าง</a>
+            <b style="color: var(--primary-green); font-size: 1.2rem; margin-right: 20px;">Supervisor Console</b>
+            <a href="main.html" style="color: var(--primary-green); border-bottom: 2px solid var(--primary-green);">📥 งานค้างทั้งหมด</a>
         </div>
         <div class="nav-links">
+            <span id="supEmail" style="font-size: 0.85rem; color: #666; margin-right: 15px;"></span>
             <button class="btn btn-outline" id="logoutBtn">ออกจากระบบ</button>
         </div>
     </nav>
 
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="margin: 0;">📋 รายการงานที่ต้องจัดการ</h3>
-            <span id="jobSummary" class="status-badge" style="background:#eee; color:#666;">กำลังโหลด...</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 style="margin: 0; color: #1F2937;">📋 รายการงานที่รอจัดการ</h2>
+            <div id="jobCount" style="background: #E5E7EB; padding: 5px 15px; border-radius: 15px; font-size: 0.9rem; color: #4B5563;">กำลังโหลด...</div>
         </div>
-        
+
         <div style="overflow-x: auto;">
             <table>
                 <thead>
@@ -32,11 +41,11 @@
                         <th>หมายเลข Internet</th>
                         <th>หัวข้อปัญหา</th>
                         <th>สถานะ</th>
-                        <th>จัดการ</th>
+                        <th style="text-align: center;">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody id="allTicketsList">
-                    <tr><td colspan="5" style="text-align: center; padding: 40px;">กำลังโหลดข้อมูลงาน...</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 50px; color: #9CA3AF;">กำลังดึงข้อมูลงาน...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -62,10 +71,13 @@
 
     onAuthStateChanged(auth, (user) => {
         if (!user) window.location.href = "../index.html";
-        else loadAllActiveTickets();
+        else {
+            document.getElementById('supEmail').innerText = user.email;
+            loadActiveJobs();
+        }
     });
 
-    function loadAllActiveTickets() {
+    function loadActiveJobs() {
         const q = query(
             collection(db, "tickets"), 
             where("status", "in", ["Open", "In Progress"]),
@@ -74,29 +86,27 @@
 
         onSnapshot(q, (snapshot) => {
             const listBody = document.getElementById('allTicketsList');
-            document.getElementById('jobSummary').innerText = `ค้างทั้งหมด: ${snapshot.size} รายการ`;
+            document.getElementById('jobCount').innerText = `งานรอดำเนินการ: ${snapshot.size} เคส`;
             
             if (snapshot.empty) {
-                listBody.innerHTML = '<tr><td colspan="5" style="padding: 40px; text-align: center; color: #999;">🎉 ไม่มีงานค้างในขณะนี้</td></tr>';
+                listBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 50px;">🎉 ไม่มีงานค้างในระบบ</td></tr>';
                 return;
             }
 
             let html = '';
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
-                const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
+                const date = t.createdAt?.toDate().toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'}) || '-';
                 const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
 
                 html += `
                     <tr>
-                        <td>${date}</td>
-                        <td><b>${t.internetNo}</b></td>
-                        <td>${t.issueType}</td>
+                        <td style="color: #6B7280;">${date}</td>
+                        <td><b style="font-size: 1rem; color: #111827;">${t.internetNo}</b></td>
+                        <td style="color: #4B5563;">${t.issueType}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                        <td>
-                            <button class="btn btn-primary" onclick="window.manageTicket('${docSnap.id}')" style="padding: 5px 12px; font-size: 0.8rem;">
-                                จัดการ
-                            </button>
+                        <td style="text-align: center;">
+                            <button class="btn-manage" onclick="window.goManage('${docSnap.id}')">จัดการงาน</button>
                         </td>
                     </tr>`;
             });
@@ -104,7 +114,7 @@
         });
     }
 
-    window.manageTicket = (id) => {
+    window.goManage = (id) => {
         localStorage.setItem('currentTicketId', id);
         window.location.href = 'manage-job.html';
     };
