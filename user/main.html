@@ -3,70 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sale Support - สำหรับพนักงานขาย</title>
+    <title>Sale Portal - Sale Support System</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        .user-header { background: #10b981; color: white; padding: 20px; border-radius: 0 0 20px 20px; margin-bottom: 25px; }
-        .form-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .history-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .time-text { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 4px; }
+        /* สไตล์เพิ่มเติมเพื่อให้เข้ากับหน้า Admin/Supervisor */
+        .main-content { padding: 20px; }
+        .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        @media (max-width: 992px) { .grid-layout { grid-template-columns: 1fr; } }
+        
+        .ticket-item { 
+            border-bottom: 1px solid #f1f5f9; padding: 15px 0; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .ticket-item:last-child { border-bottom: none; }
+        .time-label { font-size: 11px; color: #94a3b8; display: block; margin-top: 4px; }
+        .note-preview { 
+            font-size: 13px; color: #475569; background: #f8fafc; 
+            padding: 8px; border-radius: 6px; margin-top: 5px; border-left: 3px solid #e2e8f0;
+        }
     </style>
 </head>
-<body style="background-color: #f1f5f9;">
+<body>
 
-    <div class="user-header">
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto; width: 90%;">
-            <div>
-                <h1 style="margin: 0; font-size: 1.5rem;">Sale Portal</h1>
-                <p id="userEmail" style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9rem;">กำลังโหลด...</p>
-            </div>
-            <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 10px; cursor: pointer;">ออกจากระบบ</button>
+    <div class="sidebar">
+        <div class="sidebar-header">SALE PORTAL</div>
+        <div class="sidebar-menu">
+            <a href="main.html" class="active">📝 <span>ส่งเรื่องแจ้งงาน</span></a>
+            <a href="history.html">📜 <span>ประวัติแจ้งงาน</span></a>
+            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
+            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
         </div>
     </div>
 
-    <div style="max-width: 1000px; margin: 0 auto; width: 90%; padding-bottom: 50px;">
-        
-        <div class="form-card">
-            <h2 style="margin-top: 0; color: #1e293b; display: flex; align-items: center; gap: 10px;">
-                <span>📝</span> แจ้งปัญหา/ส่งงานใหม่
-            </h2>
-            <form id="ticketForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label>หมายเลข Internet (88/NF)</label>
-                        <input type="text" id="internetNo" class="input-field" placeholder="เช่น 8801234567" required>
-                    </div>
-                    <div class="form-group">
-                        <label>หัวข้อปัญหา</label>
-                        <select id="issueTopic" class="input-field" required>
-                            <option value="">-- เลือกหัวข้อ --</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>รายละเอียดเพิ่มเติม</label>
-                    <textarea id="detail" class="input-field" rows="3" placeholder="ระบุรายละเอียดที่ต้องการให้ช่วยดำเนินการ..."></textarea>
-                </div>
-                <button type="submit" id="submitBtn" class="btn-login" style="background: #10b981; margin-top: 10px;">ส่งเรื่องแจ้งงาน</button>
-            </form>
+    <div class="main-content">
+        <div class="top-bar">
+            <span style="font-weight: 600; color: #1e293b;">ยินดีต้อนรับ, <span id="userEmailDisplay">...</span></span>
         </div>
 
-        <div class="history-card">
-            <h3 style="margin-top: 0; color: #1e293b;">📜 ประวัติการแจ้งงานของคุณ</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="text-align: left; border-bottom: 2px solid #f1f5f9;">
-                            <th style="padding: 12px;">ข้อมูลงาน</th>
-                            <th style="padding: 12px;">สถานะ</th>
-                            <th style="padding: 12px;">ผลการแก้ไข/หมายเหตุ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="myTicketsBody">
-                        <tr><td colspan="3" style="text-align: center; padding: 30px; color: #94a3b8;">กำลังโหลดประวัติ...</td></tr>
-                    </tbody>
-                </table>
+        <div class="container">
+            <div class="grid-layout">
+                
+                <div class="card">
+                    <h3 style="margin-top:0;">📝 แจ้งปัญหาใหม่</h3>
+                    <form id="ticketForm">
+                        <div class="form-group">
+                            <label>หมายเลข Internet (88/NF)</label>
+                            <input type="text" id="internetNo" class="input-field" placeholder="88xxxxxxxx" required>
+                        </div>
+                        <div class="form-group">
+                            <label>หัวข้อปัญหา</label>
+                            <select id="issueTopic" class="input-field" required>
+                                <option value="">-- เลือกหัวข้อ --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>รายละเอียดเพิ่มเติม</label>
+                            <textarea id="detail" class="input-field" rows="4" placeholder="ระบุข้อมูลเพิ่มเติม..."></textarea>
+                        </div>
+                        <button type="submit" id="submitBtn" class="btn-login" style="background:#10b981; width:100%;">ส่งข้อมูลแจ้งงาน</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0;">🕒 งานล่าสุดของคุณ</h3>
+                        <a href="history.html" style="font-size:13px; color:#10b981; text-decoration:none;">ดูทั้งหมด →</a>
+                    </div>
+                    <div id="recentTicketsList">
+                        <p style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูล...</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -74,7 +82,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, collection, addDoc, onSnapshot, query, where, orderBy, limit, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
@@ -95,100 +103,84 @@
         if (!user) window.location.href = "../index.html";
         else {
             currentUser = user;
-            document.getElementById('userEmail').innerText = "Sale: " + user.email;
+            document.getElementById('userEmailDisplay').innerText = user.email;
             loadIssueOptions();
-            loadMyTickets();
+            loadRecentTickets();
         }
     });
 
-    // 1. ดึงหัวข้อปัญหาจาก Admin Settings
+    // ดึงหัวข้อปัญหาจาก Settings (Format เดียวกับ Admin)
     async function loadIssueOptions() {
-        const settingsRef = doc(db, "settings", "issueOptions");
-        const docSnap = await getDoc(settingsRef);
+        const docSnap = await getDoc(doc(db, "settings", "issueOptions"));
         if (docSnap.exists()) {
             const options = docSnap.data().options || [];
             const select = document.getElementById('issueTopic');
             options.forEach(opt => {
                 const el = document.createElement('option');
-                el.value = opt;
-                el.textContent = opt;
+                el.value = opt; el.textContent = opt;
                 select.appendChild(el);
             });
         }
     }
 
-    // 2. ส่งงานใหม่
+    // บันทึก Ticket ใหม่พร้อม TimeStamp
     document.getElementById('ticketForm').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerText = "⏳ กำลังส่งข้อมูล...";
-
-        const ticketData = {
-            internetNo: document.getElementById('internetNo').value,
-            topic: document.getElementById('issueTopic').value,
-            detail: document.getElementById('detail').value,
-            email: currentUser.email,
-            uid: currentUser.uid,
-            status: "Open",
-            supNote: "",
-            createdAt: serverTimestamp(), // เวลาสร้างงาน
-            updatedAt: serverTimestamp()  // เวลาอัปเดตล่าสุด (เริ่มต้นเท่ากับเวลาสร้าง)
-        };
+        btn.innerText = "กำลังส่ง...";
 
         try {
-            await addDoc(collection(db, "tickets"), ticketData);
-            alert("✅ ส่งเรื่องเรียบร้อยแล้ว!");
+            await addDoc(collection(db, "tickets"), {
+                internetNo: document.getElementById('internetNo').value,
+                topic: document.getElementById('issueTopic').value,
+                detail: document.getElementById('detail').value,
+                email: currentUser.email,
+                uid: currentUser.uid,
+                status: "Open",
+                supNote: "",
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            });
+            alert("✅ ส่งข้อมูลสำเร็จ");
             document.getElementById('ticketForm').reset();
-        } catch (error) {
-            alert("❌ เกิดข้อผิดพลาด: " + error.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "ส่งเรื่องแจ้งงาน";
-        }
+        } catch (error) { alert("Error: " + error.message); }
+        finally { btn.disabled = false; btn.innerText = "ส่งข้อมูลแจ้งงาน"; }
     };
 
-    // 3. ดึงประวัติงานเฉพาะของตัวเอง
-    function loadMyTickets() {
+    // แสดงงานล่าสุด 5 รายการ
+    function loadRecentTickets() {
         const q = query(
             collection(db, "tickets"),
             where("uid", "==", currentUser.uid),
-            orderBy("createdAt", "desc")
+            orderBy("createdAt", "desc"),
+            limit(5)
         );
 
         onSnapshot(q, (snap) => {
+            const listDiv = document.getElementById('recentTicketsList');
             let html = '';
             snap.forEach(docSnap => {
                 const t = docSnap.data();
-                const createDate = t.createdAt ? t.createdAt.toDate().toLocaleString('th-TH') : '...';
-                const updateDate = t.updatedAt ? t.updatedAt.toDate().toLocaleString('th-TH') : 'ไม่มีการอัปเดต';
-                
                 const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
+                const updateTime = t.updatedAt ? t.updatedAt.toDate().toLocaleString('th-TH') : '-';
 
                 html += `
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 12px;">
-                            <b>${t.internetNo}</b><br>
-                            <small style="color:#64748b;">หัวข้อ: ${t.topic}</small>
-                            <span class="time-text">🕒 แจ้งเมื่อ: ${createDate}</span>
-                        </td>
-                        <td style="padding: 12px;">
-                            <span class="status-badge ${statusClass}">${t.status}</span>
-                            <span class="time-text">🔄 อัปเดต: ${updateDate}</span>
-                        </td>
-                        <td style="padding: 12px;">
-                            <div style="font-size: 0.9rem; color: #1e293b; background: #f8fafc; padding: 8px; border-radius: 5px;">
-                                ${t.supNote || '<i style="color:#94a3b8;">รอการดำเนินการ...</i>'}
-                            </div>
-                        </td>
-                    </tr>
+                    <div class="ticket-item">
+                        <div style="flex:1;">
+                            <b>${t.internetNo}</b> <span class="status-badge ${statusClass}" style="font-size:10px; padding:2px 8px;">${t.status}</span>
+                            <div style="font-size:13px; color:#64748b; margin-top:3px;">${t.topic}</div>
+                            ${t.supNote ? `<div class="note-preview">💬 ${t.supNote}</div>` : ''}
+                            <span class="time-label">อัปเดตล่าสุด: ${updateTime}</span>
+                        </div>
+                    </div>
                 `;
             });
-            document.getElementById('myTicketsBody').innerHTML = html || '<tr><td colspan="3" style="text-align:center; padding:20px;">ยังไม่มีประวัติการแจ้งงาน</td></tr>';
+            listDiv.innerHTML = html || '<p style="text-align:center; color:#94a3b8;">ไม่พบประวัติการแจ้งงาน</p>';
         });
     }
 
-    window.logout = () => signOut(auth).then(() => window.location.href = "../index.html");
+    document.getElementById('logoutBtn').onclick = () => signOut(auth);
 </script>
 </body>
 </html>
