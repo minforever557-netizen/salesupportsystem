@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supervisor Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
@@ -19,15 +20,15 @@
 
     <div class="main-content">
         <div class="top-bar">
-            <span id="supEmail" style="font-weight: 600; color: var(--text-muted);">กำลังโหลด...</span>
+            <span id="supEmail" style="font-weight: 600; color: #6B7280;">กำลังโหลด...</span>
         </div>
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <div>
                     <h2 style="margin:0;">📋 รายการงานค้าง</h2>
-                    <p style="color: var(--text-muted); margin:0;">จัดการเคสที่สถานะ Open และ In Progress</p>
+                    <p style="color: #6B7280; margin:0;">จัดการเคสที่สถานะ Open และ In Progress</p>
                 </div>
-                <div id="jobCount" style="background: var(--primary-green); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">0 เคส</div>
+                <div id="jobCount" style="background: #10B981; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">0 เคส</div>
             </div>
 
             <div class="card">
@@ -57,6 +58,7 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // ใส่ Config ของคุณที่นี่
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -71,8 +73,9 @@
     const db = getFirestore(app);
 
     onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "../index.html";
-        else {
+        if (!user) {
+            window.location.href = "../index.html";
+        } else {
             document.getElementById('supEmail').innerText = user.email;
             loadActiveJobs();
         }
@@ -108,20 +111,31 @@
                         <td>${t.issueType}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                         <td style="text-align: center;">
-                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 0.85rem;" onclick="goManage('${docSnap.id}')">จัดการ</button>
+                            <button class="btn btn-primary btn-manage" data-id="${docSnap.id}" style="padding: 5px 12px; font-size: 0.85rem;">จัดการ</button>
                         </td>
                     </tr>`;
             });
             listBody.innerHTML = html;
+
+            // เพิ่ม Event Listener ให้ปุ่มจัดการ (วิธีนี้ปลอดภัยกว่า onclick บน GitHub)
+            document.querySelectorAll('.btn-manage').forEach(btn => {
+                btn.onclick = () => {
+                    localStorage.setItem('currentTicketId', btn.getAttribute('data-id'));
+                    window.location.href = 'manage-job.html';
+                };
+            });
+        }, (error) => {
+            console.error("Error loading jobs:", error);
+            if(error.code === 'failed-precondition') {
+                listBody.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">ต้องสร้าง Index ใน Firebase ก่อน</td></tr>';
+            }
         });
     }
 
-    window.goManage = (id) => {
-        localStorage.setItem('currentTicketId', id);
-        window.location.href = 'manage-job.html';
+    document.getElementById('logoutBtn').onclick = (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => window.location.href = "../index.html");
     };
-
-    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
 </script>
 </body>
 </html>
