@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการงาน (Supervisor) - Sale Support</title>
+    <title>รายการงาน - Supervisor</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -13,9 +13,9 @@
         <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; border-radius: 4px; padding: 5px 10px; cursor: pointer;">ออกจากระบบ</button>
     </nav>
 
-    <div class="green-container" style="max-width: 900px; margin-top: 30px; border-top: 6px solid #10B981;">
+    <div class="green-container" style="max-width: 1000px; margin-top: 30px;">
         <h3 style="color: var(--primary-green); margin-top: 0;">📋 รายการงานที่ต้องจัดการ (Open / In Progress)</h3>
-        <div id="jobSummary" style="margin-bottom: 15px; font-size: 0.9rem; color: #666;"></div>
+        <p id="jobSummary" style="font-size: 0.9rem; color: #666;"></p>
         
         <div style="overflow-x: auto;">
             <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
@@ -38,7 +38,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
@@ -53,22 +53,11 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ตรวจสอบสิทธิ์ (ต้องเป็น supervisor หรือ admin เท่านั้น)
     onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "../index.html";
-        } else {
-            const role = localStorage.getItem('userRole');
-            if (role !== 'supervisor' && role !== 'admin') {
-                alert("คุณไม่มีสิทธิ์เข้าถึงหน้านี้");
-                window.location.href = "../user/ticket.html";
-            } else {
-                loadAllActiveTickets();
-            }
-        }
+        if (!user) window.location.href = "../index.html";
+        else loadAllActiveTickets();
     });
 
-    // โหลดงานทั้งหมดที่ยังไม่ปิด (Open และ In Progress)
     function loadAllActiveTickets() {
         const q = query(
             collection(db, "tickets"), 
@@ -89,7 +78,7 @@
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
                 const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-                const statusColor = t.status === 'Open' ? '#ef4444' : '#f59e0b'; // แดงสำหรับ Open, ส้มสำหรับ In Progress
+                const statusColor = t.status === 'Open' ? '#ef4444' : '#f59e0b';
 
                 html += `
                     <tr style="border-bottom: 1px solid #eee;">
@@ -102,27 +91,22 @@
                             </span>
                         </td>
                         <td style="padding: 12px;">
-                            <button onclick="window.manageTicket('${docSnap.id}')" style="background: var(--primary-green); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
-                                จัดการงาน
+                            <button onclick="window.manageTicket('${docSnap.id}')" style="background: var(--primary-green); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">
+                                จัดการ
                             </button>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
             });
             listBody.innerHTML = html;
         });
     }
 
-    // ฟังก์ชันสำหรับเปิดหน้าจัดการงาน (จะทำใน Step ถัดไป)
-    window.manageTicket = (ticketId) => {
-        // บันทึก ID งานลงเครื่องชั่วคราวแล้วไปหน้าแก้ไข
-        localStorage.setItem('currentTicketId', ticketId);
+    window.manageTicket = (id) => {
+        localStorage.setItem('currentTicketId', id);
         window.location.href = 'manage-job.html';
     };
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth).then(() => window.location.href = "../index.html");
-    });
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth).then(() => window.location.href = "../index.html"));
 </script>
 </body>
 </html>
