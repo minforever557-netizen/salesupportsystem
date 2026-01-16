@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Sale Support System</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .admin-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .stat-card { padding: 20px; border-radius: 12px; color: white; text-align: center; }
+        .issue-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px; border-bottom: 1px solid #eee; 
+        }
+        .issue-item:last-child { border-bottom: none; }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">ADMIN CONTROL</div>
+        <div class="sidebar-menu">
+            <a href="main.html" class="active">📊 <span>Dashboard</span></a>
+            <a href="users.html">👥 <span>จัดการผู้ใช้งาน</span></a>
+            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
+            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar"><span id="adminEmail" style="font-weight: 600;">Admin Loading...</span></div>
+        <div class="container">
+            <h2 style="margin-bottom: 20px;">🎛️ ระบบจัดการหลังบ้าน</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div class="stat-card" style="background: #111827;">
+                    <small>Ticket ทั้งหมด</small><div id="totalTicket" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                </div>
+                <div class="stat-card" style="background: #EF4444;">
+                    <small>Open</small><div id="totalOpen" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                </div>
+                <div class="stat-card" style="background: #F59E0B;">
+                    <small>In Progress</small><div id="totalProcess" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                </div>
+                <div class="stat-card" style="background: #10B981;">
+                    <small>Closed</small><div id="totalClosed" style="font-size: 1.5rem; font-weight: 600;">0</div>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="card">
+                    <h3>🛠️ จัดการหัวข้อปัญหา</h3>
+                    <p style="font-size: 0.85rem; color: gray; margin-bottom: 15px;">หัวข้อเหล่านี้จะไปปรากฏในหน้าส่ง Ticket ของ Sale</p>
+                    
+                    <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                        <input type="text" id="newIssueInput" class="input-field" placeholder="ชื่อหัวข้อใหม่..." style="margin:0;">
+                        <button id="addIssueBtn" class="btn btn-primary" style="white-space: nowrap;">เพิ่ม</button>
+                    </div>
+
+                    <div id="issueList" style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+                        </div>
+                </div>
+
+                <div class="card">
+                    <h3>👁️ งานล่าสุดในระบบ</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="font-size: 0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Sale</th>
+                                    <th>หมายเลข Internet</th>
+                                    <th>สถานะ</th>
+                                    <th>ผู้ดูแล (Sup)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTickets">
+                                <tr><td colspan="4" style="text-align: center;">กำลังโหลด...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, collection, onSnapshot, updateDoc, arrayUnion, arrayRemove, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "../index.html";
+        else {
+            document.getElementById('adminEmail').innerText = "Admin: " + user.email;
+            initAdminDashboard();
+        }
+    });
+
+    function initAdminDashboard() {
+        // 1. ดึงสถิติและงานล่าสุด
+        onSnapshot(query(collection(db, "tickets"), orderBy("createdAt", "desc")), (snap) => {
+            let stats = { all: snap.size, open: 0, process: 0, closed: 0 };
+            let recentHtml = '';
+            
+            snap.forEach((doc, index) => {
+                const t = doc.data();
+                if (t.status === 'Open') stats.open++;
+                if (t.status === 'In Progress') stats.process++;
+                if (t.status === 'Closed') stats.closed++;
+
+                if (index < 5) { // แสดงแค่ 5 งานล่าสุด
+                    recentHtml += `<tr>
+                        <td>${t.email.split('@')[0]}</td>
+                        <td><b>${t.internetNo}</b></td>
+                        <td><span class="status-badge ${t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process')}">${t.status}</span></td>
+                        <td>${t.processedBy ? t.processedBy.split('@')[0] : '-'}</td>
+                    </tr>`;
+                }
+            });
+
+            document.getElementById('totalTicket').innerText = stats.all;
+            document.getElementById('totalOpen').innerText = stats.open;
+            document.getElementById('totalProcess').innerText = stats.process;
+            document.getElementById('totalClosed').innerText = stats.closed;
+            document.getElementById('recentTickets').innerHTML = recentHtml;
+        });
+
+        // 2. ดึงและจัดการหัวข้อปัญหา (Settings)
+        const settingsRef = doc(db, "settings", "issueOptions");
+        onSnapshot(settingsRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const options = docSnap.data().options || [];
+                const listHtml = options.map(opt => `
+                    <div class="issue-item">
+                        <span>${opt}</span>
+                        <button class="btn-delete" onclick="deleteIssue('${opt}')">ลบ</button>
+                    </div>
+                `).join('');
+                document.getElementById('issueList').innerHTML = listHtml;
+            }
+        });
+
+        // ฟังก์ชันเพิ่มหัวข้อ
+        document.getElementById('addIssueBtn').onclick = async () => {
+            const input = document.getElementById('newIssueInput');
+            if (!input.value) return;
+            await updateDoc(settingsRef, { options: arrayUnion(input.value) });
+            input.value = '';
+        };
+
+        // ฟังก์ชันลบหัวข้อ (ผูกเข้ากับ window เพื่อให้เรียกจาก onclick ได้)
+        window.deleteIssue = async (val) => {
+            if (confirm(`ยืนยันการลบหัวข้อ: ${val}?`)) {
+                await updateDoc(settingsRef, { options: arrayRemove(val) });
+            }
+        };
+    }
+
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
+</script>
+</body>
+</html>
