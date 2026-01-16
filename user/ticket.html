@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แจ้งปัญหา - Sale Support</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: bold;">Sale Support System</span>
+        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; border-radius: 4px; padding: 5px 10px; cursor: pointer;">ออกจากระบบ</button>
+    </nav>
+
+    <div class="green-container" style="max-width: 600px; margin-top: 30px;">
+        <h3 style="color: var(--primary-green); margin-top: 0;">➕ แจ้งเรื่องใหม่</h3>
+        <form id="ticketForm">
+            <label>หัวข้อปัญหา</label>
+            <select id="issueType" class="input-field" required>
+                <option value="">-- เลือกหัวข้อ --</option>
+                <option value="อินเทอร์เน็ตใช้งานไม่ได้">อินเทอร์เน็ตใช้งานไม่ได้</option>
+                <option value="ความเร็วไม่ตรงตามแพ็กเกจ">ความเร็วไม่ตรงตามแพ็กเกจ</option>
+                <option value="อุปกรณ์มีปัญหา">อุปกรณ์มีปัญหา</option>
+            </select>
+
+            <label>หมายเลข Internet (10 หลัก)</label>
+            <input type="text" id="internetNo" class="input-field" placeholder="88xxxxxxxx" required pattern="[0-9]{10}">
+
+            <label>รายละเอียดที่ต้องการแก้ไข</label>
+            <textarea id="details" class="input-field" rows="4" required></textarea>
+
+            <button type="submit" class="btn-green" id="submitBtn">ส่งข้อมูล</button>
+        </form>
+    </div>
+
+    <div class="green-container" style="max-width: 600px; margin-top: 20px; border-top: 6px solid #fbbf24;">
+        <h4>📋 สถานะงานของคุณ</h4>
+        <div id="ticketList">กำลังโหลดข้อมูล...</div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ตรวจสอบสิทธิ์เข้าหน้า
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "../index.html";
+        } else {
+            loadMyTickets(user.uid);
+        }
+    });
+
+    // ส่ง Ticket
+    document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+
+        try {
+            await addDoc(collection(db, "tickets"), {
+                uid: auth.currentUser.uid,
+                email: auth.currentUser.email,
+                issueType: document.getElementById('issueType').value,
+                internetNo: document.getElementById('internetNo').value,
+                details: document.getElementById('details').value,
+                status: "Open",
+                createdAt: serverTimestamp()
+            });
+            alert("ส่งเรื่องสำเร็จ!");
+            document.getElementById('ticketForm').reset();
+        } catch (e) {
+            alert("เกิดข้อผิดพลาด: " + e.message);
+        }
+        btn.disabled = false;
+    });
+
+    // โหลดข้อมูลแบบ Real-time
+    function loadMyTickets(uid) {
+        const q = query(collection(db, "tickets"), where("uid", "==", uid), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            let html = '<table style="width:100%">';
+            snapshot.forEach(doc => {
+                const t = doc.data();
+                html += `<tr style="border-bottom:1px solid #eee">
+                    <td>${t.internetNo}<br><small>${t.issueType}</small></td>
+                    <td style="text-align:right"><b>${t.status}</b></td>
+                </tr>`;
+            });
+            document.getElementById('ticketList').innerHTML = snapshot.empty ? "ยังไม่มีข้อมูล" : html + '</table>';
+        });
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+</script>
+</body>
+</html>
