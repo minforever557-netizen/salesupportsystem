@@ -10,29 +10,30 @@
         /* สไตล์สำหรับกระดิ่งแจ้งเตือน */
         .notif-wrapper {
             position: relative;
-            cursor: pointer;
+            cursor: pointer !important; /* บังคับให้เป็นรูปมือ */
             margin-right: 20px;
             display: flex;
             align-items: center;
-            transition: transform 0.2s;
+            z-index: 999; /* ให้อยู่บนสุดเสมอ */
+            padding: 5px;
+            transition: transform 0.2s ease;
         }
-        .notif-wrapper:hover { transform: scale(1.1); }
+        .notif-wrapper:hover { transform: scale(1.15); }
         
-        .notif-icon {
-            font-size: 24px;
-            color: #64748b;
-        }
+        .notif-icon { font-size: 26px; color: #4b5563; }
+        
         .notif-badge-icon {
             position: absolute;
-            top: -5px;
-            right: -8px;
+            top: -2px;
+            right: -5px;
             background: #ef4444;
             color: white;
             border-radius: 50%;
-            padding: 2px 7px;
+            padding: 2px 6px;
             font-size: 11px;
             font-weight: bold;
-            display: none; /* ซ่อนไว้ถ้าไม่มีงาน */
+            display: none;
+            border: 2px solid white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
@@ -45,14 +46,6 @@
             60% { transform: rotate(10deg); }
             80% { transform: rotate(-10deg); }
             100% { transform: rotate(0); }
-        }
-
-        /* ตกแต่งส่วนหัวตารางและ Card */
-        .card-header-flex {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px;
         }
     </style>
 </head>
@@ -68,24 +61,24 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px;">
-            <div class="notif-wrapper" id="notifBell" title="คลิกเพื่อดูงานค้าง">
+        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px; height: 70px;">
+            <div class="notif-wrapper" id="notifBell">
                 <span class="notif-icon">🔔</span>
                 <span class="notif-badge-icon" id="notifCountIcon">0</span>
             </div>
-            <span id="supEmail" style="font-weight: 600; color: #6B7280;">Supervisor: Loading...</span>
+            <span id="supEmail" style="font-weight: 600; color: #4B5563;">กำลังโหลด...</span>
         </div>
 
         <div class="container">
-            <div class="card-header-flex">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <div>
-                    <h2 style="margin:0;">📋 รายการงานค้าง</h2>
-                    <p style="color: #6B7280; margin:0;">จัดการเคสที่สถานะ Open และ In Progress</p>
+                    <h2 style="margin:0; color: #111827;">📋 รายการงานค้าง</h2>
+                    <p style="color: #6B7280; margin:0;">เคสสถานะ Open และ In Progress</p>
                 </div>
-                <div id="jobCount" style="background: #10B981; color: white; padding: 6px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 600;">0 เคส</div>
+                <div id="jobCount" style="background: #10B981; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 600;">0 เคส</div>
             </div>
 
-            <div class="card" id="ticketCard">
+            <div class="card" id="jobSection">
                 <div class="table-container" style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -99,7 +92,7 @@
                             </tr>
                         </thead>
                         <tbody id="allTicketsList">
-                            <tr><td colspan="6" style="text-align: center; padding: 40px;">กำลังดึงข้อมูลงาน...</td></tr>
+                            <tr><td colspan="6" style="text-align: center; padding: 40px;">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -125,36 +118,31 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // เช็คสิทธิ์การเข้าใช้งาน
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = "../index.html";
         } else {
             document.getElementById('supEmail').innerText = "Supervisor: " + user.email;
             loadActiveJobs();
-            if ("Notification" in window) Notification.requestPermission();
         }
     });
 
-    // ฟังก์ชันจัดการกระดิ่งเมื่อมีการกด
-    document.getElementById('notifBell').onclick = () => {
-        const badge = document.getElementById('notifCountIcon');
-        if (badge.style.display !== 'none') {
-            // เลื่อนหน้าจอไปที่บัตรรายการงาน
-            document.getElementById('ticketCard').scrollIntoView({ behavior: 'smooth' });
-            
-            // เอฟเฟกต์เน้นที่ตัวการ์ด
-            const card = document.getElementById('ticketCard');
-            card.style.ring = "2px solid #10B981";
-            card.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.4)";
-            setTimeout(() => {
-                card.style.boxShadow = "";
-                card.style.ring = "";
-            }, 1500);
-        }
-    };
+    // ฟังก์ชันเมื่อกดกระดิ่ง
+    const bellBtn = document.getElementById('notifBell');
+    bellBtn.addEventListener('click', () => {
+        const target = document.getElementById('jobSection');
+        target.scrollIntoView({ behavior: 'smooth' });
+        
+        // เพิ่มลูกเล่นให้ Card กระพริบเพื่อให้รู้ว่าเลื่อนมาดูตรงนี้
+        target.style.transition = "0.5s";
+        target.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.4)";
+        setTimeout(() => { target.style.boxShadow = ""; }, 1500);
+    });
 
     function loadActiveJobs() {
         const listBody = document.getElementById('allTicketsList');
+        const badge = document.getElementById('notifCountIcon');
         const q = query(
             collection(db, "tickets"), 
             where("status", "in", ["Open", "In Progress"]),
@@ -164,19 +152,17 @@
         let firstLoad = true;
 
         onSnapshot(q, (snapshot) => {
-            // นับเฉพาะงานที่เป็น Open สำหรับแจ้งเตือน
-            const openJobs = snapshot.docs.filter(d => d.data().status === "Open").length;
+            const openJobsCount = snapshot.docs.filter(d => d.data().status === "Open").length;
             
-            // อัปเดต Badge แจ้งเตือน
-            const badge = document.getElementById('notifCountIcon');
-            if (openJobs > 0) {
-                badge.innerText = openJobs;
+            // อัปเดต Badge
+            if (openJobsCount > 0) {
+                badge.innerText = openJobsCount;
                 badge.style.display = 'block';
                 
-                // สั่นเฉพาะเมื่อมีงานใหม่เพิ่มเข้ามาจริงๆ
+                // แจ้งเตือนเมื่อมีงานใหม่ (ไม่ใช่การโหลดครั้งแรก)
                 if (!firstLoad) {
-                    document.getElementById('notifBell').classList.add('shake');
-                    setTimeout(() => document.getElementById('notifBell').classList.remove('shake'), 500);
+                    bellBtn.classList.add('shake');
+                    setTimeout(() => bellBtn.classList.remove('shake'), 500);
                     playAlertSound();
                 }
             } else {
@@ -187,43 +173,44 @@
             firstLoad = false;
 
             if (snapshot.empty) {
-                listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้างในระบบ</td></tr>';
+                listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้าง</td></tr>';
                 return;
             }
 
             let html = '';
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
-                const date = t.createdAt ? t.createdAt.toDate().toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit'}) : '-';
+                const date = t.createdAt ? t.createdAt.toDate().toLocaleDateString('th-TH', { 
+                    day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' 
+                }) : '-';
+                
                 const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
                 
                 html += `
                     <tr>
                         <td><small>${date}</small></td>
-                        <td><small style="color: #64748b;">${t.email.split('@')[0]}</small></td>
-                        <td><b style="letter-spacing:0.5px;">${t.internetNo}</b></td>
-                        <td>${t.topic || t.issueType || 'ทั่วไป'}</td>
+                        <td><small>${t.email.split('@')[0]}</small></td>
+                        <td><b>${t.internetNo}</b></td>
+                        <td>${t.issueType || 'ทั่วไป'}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                         <td style="text-align: center;">
-                            <button class="btn-manage" data-id="${docSnap.id}">จัดการ</button>
+                            <button class="btn-manage" onclick="goToManage('${docSnap.id}')">จัดการ</button>
                         </td>
                     </tr>`;
             });
             listBody.innerHTML = html;
-
-            // ผูก Event ปุ่มจัดการ
-            document.querySelectorAll('.btn-manage').forEach(btn => {
-                btn.onclick = () => {
-                    localStorage.setItem('currentTicketId', btn.getAttribute('data-id'));
-                    window.location.href = 'manage-job.html';
-                };
-            });
         });
     }
 
+    // ฟังก์ชันย้ายไปหน้าจัดการ (ทำเป็น Global เพื่อให้ปุ่มในตารางเรียกได้)
+    window.goToManage = (id) => {
+        localStorage.setItem('currentTicketId', id);
+        window.location.href = 'manage-job.html';
+    };
+
     function playAlertSound() {
         const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(e => console.log("Audio play blocked"));
+        audio.play().catch(() => {}); // ป้องกัน error ถ้า browser บล็อกเสียง
     }
 
     document.getElementById('logoutBtn').onclick = (e) => {
@@ -233,23 +220,19 @@
 </script>
 
 <style>
-    /* สไตล์เพิ่มเติมสำหรับปุ่มจัดการในตาราง */
+    /* สไตล์ปุ่มจัดการเพิ่มเติม */
     .btn-manage {
-        padding: 6px 16px;
-        font-size: 0.85rem;
-        border-radius: 20px;
         background: #10B981;
-        border: none;
         color: white;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 15px;
         cursor: pointer;
         font-weight: 600;
+        font-size: 0.85rem;
         transition: 0.2s;
     }
-    .btn-manage:hover {
-        background: #059669;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
-    }
+    .btn-manage:hover { background: #059669; }
 </style>
 </body>
 </html>
