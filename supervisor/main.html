@@ -7,41 +7,35 @@
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* สไตล์สำหรับกระดิ่งแจ้งเตือน */
-        .notif-wrapper {
-            position: relative;
-            cursor: pointer;
-            margin-right: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .notif-icon {
-            font-size: 22px;
-            color: #64748b;
-        }
+        /* ส่วนของกระดิ่ง */
+        .notif-wrapper { position: relative; cursor: pointer; margin-right: 20px; }
+        .notif-icon { font-size: 22px; color: #64748b; }
         .notif-badge-icon {
-            position: absolute;
-            top: -5px;
-            right: -8px;
-            background: #ef4444;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: bold;
-            display: none; /* ซ่อนไว้ถ้าไม่มีงาน */
+            position: absolute; top: -5px; right: -8px;
+            background: #ef4444; color: white; border-radius: 50%;
+            padding: 2px 6px; font-size: 10px; font-weight: bold; display: none;
         }
-        /* เอฟเฟกต์กระดิ่งสั่น */
-        .shake {
-            animation: shake-animation 0.5s ease-in-out;
+
+        /* เมนู Dropdown เมื่อกดกระดิ่ง */
+        .notif-dropdown {
+            position: absolute; top: 40px; right: 0; width: 300px;
+            background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0; z-index: 1000; display: none; overflow: hidden;
         }
+        .notif-header { padding: 10px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 600; font-size: 14px; background: #f8fafc; }
+        .notif-item { 
+            padding: 12px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .notif-item:hover { background: #f0fdf4; }
+        .notif-item b { color: #1e293b; font-size: 13px; }
+        .notif-item small { color: #64748b; font-size: 11px; }
+
+        .shake { animation: shake-animation 0.5s ease-in-out; }
         @keyframes shake-animation {
-            0% { transform: rotate(0); }
-            20% { transform: rotate(15deg); }
-            40% { transform: rotate(-15deg); }
-            60% { transform: rotate(10deg); }
-            80% { transform: rotate(-10deg); }
-            100% { transform: rotate(0); }
+            0% { transform: rotate(0); } 20% { transform: rotate(15deg); }
+            40% { transform: rotate(-15deg); } 60% { transform: rotate(10deg); }
+            80% { transform: rotate(-10deg); } 100% { transform: rotate(0); }
         }
     </style>
 </head>
@@ -61,35 +55,31 @@
             <div class="notif-wrapper" id="notifBell">
                 <span class="notif-icon">🔔</span>
                 <span class="notif-badge-icon" id="notifCountIcon">0</span>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">งานใหม่รอดำเนินการ</div>
+                    <div id="notifList">
+                        <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">ไม่มีงานใหม่</div>
+                    </div>
+                </div>
             </div>
             <span id="supEmail" style="font-weight: 600; color: #6B7280;">...</span>
         </div>
 
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <div>
-                    <h2 style="margin:0;">📋 รายการงานค้าง</h2>
-                    <p style="color: #6B7280; margin:0;">จัดการเคสที่สถานะ Open และ In Progress</p>
-                </div>
-                <div id="jobCount" style="background: #10B981; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">0 เคส</div>
+                <div><h2 style="margin:0;">📋 รายการงานค้าง</h2></div>
+                <div id="jobCount" style="background: #10B981; color: white; padding: 5px 15px; border-radius: 20px;">0 เคส</div>
             </div>
-
             <div class="card">
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
                             <tr>
-                                <th>วันที่แจ้ง</th>
-                                <th>ผู้แจ้ง</th>
-                                <th>หมายเลข INTERNET</th>
-                                <th>หัวข้อ</th>
-                                <th>สถานะ</th>
-                                <th style="text-align: center;">จัดการ</th>
+                                <th>วันที่แจ้ง</th><th>ผู้แจ้ง</th><th>หมายเลข INTERNET</th>
+                                <th>หัวข้อ</th><th>สถานะ</th><th style="text-align: center;">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="allTicketsList">
-                            <tr><td colspan="6" style="text-align: center; padding: 40px;">กำลังดึงข้อมูลงาน...</td></tr>
-                        </tbody>
+                        <tbody id="allTicketsList"></tbody>
                     </table>
                 </div>
             </div>
@@ -114,91 +104,91 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // ฟังก์ชันเปิด/ปิด Dropdown
+    const bell = document.getElementById('notifBell');
+    const dropdown = document.getElementById('notifDropdown');
+    bell.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    };
+    window.onclick = () => dropdown.style.display = 'none';
+
     onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "../index.html";
-        } else {
+        if (!user) window.location.href = "../index.html";
+        else {
             document.getElementById('supEmail').innerText = "Supervisor: " + user.email;
             loadActiveJobs();
-            // ขอสิทธิ์ Browser Notification
-            if ("Notification" in window) Notification.requestPermission();
         }
     });
 
     function loadActiveJobs() {
         const listBody = document.getElementById('allTicketsList');
-        const q = query(
-            collection(db, "tickets"), 
-            where("status", "in", ["Open", "In Progress"]),
-            orderBy("createdAt", "desc")
-        );
+        const notifList = document.getElementById('notifList');
+        const q = query(collection(db, "tickets"), where("status", "in", ["Open", "In Progress"]), orderBy("createdAt", "desc"));
 
         let firstLoad = true;
 
         onSnapshot(q, (snapshot) => {
-            const openJobs = snapshot.docs.filter(d => d.data().status === "Open").length;
-            
-            // อัปเดตตัวเลขแจ้งเตือนบน Icon กระดิ่ง
+            const openJobs = snapshot.docs.filter(d => d.data().status === "Open");
             const badge = document.getElementById('notifCountIcon');
-            if (openJobs > 0) {
-                badge.innerText = openJobs;
+            
+            // 1. จัดการตัวเลข Badge และ Dropdown List
+            if (openJobs.length > 0) {
+                badge.innerText = openJobs.length;
                 badge.style.display = 'block';
-                // ถ้ามีงานใหม่เพิ่มเข้ามา (ไม่ใช่การโหลดครั้งแรก) ให้สั่นกระดิ่ง
+                
+                let notifHtml = '';
+                openJobs.forEach(doc => {
+                    const data = doc.data();
+                    notifHtml += `
+                        <div class="notif-item" onclick="goToManage('${doc.id}')">
+                            <b>📌 ${data.internetNo}</b>
+                            <small>${data.topic || 'งานใหม่เข้ามา'}</small>
+                            <small>${data.createdAt?.toDate().toLocaleString('th-TH')}</small>
+                        </div>`;
+                });
+                notifList.innerHTML = notifHtml;
+
                 if (!firstLoad) {
-                    document.getElementById('notifBell').classList.add('shake');
-                    setTimeout(() => document.getElementById('notifBell').classList.remove('shake'), 500);
-                    playAlertSound();
+                    bell.classList.add('shake');
+                    setTimeout(() => bell.classList.remove('shake'), 500);
+                    new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(()=>{});
                 }
             } else {
                 badge.style.display = 'none';
+                notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">ไม่มีงานใหม่</div>';
             }
 
+            // 2. แสดงตารางหลัก (เหมือนเดิม)
             document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
-            firstLoad = false;
-
-            if (snapshot.empty) {
-                listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้างในระบบ</td></tr>';
-                return;
-            }
-
-            let html = '';
+            let tableHtml = '';
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
-                const date = t.createdAt ? t.createdAt.toDate().toLocaleString('th-TH') : '-';
                 const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
-                
-                html += `
+                tableHtml += `
                     <tr>
-                        <td><small>${date}</small></td>
+                        <td><small>${t.createdAt?.toDate().toLocaleString('th-TH')}</small></td>
                         <td><small>${t.email}</small></td>
                         <td><b>${t.internetNo}</b></td>
-                        <td>${t.topic || t.issueType || 'ทั่วไป'}</td>
+                        <td>${t.topic || t.issueType}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                         <td style="text-align: center;">
-                            <button class="btn btn-primary btn-manage" data-id="${docSnap.id}" style="padding: 5px 12px; font-size: 0.85rem; border-radius:15px; background:#10B981; border:none; color:white; cursor:pointer;">จัดการ</button>
+                            <button class="btn-manage" onclick="goToManage('${docSnap.id}')" style="padding: 5px 12px; border-radius:15px; background:#10B981; border:none; color:white; cursor:pointer;">จัดการ</button>
                         </td>
                     </tr>`;
             });
-            listBody.innerHTML = html;
-
-            document.querySelectorAll('.btn-manage').forEach(btn => {
-                btn.onclick = () => {
-                    localStorage.setItem('currentTicketId', btn.getAttribute('data-id'));
-                    window.location.href = 'manage-job.html';
-                };
-            });
+            listBody.innerHTML = tableHtml || '<tr><td colspan="6" style="text-align: center; padding: 40px;">ไม่มีงานค้าง</td></tr>';
+            firstLoad = false;
         });
     }
 
-    function playAlertSound() {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(e => {});
-    }
-
-    document.getElementById('logoutBtn').onclick = (e) => {
-        e.preventDefault();
-        signOut(auth).then(() => window.location.href = "../index.html");
+    // ฟังก์ชันย้ายไปหน้าจัดการ
+    window.goToManage = (id) => {
+        localStorage.setItem('currentTicketId', id);
+        window.location.href = 'manage-job.html';
     };
+
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
 </script>
 </body>
 </html>
