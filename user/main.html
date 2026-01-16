@@ -1,186 +1,144 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sale Portal - Sale Support System</title>
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* สไตล์เพิ่มเติมเพื่อให้เข้ากับหน้า Admin/Supervisor */
-        .main-content { padding: 20px; }
-        .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
-        @media (max-width: 992px) { .grid-layout { grid-template-columns: 1fr; } }
-        
-        .ticket-item { 
-            border-bottom: 1px solid #f1f5f9; padding: 15px 0; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .ticket-item:last-child { border-bottom: none; }
-        .time-label { font-size: 11px; color: #94a3b8; display: block; margin-top: 4px; }
-        .note-preview { 
-            font-size: 13px; color: #475569; background: #f8fafc; 
-            padding: 8px; border-radius: 6px; margin-top: 5px; border-left: 3px solid #e2e8f0;
-        }
-    </style>
+<title>Sale Dashboard - Sale Support</title>
+<link rel="stylesheet" href="../style.css">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 20px; }
+.menu-card {
+background: white; padding: 40px; border-radius: 15px; text-align: center;
+            text-decoration: none; color: var(--text-main); transition: 0.3s; box-shadow: var(--shadow);
+            text-decoration: none; color: #111827; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+border: 1px solid transparent;
+}
+        .menu-card:hover { transform: translateY(-5px); border-color: var(--primary-green); }
+        .menu-card i { font-size: 3rem; display: block; margin-bottom: 15px; }
+        .menu-card:hover { transform: translateY(-5px); border-color: #10B981; }
+        .menu-card-icon { font-size: 3rem; display: block; margin-bottom: 15px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+.stat-box { padding: 20px; border-radius: 12px; color: white; text-align: center; }
+        .stat-number { font-size: 1.8rem; font-weight: 600; margin-top: 5px; }
+</style>
 </head>
 <body>
+@@ -31,20 +33,39 @@
+</div>
 
-    <div class="sidebar">
-        <div class="sidebar-header">SALE PORTAL</div>
-        <div class="sidebar-menu">
-            <a href="main.html" class="active">📝 <span>ส่งเรื่องแจ้งงาน</span></a>
-            <a href="history.html">📜 <span>ประวัติแจ้งงาน</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
-        </div>
-    </div>
-
-    <div class="main-content">
+<div class="main-content">
+        <div class="top-bar"><span id="userEmail" style="font-weight: 600; color: var(--text-muted);"></span></div>
         <div class="top-bar">
-            <span style="font-weight: 600; color: #1e293b;">ยินดีต้อนรับ, <span id="userEmailDisplay">...</span></span>
+            <span id="userEmail" style="font-weight: 600; color: #6B7280;">กำลังโหลด...</span>
         </div>
+<div class="container">
+<h2>ยินดีต้อนรับ, Sale Support</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">ภาพรวมการแจ้งเรื่องของคุณ</p>
+            <p style="color: #6B7280; margin-bottom: 30px;">ภาพรวมการแจ้งเรื่องของคุณ</p>
 
-        <div class="container">
-            <div class="grid-layout">
-                
-                <div class="card">
-                    <h3 style="margin-top:0;">📝 แจ้งปัญหาใหม่</h3>
-                    <form id="ticketForm">
-                        <div class="form-group">
-                            <label>หมายเลข Internet (88/NF)</label>
-                            <input type="text" id="internetNo" class="input-field" placeholder="88xxxxxxxx" required>
-                        </div>
-                        <div class="form-group">
-                            <label>หัวข้อปัญหา</label>
-                            <select id="issueTopic" class="input-field" required>
-                                <option value="">-- เลือกหัวข้อ --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>รายละเอียดเพิ่มเติม</label>
-                            <textarea id="detail" class="input-field" rows="4" placeholder="ระบุข้อมูลเพิ่มเติม..."></textarea>
-                        </div>
-                        <button type="submit" id="submitBtn" class="btn-login" style="background:#10b981; width:100%;">ส่งข้อมูลแจ้งงาน</button>
-                    </form>
+<div class="stat-grid">
+                <div class="stat-box" style="background: #3B82F6;"><small>งานทั้งหมด</small><div id="countAll">0</div></div>
+                <div class="stat-box" style="background: #EF4444;"><small>รอดำเนินการ</small><div id="countOpen">0</div></div>
+                <div class="stat-box" style="background: #10B981;"><small>ปิดงานแล้ว</small><div id="countClosed">0</div></div>
+                <div class="stat-box" style="background: #3B82F6;">
+                    <small>งานทั้งหมด</small>
+                    <div id="countAll" class="stat-number">0</div>
                 </div>
-
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h3 style="margin:0;">🕒 งานล่าสุดของคุณ</h3>
-                        <a href="history.html" style="font-size:13px; color:#10b981; text-decoration:none;">ดูทั้งหมด →</a>
-                    </div>
-                    <div id="recentTicketsList">
-                        <p style="text-align:center; padding:20px; color:#94a3b8;">กำลังโหลดข้อมูล...</p>
-                    </div>
+                <div class="stat-box" style="background: #EF4444;">
+                    <small>รอดำเนินการ</small>
+                    <div id="countOpen" class="stat-number">0</div>
                 </div>
+                <div class="stat-box" style="background: #10B981;">
+                    <small>ปิดงานแล้ว</small>
+                    <div id="countClosed" class="stat-number">0</div>
+                </div>
+</div>
 
-            </div>
-        </div>
-    </div>
+<div class="menu-grid">
+                <a href="ticket.html" class="menu-card"><i>📝</i><b>ส่ง Ticket ใหม่</b><p>แจ้งปัญหา Internet หรือขอความช่วยเหลือ</p></a>
+                <a href="history.html" class="menu-card"><i>🔍</i><b>ค้นหา/ติดตามงาน</b><p>ดูสถานะงานและหมายเหตุจาก Supervisor</p></a>
+                <a href="ticket.html" class="menu-card">
+                    <span class="menu-card-icon">📝</span>
+                    <b>ส่ง Ticket ใหม่</b>
+                    <p style="font-size: 0.9rem; color: #666;">แจ้งปัญหา Internet หรือขอความช่วยเหลือ</p>
+                </a>
+                <a href="history.html" class="menu-card">
+                    <span class="menu-card-icon">🔍</span>
+                    <b>ค้นหา/ติดตามงาน</b>
+                    <p style="font-size: 0.9rem; color: #666;">ดูสถานะงานและหมายเหตุจาก Supervisor</p>
+                </a>
+</div>
+</div>
+</div>
+@@ -54,29 +75,55 @@
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, collection, addDoc, onSnapshot, query, where, orderBy, limit, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        const firebaseConfig = { /* ใช้ของคุณ */ apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw", authDomain: "sale-support-system.firebaseapp.com", projectId: "sale-support-system", storageBucket: "sale-support-system.firebasestorage.app", messagingSenderId: "640337786680", appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd" };
+        // *** สำคัญ: นำข้อมูลจาก Firebase Console ของคุณมาวางตรงนี้ ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+            authDomain: "sale-support-system.firebaseapp.com",
+            projectId: "sale-support-system",
+            storageBucket: "sale-support-system.firebasestorage.app",
+            messagingSenderId: "640337786680",
+            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+        };
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        // ตรวจสอบการเข้าสู่ระบบ
+onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "../index.html";
+            else {
+            if (!user) {
+                window.location.href = "../index.html";
+            } else {
+document.getElementById('userEmail').innerText = user.email;
+                const q = query(collection(db, "tickets"), where("email", "==", user.email));
+                onSnapshot(q, (snap) => {
+                    let all = snap.size, open = 0, closed = 0;
+                    snap.forEach(d => { 
+                        if(d.data().status === 'Closed') closed++; 
+                        else open++;
+                    });
+                    document.getElementById('countAll').innerText = all;
+                    document.getElementById('countOpen').innerText = open;
+                    document.getElementById('countClosed').innerText = closed;
+                });
+                fetchStats(user.email);
+}
+});
+        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
 
-    let currentUser = null;
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "../index.html";
-        else {
-            currentUser = user;
-            document.getElementById('userEmailDisplay').innerText = user.email;
-            loadIssueOptions();
-            loadRecentTickets();
-        }
-    });
-
-    // ดึงหัวข้อปัญหาจาก Settings (Format เดียวกับ Admin)
-    async function loadIssueOptions() {
-        const docSnap = await getDoc(doc(db, "settings", "issueOptions"));
-        if (docSnap.exists()) {
-            const options = docSnap.data().options || [];
-            const select = document.getElementById('issueTopic');
-            options.forEach(opt => {
-                const el = document.createElement('option');
-                el.value = opt; el.textContent = opt;
-                select.appendChild(el);
+        // ฟังก์ชันดึงสถิติ
+        function fetchStats(email) {
+            const q = query(collection(db, "tickets"), where("email", "==", email));
+            onSnapshot(q, (snap) => {
+                let all = snap.size;
+                let open = 0;
+                let closed = 0;
+                snap.forEach(doc => {
+                    const status = doc.data().status;
+                    if (status === 'Closed') closed++;
+                    else open++;
+                });
+                document.getElementById('countAll').innerText = all;
+                document.getElementById('countOpen').innerText = open;
+                document.getElementById('countClosed').innerText = closed;
             });
         }
-    }
 
-    // บันทึก Ticket ใหม่พร้อม TimeStamp
-    document.getElementById('ticketForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerText = "กำลังส่ง...";
-
-        try {
-            await addDoc(collection(db, "tickets"), {
-                internetNo: document.getElementById('internetNo').value,
-                topic: document.getElementById('issueTopic').value,
-                detail: document.getElementById('detail').value,
-                email: currentUser.email,
-                uid: currentUser.uid,
-                status: "Open",
-                supNote: "",
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
+        // ปุ่มออกจากระบบ
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => {
+                window.location.href = "../index.html";
             });
-            alert("✅ ส่งข้อมูลสำเร็จ");
-            document.getElementById('ticketForm').reset();
-        } catch (error) { alert("Error: " + error.message); }
-        finally { btn.disabled = false; btn.innerText = "ส่งข้อมูลแจ้งงาน"; }
-    };
-
-    // แสดงงานล่าสุด 5 รายการ
-    function loadRecentTickets() {
-        const q = query(
-            collection(db, "tickets"),
-            where("uid", "==", currentUser.uid),
-            orderBy("createdAt", "desc"),
-            limit(5)
-        );
-
-        onSnapshot(q, (snap) => {
-            const listDiv = document.getElementById('recentTicketsList');
-            let html = '';
-            snap.forEach(docSnap => {
-                const t = docSnap.data();
-                const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
-                const updateTime = t.updatedAt ? t.updatedAt.toDate().toLocaleString('th-TH') : '-';
-
-                html += `
-                    <div class="ticket-item">
-                        <div style="flex:1;">
-                            <b>${t.internetNo}</b> <span class="status-badge ${statusClass}" style="font-size:10px; padding:2px 8px;">${t.status}</span>
-                            <div style="font-size:13px; color:#64748b; margin-top:3px;">${t.topic}</div>
-                            ${t.supNote ? `<div class="note-preview">💬 ${t.supNote}</div>` : ''}
-                            <span class="time-label">อัปเดตล่าสุด: ${updateTime}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            listDiv.innerHTML = html || '<p style="text-align:center; color:#94a3b8;">ไม่พบประวัติการแจ้งงาน</p>';
         });
-    }
-
-    document.getElementById('logoutBtn').onclick = () => signOut(auth);
 </script>
 </body>
 </html>
