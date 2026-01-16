@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ค้นหาและติดตามงาน - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
 </head>
@@ -18,7 +19,11 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar"><span id="userEmail" style="font-weight: 600;"></span></div>
+        <div class="top-bar">
+            <div style="flex: 1; font-weight: 600;">ประวัติการแจ้งเรื่อง</div>
+            <span id="userEmail" style="font-weight: 600; color: var(--text-muted);"></span>
+        </div>
+
         <div class="container">
             <div class="card">
                 <h3>🔍 ค้นหาและติดตามสถานะงาน</h3>
@@ -28,24 +33,25 @@
                     <button id="viewMineBtn" class="filter-btn">👤 เฉพาะงานของฉัน</button>
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet 10 หลัก..." style="margin:0;">
+                <div style="margin-bottom: 25px;">
+                    <label>ค้นหาหมายเลข Internet</label>
+                    <input type="text" id="searchInput" class="input-field" placeholder="พิมพ์หมายเลข 10 หลักเพื่อค้นหา..." style="margin-top: 8px;">
                 </div>
                 
-                <div style="overflow-x: auto;">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>วันที่แจ้ง</th>
-                                <th>ผู้แจ้ง (Email)</th>
+                                <th>ผู้แจ้ง</th>
                                 <th>หมายเลข Internet</th>
                                 <th>หัวข้อ</th>
                                 <th>สถานะ</th>
-                                <th>หมายเหตุจาก Supervisor</th>
+                                <th>หมายเหตุ</th>
                             </tr>
                         </thead>
                         <tbody id="historyBody">
-                            <tr><td colspan="6" style="text-align:center; padding: 20px;">กำลังโหลดข้อมูล...</td></tr>
+                            <tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -58,6 +64,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Firebase Config (คงเดิมของคุณ)
         const firebaseConfig = {
             apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
             authDomain: "sale-support-system.firebaseapp.com",
@@ -71,7 +78,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentView = 'all'; // 'all' หรือ 'mine'
+        let currentView = 'all';
         let currentUserEmail = "";
 
         onAuthStateChanged(auth, (user) => {
@@ -79,7 +86,7 @@
                 window.location.href = "../index.html";
             } else {
                 currentUserEmail = user.email;
-                document.getElementById('userEmail').innerText = currentUserEmail;
+                document.getElementById('userEmail').innerText = user.email;
                 loadHistory();
             }
         });
@@ -87,57 +94,44 @@
         function loadHistory() {
             const tbody = document.getElementById('historyBody');
             const searchText = document.getElementById('searchInput').value;
-            
             let q;
             const ticketsRef = collection(db, "tickets");
 
-            // กรณีที่ 1: ดูงานทั้งหมด (เรียงจากใหม่ไปเก่า)
             if (currentView === 'all') {
                 q = query(ticketsRef, orderBy("createdAt", "desc"));
-            } 
-            // กรณีที่ 2: ดูเฉพาะงานของตัวเอง (เรียงจากใหม่ไปเก่า)
-            else {
-                q = query(
-                    ticketsRef, 
-                    where("email", "==", currentUserEmail),
-                    orderBy("createdAt", "desc")
-                );
+            } else {
+                q = query(ticketsRef, where("email", "==", currentUserEmail), orderBy("createdAt", "desc"));
             }
 
             onSnapshot(q, (snapshot) => {
                 let html = '';
                 if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">ไม่พบข้อมูลงานในระบบ</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px;">ไม่พบข้อมูลงาน</td></tr>';
                     return;
                 }
 
                 snapshot.forEach(docSnap => {
                     const t = docSnap.data();
-                    
-                    // Filter ค้นหาเบอร์ Internet
                     if (searchText && !t.internetNo.includes(searchText)) return;
 
-                    const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
+                    const date = t.createdAt?.toDate().toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'2-digit' }) || '-';
                     const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'In Progress' ? 'bg-process' : 'bg-closed');
 
                     html += `<tr>
                         <td><small>${date}</small></td>
-                        <td><small>${t.email}</small></td>
+                        <td><small>${t.email.split('@')[0]}</small></td>
                         <td><b>${t.internetNo}</b></td>
                         <td>${t.issueType}</td>
                         <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                        <td style="color:#059669; font-size:0.9rem;">${t.comment || '-'}</td>
+                        <td class="comment-text">${t.supNote || t.comment || '-'}</td>
                     </tr>`;
                 });
                 
-                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding: 20px;">ไม่พบหมายเลข Internet ที่ค้นหา</td></tr>';
-            }, (error) => {
-                console.error("Error:", error);
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding: 20px;">เกิดข้อผิดพลาด: ${error.message} <br> (ตรวจสอบการสร้าง Index ใน Firebase)</td></tr>`;
+                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding: 30px;">ไม่พบหมายเลขที่ระบุ</td></tr>';
             });
         }
 
-        // ปุ่มสลับโหมดการดู
+        // Event Listeners
         document.getElementById('viewAllBtn').onclick = () => {
             currentView = 'all';
             document.getElementById('viewAllBtn').classList.add('active');
@@ -152,14 +146,8 @@
             loadHistory();
         };
 
-        // ค้นหาแบบ Real-time
         document.getElementById('searchInput').oninput = () => loadHistory();
-
-        // Logout
-        document.getElementById('logoutBtn').onclick = (e) => {
-            e.preventDefault();
-            signOut(auth).then(() => window.location.href = "../index.html");
-        };
+        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
     </script>
 </body>
 </html>
