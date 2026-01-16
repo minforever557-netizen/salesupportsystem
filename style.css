@@ -280,3 +280,45 @@ td { padding: 15px; border-bottom: 1px solid #E5E7EB; font-size: 0.95rem; }
     .main-content { margin-left: 70px; }
     .stat-grid { grid-template-columns: 1fr; }
 }
+/* --- History Page Specific --- */
+.view-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.filter-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+    background: var(--white);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex: 1; /* ให้ปุ่มขยายเท่ากัน */
+}
+
+.filter-btn.active {
+    background: var(--primary-green);
+    color: var(--white);
+    box-shadow: var(--shadow);
+}
+
+/* ปรับปรุง Table ให้ดูง่ายขึ้น */
+.table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.comment-text {
+    color: var(--dark-green);
+    font-size: 0.85rem;
+    max-width: 250px;
+    word-wrap: break-word;
+}
