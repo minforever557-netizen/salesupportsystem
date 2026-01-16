@@ -3,33 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายการงาน - Supervisor</title>
+    <title>Supervisor - รายการงาน</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-    <nav style="background: var(--primary-green); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold;">Supervisor Dashboard</span>
-        <button id="logoutBtn" style="background: none; border: 1px solid white; color: white; border-radius: 4px; padding: 5px 10px; cursor: pointer;">ออกจากระบบ</button>
+    <nav>
+        <div class="nav-links">
+            <b style="color: var(--primary-green); margin-right: 15px;">Supervisor Mode</b>
+            <a href="main.html" class="active">📥 รายการงานค้าง</a>
+        </div>
+        <div class="nav-links">
+            <button class="btn btn-outline" id="logoutBtn">ออกจากระบบ</button>
+        </div>
     </nav>
 
-    <div class="green-container" style="max-width: 1000px; margin-top: 30px;">
-        <h3 style="color: var(--primary-green); margin-top: 0;">📋 รายการงานที่ต้องจัดการ (Open / In Progress)</h3>
-        <p id="jobSummary" style="font-size: 0.9rem; color: #666;"></p>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">📋 รายการงานที่ต้องจัดการ</h3>
+            <span id="jobSummary" class="status-badge" style="background:#eee; color:#666;">กำลังโหลด...</span>
+        </div>
         
         <div style="overflow-x: auto;">
-            <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
+            <table>
                 <thead>
-                    <tr style="background: #f4f4f4; text-align: left;">
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">วันที่แจ้ง</th>
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">หมายเลข Internet</th>
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">หัวข้อปัญหา</th>
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">สถานะ</th>
-                        <th style="padding: 12px; border-bottom: 2px solid #ddd;">จัดการ</th>
+                    <tr>
+                        <th>วันที่แจ้ง</th>
+                        <th>หมายเลข Internet</th>
+                        <th>หัวข้อปัญหา</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody id="allTicketsList">
-                    <tr><td colspan="5" style="padding: 20px; text-align: center;">กำลังโหลดข้อมูลงาน...</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 40px;">กำลังโหลดข้อมูลงาน...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -67,10 +74,10 @@
 
         onSnapshot(q, (snapshot) => {
             const listBody = document.getElementById('allTicketsList');
-            document.getElementById('jobSummary').innerText = `พบงานค้างทั้งหมด: ${snapshot.size} รายการ`;
+            document.getElementById('jobSummary').innerText = `ค้างทั้งหมด: ${snapshot.size} รายการ`;
             
             if (snapshot.empty) {
-                listBody.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center;">ไม่มีงานค้างในระบบ</td></tr>';
+                listBody.innerHTML = '<tr><td colspan="5" style="padding: 40px; text-align: center; color: #999;">🎉 ไม่มีงานค้างในขณะนี้</td></tr>';
                 return;
             }
 
@@ -78,20 +85,16 @@
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
                 const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-                const statusColor = t.status === 'Open' ? '#ef4444' : '#f59e0b';
+                const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
 
                 html += `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 12px;">${date}</td>
-                        <td style="padding: 12px;"><b>${t.internetNo}</b></td>
-                        <td style="padding: 12px;">${t.issueType}</td>
-                        <td style="padding: 12px;">
-                            <span style="color: white; background: ${statusColor}; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">
-                                ${t.status}
-                            </span>
-                        </td>
-                        <td style="padding: 12px;">
-                            <button onclick="window.manageTicket('${docSnap.id}')" style="background: var(--primary-green); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">
+                    <tr>
+                        <td>${date}</td>
+                        <td><b>${t.internetNo}</b></td>
+                        <td>${t.issueType}</td>
+                        <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="window.manageTicket('${docSnap.id}')" style="padding: 5px 12px; font-size: 0.8rem;">
                                 จัดการ
                             </button>
                         </td>
