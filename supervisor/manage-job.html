@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ดำเนินการจัดการงาน - Supervisor</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <nav style="background: var(--primary-green); color: white; padding: 15px;">
+        <a href="main.html" style="color: white; text-decoration: none;">⬅️ กลับหน้ารายการงาน</a>
+    </nav>
+
+    <div class="green-container" style="max-width: 600px; margin-top: 30px;">
+        <h3 style="color: var(--primary-green);">🛠️ Action Case (ดำเนินการจัดการ)</h3>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        
+        <div id="ticketDetail" style="margin-bottom: 20px; line-height: 1.8; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+            กำลังโหลดข้อมูลรายละเอียด...
+        </div>
+
+        <form id="actionForm">
+            <label><b>เปลี่ยนสถานะ:</b></label>
+            <select id="statusUpdate" class="input-field">
+                <option value="Open">Open (รอตรวจสอบ)</option>
+                <option value="In Progress">In Progress (กำลังดำเนินการ)</option>
+                <option value="Closed">Closed (ปิดงาน/สำเร็จ)</option>
+            </select>
+
+            <label><b>ใส่ Comment หรือหมายเหตุแจัง Sale:</b></label>
+            <textarea id="comment" class="input-field" rows="4" placeholder="พิมพ์ข้อความตอบกลับที่นี่..."></textarea>
+
+            <button type="submit" class="btn-green" id="saveBtn">อัปเดตและบันทึกข้อมูล</button>
+        </form>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const ticketId = localStorage.getItem('currentTicketId');
+
+    async function loadTicket() {
+        if(!ticketId) { window.location.href = 'main.html'; return; }
+        const docSnap = await getDoc(doc(db, "tickets", ticketId));
+
+        if (docSnap.exists()) {
+            const t = docSnap.data();
+            document.getElementById('ticketDetail').innerHTML = `
+                <p><b>📌 หมายเลข Internet:</b> ${t.internetNo}</p>
+                <p><b>❓ หัวข้อ:</b> ${t.issueType}</p>
+                <p><b>📝 รายละเอียดจาก Sale:</b> ${t.details}</p>
+                <p><b>📧 ผู้แจ้ง:</b> ${t.email}</p>
+            `;
+            document.getElementById('statusUpdate').value = t.status;
+            document.getElementById('comment').value = t.comment || "";
+        }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) loadTicket();
+        else window.location.href = "../index.html";
+    });
+
+    document.getElementById('actionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+
+        try {
+            await updateDoc(doc(db, "tickets", ticketId), {
+                status: document.getElementById('statusUpdate').value,
+                comment: document.getElementById('comment').value,
+                updatedAt: serverTimestamp(),
+                supervisorEmail: auth.currentUser.email
+            });
+            alert("บันทึกข้อมูลสำเร็จ!");
+            window.location.href = 'main.html';
+        } catch (error) {
+            alert("Error: " + error.message);
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
