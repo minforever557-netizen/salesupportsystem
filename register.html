@@ -3,37 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียน - Sale Support</title>
+    <title>ลงทะเบียน - Sale Support System</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #F3F4F6;
+            margin: 0;
+        }
+        .register-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="green-container">
-    <h2 style="text-align: center; color: var(--primary-green);">ลงทะเบียนใหม่</h2>
-    <form id="regForm">
-        <label>อีเมล</label>
-        <input type="email" id="regEmail" class="input-field" placeholder="example@mail.com" required>
+    <div class="register-card">
+        <h2 style="color: var(--primary-green); margin-top: 0; text-align: center;">ลงทะเบียนสมาชิก</h2>
+        <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 25px;">สร้างบัญชีผู้ใช้งานเพื่อเข้าสู่ระบบ Sale Support</p>
         
-        <label>รหัสผ่าน (6 ตัวขึ้นไป)</label>
-        <input type="password" id="regPassword" class="input-field" placeholder="••••••••" required>
-        
-        <label>ยืนยันรหัสผ่าน</label>
-        <input type="password" id="confirmPassword" class="input-field" placeholder="••••••••" required>
-        
-        <button type="submit" class="btn-green" id="regBtn">สร้างบัญชี</button>
-    </form>
-    <div style="margin-top:15px; text-align:center;">
-        <a href="index.html" class="text-link">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</a>
+        <form id="registerForm">
+            <label>อีเมล (Email)</label>
+            <input type="email" id="regEmail" class="input-field" placeholder="example@email.com" required>
+            
+            <label>รหัสผ่าน (Password)</label>
+            <input type="password" id="regPassword" class="input-field" placeholder="อย่างน้อย 6 ตัวอักษร" required minlength="6">
+
+            <label>ยืนยันรหัสผ่าน (Confirm Password)</label>
+            <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านอีกครั้ง" required>
+
+            <button type="submit" class="btn btn-primary" id="regBtn" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 15px;">
+                สร้างบัญชีผู้ใช้งาน
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: #6B7280;">
+            มีบัญชีอยู่แล้ว? <a href="index.html" style="color: var(--primary-green); text-decoration: none; font-weight: bold;">เข้าสู่ระบบที่นี่</a>
+        </div>
     </div>
-</div>
 
 <script type="module">
-    // นำเข้า Firebase Functions ที่จำเป็น
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Firebase Config ของคุณ
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -47,36 +69,44 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    document.getElementById('regForm').addEventListener('submit', async (e) => {
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
         const email = document.getElementById('regEmail').value;
-        const pass = document.getElementById('regPassword').value;
-        const confirm = document.getElementById('confirmPassword').value;
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
         const btn = document.getElementById('regBtn');
 
-        if(pass !== confirm) return alert("รหัสผ่านไม่ตรงกัน");
+        // 1. ตรวจสอบรหัสผ่านให้ตรงกัน
+        if (password !== confirmPassword) {
+            alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
+            return;
+        }
 
         btn.disabled = true;
         btn.innerText = "กำลังสร้างบัญชี...";
 
         try {
-            // 1. สร้าง User ใน Authentication
-            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            // 2. สร้าง User ใน Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 2. เก็บข้อมูล Role 'user' เริ่มต้นไว้ใน Firestore
+            // 3. บันทึกข้อมูลลงใน Firestore (Role เริ่มต้นเป็น user)
             await setDoc(doc(db, "users", user.uid), {
                 email: email,
-                role: "user", // ค่าเริ่มต้นให้เป็น User เสมอ
+                role: "user", 
                 createdAt: serverTimestamp()
             });
 
-            alert("ลงทะเบียนสำเร็จ!");
-            window.location.href = "index.html"; // กลับไปหน้า Login
+            alert("ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ");
+            window.location.href = 'index.html';
+
         } catch (error) {
-            alert("ผิดพลาด: " + error.message);
+            let message = "เกิดข้อผิดพลาดในการลงทะเบียน";
+            if (error.code === 'auth/email-already-in-use') message = "อีเมลนี้ถูกใช้งานไปแล้ว";
+            alert(message + " (" + error.code + ")");
             btn.disabled = false;
-            btn.innerText = "สร้างบัญชี";
+            btn.innerText = "สร้างบัญชีผู้ใช้งาน";
         }
     });
 </script>
