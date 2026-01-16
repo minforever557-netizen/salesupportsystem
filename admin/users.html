@@ -2,8 +2,17 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Users - Admin</title>
+    <title>จัดการผู้ใช้งาน - Admin Panel</title>
     <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .user-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        .user-table th, .user-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .user-table th { background: #f8fafc; color: #64748b; font-weight: 600; }
+        .pw-text { font-family: monospace; color: #2563eb; background: #eff6ff; padding: 2px 6px; border-radius: 4px; }
+        .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .btn-delete:hover { background: #ef4444; color: white; }
+    </style>
 </head>
 <body>
     <div class="sidebar">
@@ -18,18 +27,24 @@
 
     <div class="main-content">
         <div class="container">
-            <h2>👥 รายชื่อผู้ใช้งานและรหัสผ่าน</h2>
-            <div class="card">
-                <table>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>👥 จัดการผู้ใช้งานและสิทธิ์เข้าถึง</h2>
+                <div id="userCount" style="background: #1e293b; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px;">พบ 0 บัญชี</div>
+            </div>
+
+            <div class="card" style="padding: 0;">
+                <table class="user-table">
                     <thead>
                         <tr>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Password (ที่บันทึกไว้)</th>
+                            <th>อีเมลผู้ใช้งาน</th>
+                            <th>รหัสผ่าน (ที่บันทึก)</th>
+                            <th>ระดับสิทธิ์ (Role)</th>
                             <th>จัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="userTable"></tbody>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="4" style="text-align:center; padding: 40px;">กำลังโหลดข้อมูลผู้ใช้งาน...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -37,36 +52,82 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = { /* Config เดียวกับข้างบน */ };
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onSnapshot(collection(db, "users"), (snap) => {
-        let html = '';
-        snap.forEach(userDoc => {
-            const u = userDoc.data();
-            html += `<tr>
-                <td>${u.email}</td>
-                <td><span class="status-badge bg-process">${u.role || 'user'}</span></td>
-                <td style="font-family: monospace; color: #2563eb;">${u.password || '******'}</td>
-                <td>
-                    <select onchange="updateRole('${userDoc.id}', this.value)" style="padding:4px;">
-                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
-                        <option value="supervisor" ${u.role === 'supervisor' ? 'selected' : ''}>Sup</option>
-                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-                    </select>
-                </td>
-            </tr>`;
-        });
-        document.getElementById('userTable').innerHTML = html;
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "../index.html";
+        else loadUsers();
     });
 
-    window.updateRole = async (uid, newRole) => {
-        await updateDoc(doc(db, "users", uid), { role: newRole });
-        alert('อัปเดตสิทธิ์เรียบร้อย');
+    function loadUsers() {
+        // ดึงข้อมูลจาก Collection "users"
+        const q = query(collection(db, "users"), orderBy("email", "asc"));
+        
+        onSnapshot(q, (snap) => {
+            const tbody = document.getElementById('userTableBody');
+            document.getElementById('userCount').innerText = `พบ ${snap.size} บัญชี`;
+            
+            let html = '';
+            snap.forEach(userDoc => {
+                const u = userDoc.data();
+                const uid = userDoc.id;
+                
+                html += `
+                    <tr>
+                        <td>
+                            <b>${u.email}</b><br>
+                            <small style="color: #94a3b8;">UID: ${uid.substring(0,8)}...</small>
+                        </td>
+                        <td><span class="pw-text">${u.password || 'N/A'}</span></td>
+                        <td>
+                            <select onchange="updateUserRole('${uid}', this.value)" style="padding: 5px; border-radius: 5px;">
+                                <option value="user" ${u.role === 'user' ? 'selected' : ''}>User (Sale)</option>
+                                <option value="supervisor" ${u.role === 'supervisor' ? 'selected' : ''}>Supervisor</option>
+                                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteUserData('${uid}', '${u.email}')">ลบ</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="4" style="text-align:center;">ไม่พบข้อมูลผู้ใช้งานในระบบ</td></tr>';
+        });
+    }
+
+    // ฟังก์ชันอัปเดตสิทธิ์
+    window.updateUserRole = async (uid, newRole) => {
+        try {
+            await updateDoc(doc(db, "users", uid), { role: newRole });
+            alert("✅ อัปเดตสิทธิ์เรียบร้อย");
+        } catch (e) { alert("❌ Error: " + e.message); }
     };
+
+    // ฟังก์ชันลบข้อมูลผู้ใช้ (ลบเฉพาะใน Firestore)
+    window.deleteUserData = async (uid, email) => {
+        if (confirm(`ยืนยันการลบข้อมูลของ ${email}?\n(หมายเหตุ: บัญชียังคงอยู่ในระบบ Auth แต่จะไม่มีข้อมูลในหน้านี้)`)) {
+            try {
+                await deleteDoc(doc(db, "users", uid));
+            } catch (e) { alert("❌ Error: " + e.message); }
+        }
+    };
+
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
 </script>
 </body>
 </html>
