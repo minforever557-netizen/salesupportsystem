@@ -1,77 +1,233 @@
+/* --- Google Font --- */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+
 :root {
     --primary-green: #10B981;
     --dark-green: #059669;
-    --light-bg: #F3F4F6;
+    --sidebar-bg: #1F2937;
+    --sidebar-hover: #374151;
+    --text-main: #111827;
+    --text-muted: #6B7280;
+    --bg-light: #F3F4F6;
     --white: #ffffff;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --sidebar-width: 260px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Sarabun', sans-serif;
 }
 
 body {
-    font-family: 'Sarabun', sans-serif;
-    background-color: var(--light-bg);
     margin: 0;
-    color: #374151;
+    padding: 0;
+    display: flex; /* แบ่ง Sidebar และ Content */
+    min-height: 100vh;
+    background-color: var(--bg-light);
+    color: var(--text-main);
 }
 
-/* Navigation Bar */
-nav {
-    background: var(--white);
-    padding: 0 20px;
-    height: 60px;
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    color: var(--white);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    transition: 0.3s;
     z-index: 1000;
 }
 
-.nav-links { display: flex; gap: 20px; align-items: center; }
-.nav-links a { 
-    text-decoration: none; 
-    color: #4B5563; 
-    font-size: 0.9rem; 
-    font-weight: 500;
-    transition: color 0.3s;
+.sidebar-header {
+    padding: 25px 20px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid #374151;
+    color: var(--primary-green);
+    letter-spacing: 1px;
 }
-.nav-links a:hover { color: var(--primary-green); }
 
-/* Containers */
-.container {
-    max-width: 1000px;
-    margin: 30px auto;
+.sidebar-menu {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 14px 25px;
+    color: #D1D5DB;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.sidebar-menu a:hover {
+    background-color: var(--sidebar-hover);
+    color: var(--white);
+}
+
+.sidebar-menu a.active {
+    background-color: var(--sidebar-hover);
+    color: var(--white);
+    border-left: 5px solid var(--primary-green);
+}
+
+.sidebar-footer {
     padding: 20px;
+    border-top: 1px solid #374151;
+}
+
+/* --- Main Content Area --- */
+.main-content {
+    margin-left: var(--sidebar-width); /* เว้นที่ให้ Sidebar */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* ป้องกันเนื้อหาดันหน้าจอ */
+}
+
+.top-bar {
+    height: 65px;
     background: var(--white);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.container {
+    padding: 30px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* --- Cards & Elements --- */
+.card {
+    background: var(--white);
+    padding: 25px;
     border-radius: 12px;
     box-shadow: var(--shadow);
+    margin-bottom: 25px;
 }
 
-/* Buttons */
-.btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
+h2, h3 {
+    margin-top: 0;
+    color: var(--text-main);
 }
-.btn-primary { background: var(--primary-green); color: white; }
-.btn-primary:hover { background: var(--dark-green); }
-.btn-outline { background: transparent; border: 1px solid #D1D5DB; color: #4B5563; }
-.btn-outline:hover { background: #F9FAFB; }
 
-/* Table styling */
-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-th { background: #F9FAFB; padding: 12px; text-align: left; font-size: 0.85rem; color: #6B7280; }
-td { padding: 12px; border-bottom: 1px solid #F3F4F6; }
-
-/* Form inputs */
+/* --- Forms & Inputs --- */
 .input-field {
     width: 100%;
-    padding: 10px;
-    margin: 8px 0 20px 0;
+    padding: 12px 15px;
+    margin: 10px 0 20px 0;
     border: 1px solid #D1D5DB;
-    border-radius: 6px;
-    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-field:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+label {
+    font-weight: 600;
+    color: #4B5563;
+    font-size: 0.9rem;
+}
+
+/* --- Buttons --- */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-green);
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid #D1D5DB;
+    color: #4B5563;
+}
+
+.btn-outline:hover {
+    background-color: #F9FAFB;
+}
+
+/* --- Tables --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: var(--white);
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    background-color: #F9FAFB;
+    border-bottom: 2px solid #E5E7EB;
+    color: #4B5563;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #E5E7EB;
+    font-size: 0.95rem;
+}
+
+tr:hover {
+    background-color: #FBFBFF;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.bg-open { background-color: #EF4444; }
+.bg-process { background-color: #F59E0B; }
+.bg-closed { background-color: #10B981; }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+    .sidebar-header, .sidebar-menu a span {
+        display: none;
+    }
+    .main-content {
+        margin-left: 70px;
+    }
 }
