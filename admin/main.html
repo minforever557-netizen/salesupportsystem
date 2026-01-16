@@ -2,270 +2,189 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - Sale Support</title>
+    <title>Admin Super All-in-One</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* --- สไตล์ระบบแจ้งเตือน --- */
-        .top-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0 25px; 
-            background: white; 
-            height: 60px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .notif-wrapper { position: relative; cursor: pointer; display: flex; align-items: center; }
-        .notif-icon { font-size: 22px; color: #64748b; }
-        .notif-badge-icon {
-            position: absolute; top: -5px; right: -8px;
-            background: #ef4444; color: white; border-radius: 50%;
-            padding: 2px 6px; font-size: 10px; font-weight: bold; display: none;
-        }
-
-        .notif-dropdown {
-            position: absolute; top: 45px; right: 0; width: 320px;
-            background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0; z-index: 1000; display: none; overflow: hidden;
-        }
-        .notif-header { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 600; background: #f8fafc; color: #1e293b; }
-        .notif-item { 
-            padding: 12px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; gap: 3px; text-align: left;
-        }
-        .notif-item:hover { background: #f0fdf4; border-left: 4px solid #10b981; }
-        .notif-item b { font-size: 13px; color: #1e293b; }
-        .notif-item span { font-size: 12px; color: #4b5563; }
-
-        .shake { animation: shake-animation 0.5s ease-in-out; }
-        @keyframes shake-animation {
-            0%, 100% { transform: rotate(0); }
-            20%, 60% { transform: rotate(15deg); }
-            40%, 80% { transform: rotate(-15deg); }
-        }
-        
-        /* ปุ่มจัดการสไตล์ Admin */
-        .btn-manage {
-            background: #111827;
-            color: white;
-            padding: 6px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-        .btn-manage:hover { background: #374151; }
+        /* สไตล์เพิ่มเติมสำหรับเมนูใหม่ */
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+        .sidebar-menu a { cursor: pointer; }
+        .search-box { position: relative; margin-bottom: 20px; }
+        .search-box input { padding-left: 35px; }
+        .search-box span { position: absolute; left: 10px; top: 12px; }
     </style>
 </head>
 <body>
+
     <div class="sidebar">
-        <div class="sidebar-header">ADMIN PANEL</div>
+        <div class="sidebar-header">ADMIN SUPER USER</div>
         <div class="sidebar-menu">
-            <a href="main.html" class="active">📊 <span>Dashboard</span></a>
-            <a href="users.html">👥 <span>จัดการผู้ใช้งาน</span></a>
+            <a onclick="showSection('dashboard')" id="menu-dashboard" class="active">📊 <span>Dashboard (จัดการ)</span></a>
+            <a onclick="showSection('create')" id="menu-create">➕ <span>สร้างคำขอใหม่</span></a>
+            <a onclick="showSection('track')" id="menu-track">🔍 <span>ติดตามสถานะงาน</span></a>
             <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
+            <a href="users.html">👥 <span>จัดการผู้ใช้งาน</span></a>
             <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
         </div>
     </div>
 
     <div class="main-content">
-        <div class="top-bar">
-            <h3 style="margin:0; color: #1e293b;">📊 ระบบจัดการหลังบ้าน (Admin Control)</h3>
-            <div style="display: flex; align-items: center; gap: 25px;">
-                <div class="notif-wrapper" id="notifBell">
-                    <span class="notif-icon">🔔</span>
-                    <span class="notif-badge-icon" id="notifCount">0</span>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">🔔 งานใหม่รอดำเนินการ (Open)</div>
-                        <div id="notifList">
-                            <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">ไม่มีงานใหม่</div>
-                        </div>
+        <div id="section-dashboard" class="section-content active">
+            <div class="container">
+                <h3 style="margin-bottom: 20px;">🛠️ จัดการงานในระบบ (Admin Mode)</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+                    <div class="card" style="background: #111827; color: white; text-align: center;">
+                        <small>Ticket ทั้งหมด</small><div id="totalTicket" style="font-size: 2rem; font-weight: 600;">0</div>
                     </div>
+                    </div>
+
+                <div class="card">
+                    <h3>👁️ งานล่าสุดที่รอดำเนินการ</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SALE</th>
+                                <th>หมายเลข INTERNET</th>
+                                <th>สถานะ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentTickets"></tbody>
+                    </table>
                 </div>
-                <span id="adminEmail" style="font-weight: 600; color: #475569;">กำลังโหลด...</span>
             </div>
         </div>
 
-        <div class="container">
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 25px 0;">
-                <div class="card" style="background: #111827; color: white; text-align: center;">
-                    <small>Ticket ทั้งหมด</small><div id="totalTicket" style="font-size: 2rem; font-weight: 600;">0</div>
-                </div>
-                <div class="card" style="background: #EF4444; color: white; text-align: center;">
-                    <small>Open</small><div id="totalOpen" style="font-size: 2rem; font-weight: 600;">0</div>
-                </div>
-                <div class="card" style="background: #F59E0B; color: white; text-align: center;">
-                    <small>In Progress</small><div id="totalProcess" style="font-size: 2rem; font-weight: 600;">0</div>
-                </div>
-                <div class="card" style="background: #10B981; color: white; text-align: center;">
-                    <small>Closed</small><div id="totalClosed" style="font-size: 2rem; font-weight: 600;">0</div>
+        <div id="section-create" class="section-content">
+            <div class="container">
+                <div class="card">
+                    <h3>➕ ส่งคำขอการจัดการ Case (Admin Create)</h3>
+                    <form id="ticketForm">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label>เลือกหัวข้อปัญหา:</label>
+                                <select id="issueTopic" class="input-field" required>
+                                    <option value="">-- เลือกหัวข้อ --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>หมายเลข Internet (10 หลัก):</label>
+                                <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required maxlength="10">
+                            </div>
+                        </div>
+                        <label>รายละเอียดเพิ่มเติม:</label>
+                        <textarea id="issueDetail" class="input-field" rows="4" placeholder="ระบุรายละเอียดปัญหา..."></textarea>
+                        <button type="submit" class="btn" style="background: #10B981; color:white; width: 100%;">🚀 ส่งข้อมูลแจ้งเรื่อง</button>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+        <div id="section-track" class="section-content">
+            <div class="container">
                 <div class="card">
-                    <h3>🛠️ จัดการหัวข้อปัญหา</h3>
-                    <div style="display: flex; gap: 5px; margin-bottom: 15px;">
-                        <input type="text" id="newIssueInput" class="input-field" placeholder="ชื่อหัวข้อใหม่..." style="margin:0;">
-                        <button id="addIssueBtn" class="btn btn-primary" style="background:#10B981; border:none;">เพิ่ม</button>
+                    <h3>📋 ประวัติการแจ้งเรื่องทั้งหมด</h3>
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet 10 หลัก...">
                     </div>
-                    <div id="issueList" style="max-height: 300px; overflow-y: auto;"></div>
-                </div>
-
-                <div class="card">
-                    <h3>👁️ งานล่าสุดในระบบ</h3>
-                    <div style="overflow-x: auto;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>SALE</th>
-                                    <th>หมายเลข INTERNET</th>
-                                    <th>สถานะ</th>
-                                    <th style="text-align:center;">จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentTickets"></tbody>
-                        </table>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>วันที่แจ้ง</th>
+                                <th>Internet No.</th>
+                                <th>หัวข้อปัญหา</th>
+                                <th>สถานะ</th>
+                                <th>หมายเหตุจาก Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trackTableBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
 <script type="module">
+    // --- นำเข้า Firebase และตั้งค่าเหมือนเดิม ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, collection, onSnapshot, updateDoc, arrayUnion, arrayRemove, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    // (Firebase Config ของคุณ...)
+    const firebaseConfig = { ... };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // --- ฟังก์ชันควบคุมเมนู ---
+    window.showSection = (sectionId) => {
+        document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+        
+        document.getElementById('section-' + sectionId).classList.add('active');
+        document.getElementById('menu-' + sectionId).classList.add('active');
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // --- ฟังก์ชันสร้าง Ticket (Create) ---
+    document.getElementById('ticketForm').onsubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await addDoc(collection(db, "tickets"), {
+                internetNo: document.getElementById('internetNo').value,
+                topic: document.getElementById('issueTopic').value,
+                detail: document.getElementById('issueDetail').value,
+                email: auth.currentUser.email,
+                status: "Open",
+                createdAt: serverTimestamp()
+            });
+            alert("สร้างคำขอสำเร็จ!");
+            document.getElementById('ticketForm').reset();
+            showSection('track'); // สร้างเสร็จแล้วพาไปหน้าติดตามสถานะ
+        } catch (err) { alert(err.message); }
+    };
 
-    // --- ฟังก์ชันนำทางไปหน้าจัดการ (Admin-Manage) ---
-    window.goToAdminManage = (id) => {
+    // --- ฟังก์ชันดึงข้อมูล Dashboard & Track ---
+    // (ใช้ onSnapshot เพื่อให้ข้อมูลอัปเดต Real-time ทั้งสองส่วน)
+    onSnapshot(query(collection(db, "tickets"), orderBy("createdAt", "desc")), (snap) => {
+        let manageHtml = '';
+        let trackHtml = '';
+        
+        snap.forEach(docSnap => {
+            const t = docSnap.data();
+            const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
+            const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
+
+            // สำหรับหน้า Dashboard (จัดการ)
+            manageHtml += `<tr>
+                <td><small>${t.email}</small></td>
+                <td><b>${t.internetNo}</b></td>
+                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                <td><button class="btn" onclick="goToAdminManage(event, '${docSnap.id}')" style="background:#111827; color:white; padding:5px 10px;">จัดการ</button></td>
+            </tr>`;
+
+            // สำหรับหน้าติดตามสถานะ (Track)
+            trackHtml += `<tr>
+                <td>${date}</td>
+                <td><b>${t.internetNo}</b></td>
+                <td>${t.topic}</td>
+                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                <td style="color: #10B981;">${t.supNote || t.comment || '-'}</td>
+            </tr>`;
+        });
+
+        document.getElementById('recentTickets').innerHTML = manageHtml;
+        document.getElementById('trackTableBody').innerHTML = trackHtml;
+    });
+
+    // --- นำทางไปหน้าจัดการ (ใช้ตัวเดียวกับที่แก้ให้ก่อนหน้า) ---
+    window.goToAdminManage = (event, id) => {
         localStorage.setItem('adminEditTicketId', id);
         window.location.href = 'admin-manage.html';
     };
 
-    // Notification UI Control
-    const bell = document.getElementById('notifBell');
-    const dropdown = document.getElementById('notifDropdown');
-    bell.onclick = (e) => {
-        e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    };
-    window.onclick = () => dropdown.style.display = 'none';
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "../index.html";
-        else {
-            document.getElementById('adminEmail').innerText = "Admin: " + user.email;
-            initAdminDashboard();
-            watchNewTickets();
-        }
-    });
-
-    function initAdminDashboard() {
-        onSnapshot(query(collection(db, "tickets"), orderBy("createdAt", "desc")), (snap) => {
-            let stats = { all: snap.size, open: 0, process: 0, closed: 0 };
-            let html = '';
-            snap.forEach(docSnap => {
-                const t = docSnap.data();
-                if (t.status === 'Open') stats.open++;
-                if (t.status === 'In Progress') stats.process++;
-                if (t.status === 'Closed') stats.closed++;
-
-                const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
-                
-                // แก้ไขปุ่มในตารางให้เรียก goToAdminManage
-                html += `<tr>
-                    <td><small>${t.email.split('@')[0]}</small></td>
-                    <td><b>${t.internetNo}</b></td>
-                    <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                    <td style="text-align:center;">
-                        <button class="btn-manage" onclick="goToAdminManage('${docSnap.id}')">จัดการ</button>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('totalTicket').innerText = stats.all;
-            document.getElementById('totalOpen').innerText = stats.open;
-            document.getElementById('totalProcess').innerText = stats.process;
-            document.getElementById('totalClosed').innerText = stats.closed;
-            document.getElementById('recentTickets').innerHTML = html || '<tr><td colspan="4">ไม่มีข้อมูล</td></tr>';
-        });
-
-        const settingsRef = doc(db, "settings", "issueOptions");
-        onSnapshot(settingsRef, (s) => {
-            if(s.exists()){
-                const options = s.data().options || [];
-                document.getElementById('issueList').innerHTML = options.map(opt => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
-                        <span>${opt}</span>
-                        <button onclick="deleteIssue('${opt}')" style="background:#EF4444; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer;">ลบ</button>
-                    </div>
-                `).join('');
-            }
-        });
-
-        document.getElementById('addIssueBtn').onclick = async () => {
-            const input = document.getElementById('newIssueInput');
-            if (input.value) await updateDoc(settingsRef, { options: arrayUnion(input.value) });
-            input.value = '';
-        };
-        window.deleteIssue = async (v) => { if(confirm('ลบหัวข้อ: '+v)) await updateDoc(settingsRef, { options: arrayRemove(v) }); };
-    }
-
-    function watchNewTickets() {
-        const q = query(collection(db, "tickets"), where("status", "==", "Open"));
-        let isFirstLoad = true;
-
-        onSnapshot(q, (snap) => {
-            const badge = document.getElementById('notifCount');
-            const notifList = document.getElementById('notifList');
-            
-            if (!snap.empty) {
-                badge.innerText = snap.size;
-                badge.style.display = 'block';
-                
-                let listHtml = '';
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    // แก้ไขรายการในแจ้งเตือนให้ไปหน้าจัดการ
-                    listHtml += `
-                        <div class="notif-item" onclick="goToAdminManage('${docSnap.id}')">
-                            <b>📌 ${data.internetNo}</b>
-                            <span>ปัญหา: ${data.topic || 'ไม่ได้ระบุ'}</span>
-                            <small>${data.createdAt?.toDate().toLocaleString('th-TH')}</small>
-                        </div>`;
-                });
-                notifList.innerHTML = listHtml;
-
-                if (!isFirstLoad) {
-                    bell.classList.add('shake');
-                    setTimeout(() => bell.classList.remove('shake'), 500);
-                    new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(()=>{});
-                }
-            } else {
-                badge.style.display = 'none';
-                notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8;">ไม่มีงานใหม่</div>';
-            }
-            isFirstLoad = false;
-        });
-    }
-
-    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
+    // (เพิ่มโค้ดดึงข้อมูล issueOptions มาใส่ใน select issueTopic ด้วย)
 </script>
 </body>
 </html>
