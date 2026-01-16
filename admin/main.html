@@ -2,27 +2,29 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Super All-in-One</title>
+    <title>Supervisor Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* สไตล์เพิ่มเติมสำหรับเมนูใหม่ */
+        /* สไตล์สำหรับการสลับหน้าเมนู */
         .section-content { display: none; }
         .section-content.active { display: block; }
-        .sidebar-menu a { cursor: pointer; }
-        .search-box { position: relative; margin-bottom: 20px; }
-        .search-box input { padding-left: 35px; }
-        .search-box span { position: absolute; left: 10px; top: 12px; }
+        .sidebar-menu a { cursor: pointer; transition: 0.3s; }
+        .sidebar-menu a.active { background: #374151; border-left: 4px solid #10b981; }
+        
+        /* สไตล์ปุ่มและฟอร์ม */
+        .card { margin-bottom: 20px; }
+        .btn-manage { background: #111827; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="sidebar-header">ADMIN SUPER USER</div>
+        <div class="sidebar-header">SUPERVISOR PANEL</div>
         <div class="sidebar-menu">
-            <a onclick="showSection('dashboard')" id="menu-dashboard" class="active">📊 <span>Dashboard (จัดการ)</span></a>
-            <a onclick="showSection('create')" id="menu-create">➕ <span>สร้างคำขอใหม่</span></a>
-            <a onclick="showSection('track')" id="menu-track">🔍 <span>ติดตามสถานะงาน</span></a>
+            <a onclick="showSection('dashboard')" id="menu-dashboard" class="active">📊 <span>จัดการงาน (Dashboard)</span></a>
+            <a onclick="showSection('create')" id="menu-create">➕ <span>ส่งคำขอใหม่ (Create)</span></a>
+            <a onclick="showSection('track')" id="menu-track">🔍 <span>ติดตามงานทั้งหมด (Track)</span></a>
             <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
             <a href="users.html">👥 <span>จัดการผู้ใช้งาน</span></a>
             <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
@@ -32,15 +34,8 @@
     <div class="main-content">
         <div id="section-dashboard" class="section-content active">
             <div class="container">
-                <h3 style="margin-bottom: 20px;">🛠️ จัดการงานในระบบ (Admin Mode)</h3>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
-                    <div class="card" style="background: #111827; color: white; text-align: center;">
-                        <small>Ticket ทั้งหมด</small><div id="totalTicket" style="font-size: 2rem; font-weight: 600;">0</div>
-                    </div>
-                    </div>
-
+                <h3 style="color: #1e293b;">📊 งานล่าสุดในระบบที่รอดำเนินการ</h3>
                 <div class="card">
-                    <h3>👁️ งานล่าสุดที่รอดำเนินการ</h3>
                     <table>
                         <thead>
                             <tr>
@@ -59,14 +54,14 @@
         <div id="section-create" class="section-content">
             <div class="container">
                 <div class="card">
-                    <h3>➕ ส่งคำขอการจัดการ Case (Admin Create)</h3>
-                    <form id="ticketForm">
+                    <h3 style="color: #10B981;">➕ ส่งคำขอการจัดการ Case</h3>
+                    <form id="createTicketForm">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                             <div>
                                 <label>เลือกหัวข้อปัญหา:</label>
                                 <select id="issueTopic" class="input-field" required>
                                     <option value="">-- เลือกหัวข้อ --</option>
-                                </select>
+                                    </select>
                             </div>
                             <div>
                                 <label>หมายเลข Internet (10 หลัก):</label>
@@ -75,7 +70,7 @@
                         </div>
                         <label>รายละเอียดเพิ่มเติม:</label>
                         <textarea id="issueDetail" class="input-field" rows="4" placeholder="ระบุรายละเอียดปัญหา..."></textarea>
-                        <button type="submit" class="btn" style="background: #10B981; color:white; width: 100%;">🚀 ส่งข้อมูลแจ้งเรื่อง</button>
+                        <button type="submit" class="btn" style="background: #10B981; color:white; width: 100%; margin-top: 10px;">🚀 ส่งข้อมูลแจ้งเรื่อง</button>
                     </form>
                 </div>
             </div>
@@ -84,10 +79,9 @@
         <div id="section-track" class="section-content">
             <div class="container">
                 <div class="card">
-                    <h3>📋 ประวัติการแจ้งเรื่องทั้งหมด</h3>
-                    <div class="search-box">
-                        <span>🔍</span>
-                        <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet 10 หลัก...">
+                    <h3>🔍 ติดตามสถานะงานทั้งหมด</h3>
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="searchInput" class="input-field" placeholder="พิมพ์หมายเลข 10 หลักเพื่อค้นหา...">
                     </div>
                     <table>
                         <thead>
@@ -96,7 +90,7 @@
                                 <th>Internet No.</th>
                                 <th>หัวข้อปัญหา</th>
                                 <th>สถานะ</th>
-                                <th>หมายเหตุจาก Admin</th>
+                                <th>หมายเหตุจาก Supervisor</th>
                             </tr>
                         </thead>
                         <tbody id="trackTableBody"></tbody>
@@ -107,18 +101,24 @@
     </div>
 
 <script type="module">
-    // --- นำเข้า Firebase และตั้งค่าเหมือนเดิม ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // (Firebase Config ของคุณ...)
-    const firebaseConfig = { ... };
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.firebasestorage.app",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // --- ฟังก์ชันควบคุมเมนู ---
+    // --- ฟังก์ชันสลับหน้าเมนู ---
     window.showSection = (sectionId) => {
         document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
@@ -127,8 +127,47 @@
         document.getElementById('menu-' + sectionId).classList.add('active');
     };
 
-    // --- ฟังก์ชันสร้าง Ticket (Create) ---
-    document.getElementById('ticketForm').onsubmit = async (e) => {
+    // --- ฟังก์ชันนำทางไปหน้าจัดการ (Admin-Manage) ---
+    window.goToAdminManage = (event, id) => {
+        if (event) event.preventDefault();
+        localStorage.setItem('adminEditTicketId', id);
+        window.location.href = 'admin-manage.html';
+    };
+
+    // --- โหลดข้อมูลงานทั้งหมด ---
+    onSnapshot(query(collection(db, "tickets"), orderBy("createdAt", "desc")), (snap) => {
+        let dashboardHtml = '';
+        let trackHtml = '';
+        
+        snap.forEach(docSnap => {
+            const t = docSnap.data();
+            const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
+            const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
+
+            // 1. สำหรับ Dashboard จัดการ
+            dashboardHtml += `<tr>
+                <td><small>${t.email.split('@')[0]}</small></td>
+                <td><b>${t.internetNo}</b></td>
+                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                <td><button class="btn-manage" onclick="goToAdminManage(event, '${docSnap.id}')">จัดการ</button></td>
+            </tr>`;
+
+            // 2. สำหรับหน้าติดตามสถานะ
+            trackHtml += `<tr>
+                <td>${date}</td>
+                <td><b>${t.internetNo}</b></td>
+                <td>${t.topic || '-'}</td>
+                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                <td style="color: #10B981;">${t.supNote || t.comment || '-'}</td>
+            </tr>`;
+        });
+
+        document.getElementById('recentTickets').innerHTML = dashboardHtml;
+        document.getElementById('trackTableBody').innerHTML = trackHtml;
+    });
+
+    // --- ฟังก์ชันสร้างคำขอใหม่ (Create) ---
+    document.getElementById('createTicketForm').onsubmit = async (e) => {
         e.preventDefault();
         try {
             await addDoc(collection(db, "tickets"), {
@@ -139,52 +178,23 @@
                 status: "Open",
                 createdAt: serverTimestamp()
             });
-            alert("สร้างคำขอสำเร็จ!");
-            document.getElementById('ticketForm').reset();
-            showSection('track'); // สร้างเสร็จแล้วพาไปหน้าติดตามสถานะ
-        } catch (err) { alert(err.message); }
+            alert("ส่งคำขอสำเร็จ!");
+            document.getElementById('createTicketForm').reset();
+            showSection('dashboard');
+        } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
     };
 
-    // --- ฟังก์ชันดึงข้อมูล Dashboard & Track ---
-    // (ใช้ onSnapshot เพื่อให้ข้อมูลอัปเดต Real-time ทั้งสองส่วน)
-    onSnapshot(query(collection(db, "tickets"), orderBy("createdAt", "desc")), (snap) => {
-        let manageHtml = '';
-        let trackHtml = '';
-        
-        snap.forEach(docSnap => {
-            const t = docSnap.data();
-            const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-            const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'Closed' ? 'bg-closed' : 'bg-process');
-
-            // สำหรับหน้า Dashboard (จัดการ)
-            manageHtml += `<tr>
-                <td><small>${t.email}</small></td>
-                <td><b>${t.internetNo}</b></td>
-                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                <td><button class="btn" onclick="goToAdminManage(event, '${docSnap.id}')" style="background:#111827; color:white; padding:5px 10px;">จัดการ</button></td>
-            </tr>`;
-
-            // สำหรับหน้าติดตามสถานะ (Track)
-            trackHtml += `<tr>
-                <td>${date}</td>
-                <td><b>${t.internetNo}</b></td>
-                <td>${t.topic}</td>
-                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                <td style="color: #10B981;">${t.supNote || t.comment || '-'}</td>
-            </tr>`;
-        });
-
-        document.getElementById('recentTickets').innerHTML = manageHtml;
-        document.getElementById('trackTableBody').innerHTML = trackHtml;
+    // --- โหลดหัวข้อปัญหา ---
+    onSnapshot(doc(db, "settings", "issueOptions"), (s) => {
+        if(s.exists()){
+            const options = s.data().options || [];
+            const select = document.getElementById('issueTopic');
+            select.innerHTML = '<option value="">-- เลือกหัวข้อ --</option>' + 
+                options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        }
     });
 
-    // --- นำทางไปหน้าจัดการ (ใช้ตัวเดียวกับที่แก้ให้ก่อนหน้า) ---
-    window.goToAdminManage = (event, id) => {
-        localStorage.setItem('adminEditTicketId', id);
-        window.location.href = 'admin-manage.html';
-    };
-
-    // (เพิ่มโค้ดดึงข้อมูล issueOptions มาใส่ใน select issueTopic ด้วย)
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
 </script>
 </body>
 </html>
