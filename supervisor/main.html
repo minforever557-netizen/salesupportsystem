@@ -78,6 +78,7 @@
     });
 
     function loadActiveJobs() {
+        // ดึงเฉพาะงานที่มีสถานะ Open หรือ In Progress
         const q = query(
             collection(db, "tickets"), 
             where("status", "in", ["Open", "In Progress"]),
@@ -96,7 +97,7 @@
             let html = '';
             snapshot.forEach(docSnap => {
                 const t = docSnap.data();
-                const date = t.createdAt?.toDate().toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'}) || '-';
+                const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
                 const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
 
                 html += `
@@ -115,7 +116,7 @@
     }
 
     window.goManage = (id) => {
-        localStorage.setItem('currentTicketId', id);
+        localStorage.setItem('currentTicketId', id); // เก็บ ID ลง LocalStorage เพื่อใช้ในหน้าถัดไป
         window.location.href = 'manage-job.html';
     };
 
