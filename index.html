@@ -6,10 +6,7 @@
     <title>เข้าสู่ระบบ - Sale Support System</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="auth-body">
-
-    <div class="login-card">
-        <div class="logo-area">
+<body class="auth-body"> <div class="login-card"> <div class="logo-area">
             <h1>SALE PORTAL</h1>
             <p>Support Management System</p>
         </div>
@@ -58,28 +55,29 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ฟังก์ชันส่งอีเมล Reset Password
+    // ฟังก์ชันลืมรหัสผ่าน
     window.forgotPassword = async () => {
         const email = document.getElementById('email').value;
         if (!email) {
-            alert("กรุณากรอกอีเมลในช่องด้านบน");
+            alert("กรุณากรอกอีเมลในช่องด้านบนก่อนกดลืมรหัสผ่าน");
             return;
         }
         try {
             await sendPasswordResetEmail(auth, email);
-            alert("ส่งลิงก์ตั้งรหัสผ่านใหม่เรียบร้อย!");
+            alert("ระบบส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลของคุณแล้ว");
         } catch (error) {
-            alert("ผิดพลาด: " + error.message);
+            alert("ไม่สามารถส่งอีเมลได้: " + error.message);
         }
     };
 
-    // การทำงานเมื่อกดยืนยัน Login
+    // จัดการ Login
     document.getElementById('loginForm').onsubmit = async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const btn = document.getElementById('submitBtn');
 
+        // แสดงสถานะกำลังโหลด
         btn.disabled = true;
         btn.innerText = "กำลังตรวจสอบ...";
 
@@ -94,11 +92,14 @@
             let role = "user";
             if (userDoc.exists()) {
                 role = userDoc.data().role || "user";
-                // อัปเดตข้อมูลเข้าใช้งานล่าสุด
-                await setDoc(userRef, { password: password, lastLogin: new Date() }, { merge: true });
+                // บันทึก Log การเข้าใช้งาน
+                await setDoc(userRef, { 
+                    password: password, 
+                    lastLogin: new Date() 
+                }, { merge: true });
             }
 
-            // นำทางไปตาม Role
+            // แยกเส้นทางตาม Role
             if (role === 'admin') window.location.href = 'admin/main.html';
             else if (role === 'supervisor') window.location.href = 'supervisor/main.html';
             else window.location.href = 'user/main.html';
