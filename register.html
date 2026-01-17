@@ -1,21 +1,32 @@
-<body class="auth-body">
-
-    <div class="auth-card">
-        <h2 style="color: var(--primary-green); text-align: center;">สร้างบัญชีใหม่</h2>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สร้างบัญชีใหม่ - Sale Support System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body"> <div class="auth-card"> <h2 class="auth-title">สร้างบัญชีใหม่</h2>
         
         <div class="info-box">
             📌 เมื่อลงทะเบียนแล้ว บัญชีของคุณจะมีสิทธิ์เป็น <b>User (Sale)</b> โดยอัตโนมัติ
         </div>
 
         <form id="registerForm">
-            <label>อีเมลพนักงาน</label>
-            <input type="email" id="regEmail" class="input-field" placeholder="name@company.com" required>
+            <div class="form-group">
+                <label>อีเมลพนักงาน</label>
+                <input type="email" id="regEmail" class="input-field" placeholder="name@company.com" required>
+            </div>
             
-            <label>รหัสผ่าน</label>
-            <input type="password" id="regPassword" class="input-field" placeholder="กำหนดรหัสผ่าน 6 ตัวขึ้นไป" required minlength="6">
-            
-            <label>ยืนยันรหัสผ่าน</label>
-            <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านให้ตรงกัน" required>
+            <div class="form-group">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="regPassword" class="input-field" placeholder="กำหนดรหัสผ่าน 6 ตัวขึ้นไป" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label>ยืนยันรหัสผ่าน</label>
+                <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านให้ตรงกัน" required>
+            </div>
 
             <button type="submit" class="btn-auth" id="regBtn">ลงทะเบียนเข้าใช้งาน</button>
         </form>
@@ -25,4 +36,8 @@
         </div>
     </div>
 
+    <script type="module">
+        // ... โค้ด Firebase ของคุณ ...
+    </script>
 </body>
+</html>
