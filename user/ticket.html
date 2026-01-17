@@ -21,36 +21,35 @@
     </div>
 
     <div class="main-content">
-        <div class="top-bar">
-            <h3 style="margin:0;">แจ้งเรื่องสนับสนุน</h3>
-            <div id="userEmailTop" style="font-weight: 600; color: var(--text-muted);">Loading...</div>
-        </div>
-
-        <div class="container">
-            <div class="card">
-    <h2 class="ticket-header">📝 ส่งคำขอจัดการ Case ใหม่</h2>
-    <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
-    
-    <form id="ticketForm">
-        <label for="issueType">หัวข้อปัญหา:</label>
-        <select id="issueType" class="input-field" required>
-            <option value="">-- เลือกหัวข้อ --</option>
-        </select>
-
-        <label for="internetNo">หมายเลข Internet (10 หลัก):</label>
-        <input type="text" id="internetNo" class="input-field" 
-               placeholder="เช่น 88XXXXXXXX" required pattern="[0-9]{10}">
-
-        <label for="details">รายละเอียดเพิ่มเติม:</label>
-        <textarea id="details" class="input-field" rows="5" 
-                  placeholder="ระบุรายละเอียดของปัญหาหรือความต้องการ..." required></textarea>
-
-        <button type="submit" class="btn-primary" id="submitBtn">ส่งข้อมูลแจ้งเรื่อง</button>
-    </form>
-</div>
-        </div>
+    <div class="top-bar">
+        <h3 style="margin:0;">แจ้งเรื่องสนับสนุน</h3>
+        <div id="userEmailTop" style="font-weight: 600; color: var(--text-muted);">Loading...</div>
     </div>
 
+    <div class="container">
+        <div class="card">
+            <h2 class="ticket-header" style="color: var(--primary-green); margin-top:0;">📝 ส่งคำขอจัดการ Case ใหม่</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
+            
+            <form id="ticketForm">
+                <label style="display:block; font-weight:600; margin-bottom:8px;">หัวข้อปัญหา:</label>
+                <select id="issueType" class="input-field" style="margin-bottom:20px;" required>
+                    <option value="">-- เลือกหัวข้อ --</option>
+                </select>
+
+                <label style="display:block; font-weight:600; margin-bottom:8px;">หมายเลข Internet (10 หลัก):</label>
+                <input type="text" id="internetNo" class="input-field" style="margin-bottom:20px;" 
+                       placeholder="เช่น 88XXXXXXXX" required pattern="[0-9]{10}">
+
+                <label style="display:block; font-weight:600; margin-bottom:8px;">รายละเอียดเพิ่มเติม:</label>
+                <textarea id="details" class="input-field" rows="5" style="margin-bottom:25px;" 
+                          placeholder="ระบุรายละเอียดของปัญหาหรือความต้องการ..." required></textarea>
+
+                <button type="submit" class="btn-primary" id="submitBtn">ส่งข้อมูลแจ้งเรื่อง</button>
+            </form>
+        </div>
+    </div>
+</div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
