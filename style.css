@@ -4,16 +4,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
 
 :root {
-    --primary-green: #10B981;    /* สีเขียวหลัก */
-    --dark-green: #059669;       /* สีเขียวเข้มสำหรับ Hover */
-    --sidebar-bg: #1F2937;       /* สีพื้นหลังแถบเมนู */
-    --sidebar-hover: #374151;    /* สีเมนูเมื่อเอาเมาส์ชี้ */
-    --text-main: #111827;        /* สีตัวอักษรหลัก */
-    --text-muted: #6B7280;       /* สีตัวอักษรจาง */
-    --bg-light: #F3F4F6;         /* สีพื้นหลังเว็บ */
-    --white: #ffffff;            /* สีขาว */
+    --primary-green: #10B981;
+    --dark-green: #059669;
+    --sidebar-bg: #1F2937;
+    --sidebar-hover: #374151;
+    --text-main: #111827;
+    --text-muted: #6B7280;
+    --bg-light: #F3F4F6;
+    --white: #ffffff;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --sidebar-width: 260px;      /* ความกว้างเมนูซ้าย */
+    --sidebar-width: 260px;
 }
 
 * {
@@ -30,32 +30,51 @@ body {
 }
 
 /* ============================================================
-   2. AUTH PAGES (Login & Register)
+   2. COMMON COMPONENTS (ใช้ร่วมกันทุกหน้า)
    ============================================================ */
-.auth-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.auth-card, .login-card {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    width: 90%;
-    max-width: 450px;
+.card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+/* ยุบรวมปุ่มทุกประเภทให้มีโครงสร้างเดียวกัน */
+.btn-auth, .btn-primary, .filter-btn {
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
     text-align: center;
 }
 
-.logo-area { margin-bottom: 30px; }
-.logo-area h1 { color: #1e293b; font-size: 24px; margin: 0; letter-spacing: 1px; }
+/* ปุ่มหลักสีเขียว */
+.btn-auth, .btn-primary {
+    width: 100%;
+    background: var(--primary-green);
+    color: white;
+    padding: 14px;
+}
 
-.form-group { text-align: left; margin-bottom: 20px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px; }
+.btn-auth:hover, .btn-primary:hover {
+    background: var(--dark-green);
+    transform: translateY(-2px);
+}
 
+.btn-primary:disabled {
+    background: #9CA3AF;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* อินพุตฟิลด์ */
 .input-field {
     width: 100%;
     padding: 12px 15px;
@@ -63,6 +82,7 @@ body {
     border-radius: 8px;
     outline: none;
     transition: 0.2s;
+    margin-bottom: 20px;
 }
 
 .input-field:focus {
@@ -70,25 +90,8 @@ body {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-.btn-auth {
-    width: 100%;
-    background: var(--primary-green);
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
-}
-
-.btn-auth:hover {
-    background: var(--dark-green);
-    transform: translateY(-1px);
-}
-
 /* ============================================================
-   3. SIDEBAR & MAIN LAYOUT
+   3. SIDEBAR & LAYOUT
    ============================================================ */
 .sidebar {
     width: var(--sidebar-width);
@@ -146,104 +149,8 @@ body {
 }
 
 /* ============================================================
-   4. DASHBOARD & NOTIFICATIONS
+   4. TABLE & HISTORY
    ============================================================ */
-.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-.stat-box { padding: 20px; border-radius: 12px; color: white; text-align: center; }
-.stat-number { font-size: 1.8rem; font-weight: 600; }
-
-.menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-.menu-card {
-    background: white; padding: 30px; border-radius: 15px; text-align: center;
-    text-decoration: none; color: var(--text-main); transition: 0.3s; box-shadow: var(--shadow);
-    border: 1px solid transparent;
-}
-.menu-card:hover { transform: translateY(-5px); border-color: var(--primary-green); }
-
-.notif-wrapper { position: relative; cursor: pointer; margin-right: 20px; }
-.notif-badge-icon {
-    position: absolute; top: -5px; right: -8px; background: #EF4444; color: white;
-    border-radius: 50%; padding: 2px 6px; font-size: 10px; display: none;
-}
-.notif-dropdown {
-    position: absolute; top: 40px; right: 0; width: 300px; background: white;
-    border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: none; z-index: 1001;
-}
-.notif-item { padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; text-align: left; }
-.notif-item:hover { background: #f0fdf4; }
-
-.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-.modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; }
-
-/* ============================================================
-   5. RESPONSIVE
-   ============================================================ */
-@media (max-width: 768px) {
-    .sidebar { width: 70px; }
-    .sidebar-header, .sidebar-menu a span { display: none; }
-    .main-content { margin-left: 70px; }
-    .stat-grid { grid-template-columns: 1fr; }
-}
-
-/* ============================================================
-   6. TICKET FORM SPECIFIC STYLE
-   ============================================================ */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.card {
-    background: var(--white);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: var(--shadow);
-}
-
-.ticket-header {
-    color: var(--primary-green);
-    margin-top: 0;
-}
-
-#ticketForm label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--text-main);
-}
-
-#ticketForm .input-field {
-    margin-bottom: 20px;
-}
-
-.btn-primary {
-    width: 100%;
-    background: var(--primary-green);
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
-}
-
-.btn-primary:hover {
-    background: var(--dark-green);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-}
-
-.btn-primary:disabled {
-    background: #9CA3AF;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ============================================================
-   HISTORY & TABLE STYLE
-   ============================================================ */
-/* ปุ่มสลับโหมดการดู (Filter) */
 .view-filter {
     display: flex;
     gap: 10px;
@@ -255,11 +162,6 @@ body {
 
 .filter-btn {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
     background: white;
     color: var(--text-muted);
 }
@@ -270,7 +172,6 @@ body {
     box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
 }
 
-/* การจัดการตาราง */
 .table-responsive {
     overflow-x: auto;
     border-radius: 10px;
@@ -281,25 +182,20 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: white;
-    font-size: 0.95rem;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #edf2f7;
 }
 
 th {
     background: #f9fafb;
-    padding: 15px;
-    text-align: left;
     font-weight: 600;
-    border-bottom: 2px solid #edf2f7;
-    white-space: nowrap;
 }
 
-td {
-    padding: 15px;
-    border-bottom: 1px solid #edf2f7;
-    vertical-align: middle;
-}
-
-/* ป้ายแสดงสถานะ (Status Badges) */
+/* สถานะ (Status Badges) */
 .status-badge {
     padding: 5px 12px;
     border-radius: 20px;
@@ -308,6 +204,16 @@ td {
     display: inline-block;
 }
 
-.bg-open { background: #fef3c7; color: #92400e; }    /* สีส้ม/เหลือง สำหรับงานใหม่ */
-.bg-process { background: #dbeafe; color: #1e40af; } /* สีฟ้า สำหรับกำลังทำ */
-.bg-closed { background: #d1fae5; color: #065f46; }  /* สีเขียว สำหรับเสร็จแล้ว */
+.bg-open { background: #fef3c7; color: #92400e; }
+.bg-process { background: #dbeafe; color: #1e40af; }
+.bg-closed { background: #d1fae5; color: #065f46; }
+
+/* ============================================================
+   5. RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .sidebar { width: 70px; }
+    .sidebar-header, .sidebar-menu a span { display: none; }
+    .main-content { margin-left: 70px; }
+    .container { width: 100%; }
+}
