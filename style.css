@@ -30,7 +30,7 @@ body {
 }
 
 /* ============================================================
-   2. COMMON COMPONENTS (ใช้ร่วมกันทุกหน้า)
+   2. COMMON COMPONENTS
    ============================================================ */
 .container {
     max-width: 1000px;
@@ -45,7 +45,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* ยุบรวมปุ่มทุกประเภทให้มีโครงสร้างเดียวกัน */
 .btn-auth, .btn-primary, .filter-btn {
     border: none;
     border-radius: 10px;
@@ -55,7 +54,6 @@ body {
     text-align: center;
 }
 
-/* ปุ่มหลักสีเขียว */
 .btn-auth, .btn-primary {
     width: 100%;
     background: var(--primary-green);
@@ -68,13 +66,6 @@ body {
     transform: translateY(-2px);
 }
 
-.btn-primary:disabled {
-    background: #9CA3AF;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* อินพุตฟิลด์ */
 .input-field {
     width: 100%;
     padding: 12px 15px;
@@ -134,7 +125,6 @@ body {
 .main-content {
     margin-left: var(--sidebar-width);
     padding: 30px;
-    transition: 0.3s;
 }
 
 .top-bar {
@@ -149,29 +139,40 @@ body {
 }
 
 /* ============================================================
-   4. TABLE & HISTORY
+   4. MODAL SYSTEM (จุดที่เพิ่มเพื่อให้กดดูรายละเอียดได้)
    ============================================================ */
-.view-filter {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    background: #f3f4f6;
-    padding: 10px;
-    border-radius: 12px;
+.modal {
+    display: none; /* ซ่อนไว้เริ่มต้น */
+    position: fixed;
+    z-index: 9999; /* ให้อยู่บนสุด */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังดำจางๆ */
+    backdrop-filter: blur(4px); /* ทำพื้นหลังเบลอ */
 }
 
-.filter-btn {
-    padding: 10px 20px;
-    background: white;
-    color: var(--text-muted);
+.modal-content {
+    background-color: var(--white);
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    animation: modalSlide 0.3s ease-out;
 }
 
-.filter-btn.active {
-    background: var(--primary-green);
-    color: white;
-    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+@keyframes modalSlide {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
+/* ============================================================
+   5. TABLE & STATUS
+   ============================================================ */
 .table-responsive {
     overflow-x: auto;
     border-radius: 10px;
@@ -190,18 +191,13 @@ th, td {
     border-bottom: 1px solid #edf2f7;
 }
 
-th {
-    background: #f9fafb;
-    font-weight: 600;
-}
+th { background: #f9fafb; font-weight: 600; }
 
-/* สถานะ (Status Badges) */
 .status-badge {
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    display: inline-block;
 }
 
 .bg-open { background: #fef3c7; color: #92400e; }
@@ -209,11 +205,10 @@ th {
 .bg-closed { background: #d1fae5; color: #065f46; }
 
 /* ============================================================
-   5. RESPONSIVE
+   6. RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
     .sidebar { width: 70px; }
     .sidebar-header, .sidebar-menu a span { display: none; }
     .main-content { margin-left: 70px; }
-    .container { width: 100%; }
 }
