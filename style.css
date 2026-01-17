@@ -1,46 +1,124 @@
-/* --- Google Font: นำเข้าฟอนต์ Sarabun เพื่อใช้แสดงผลภาษาไทยให้สวยงาม --- */
+/* ============================================================
+   1. GLOBAL SETTINGS & VARIABLES
+   นำเข้าฟอนต์และกำหนดค่าสีกลางเพื่อให้ง่ายต่อการแก้ไขจุดเดียว
+   ============================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
 
-/* --- Root Variables: กำหนดตัวแปรกลางสำหรับค่าสีและขนาด เพื่อให้ง่ายต่อการแก้ไขจุดเดียวทั้งเว็บ --- */
 :root {
-    --primary-green: #10B981;    /* สีเขียวหลัก (เขียวสว่าง) */
-    --dark-green: #059669;       /* สีเขียวเข้ม (ใช้ตอน Hover ปุ่ม) */
-    --sidebar-bg: #1F2937;       /* สีพื้นหลังแถบเมนูด้านข้าง */
-    --sidebar-hover: #374151;    /* สีเมื่อเอาเมาส์ไปชี้ที่เมนู */
-    --text-main: #111827;        /* สีตัวอักษรหลัก (เกือบดำ) */
-    --text-muted: #6B7280;       /* สีตัวอักษรจาง (สำหรับคำบรรยาย) */
-    --bg-light: #F3F4F6;         /* สีพื้นหลังของหน้าเว็บ (เทาอ่อน) */
+    --primary-green: #10B981;    /* สีเขียวหลัก */
+    --dark-green: #059669;       /* สีเขียวเข้มสำหรับ Hover */
+    --sidebar-bg: #1F2937;       /* สีพื้นหลังแถบเมนู */
+    --sidebar-hover: #374151;    /* สีเมนูเมื่อเอาเมาส์ชี้ */
+    --text-main: #111827;        /* สีตัวอักษรหลัก */
+    --text-muted: #6B7280;       /* สีตัวอักษรจาง */
+    --bg-light: #F3F4F6;         /* สีพื้นหลังเว็บ */
     --white: #ffffff;            /* สีขาว */
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* เงาของ Card */
-    --sidebar-width: 260px;      /* ความกว้างของเมนูด้านข้าง */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --sidebar-width: 260px;      /* ความกว้างเมนูซ้าย */
 }
 
-/* --- Global Reset: ตั้งค่าพื้นฐานให้ทุก Element คำนวณขนาดรวม Padding และใช้ฟอนต์เดียวกัน --- */
 * {
-    box-sizing: border-box;      /* ให้ความกว้างรวม Padding และ Border ไม่ให้ขนาดเพี้ยน */
+    box-sizing: border-box;      /* คำนวณขนาดรวม Padding ไม่ให้ขนาดเพี้ยน */
     font-family: 'Sarabun', sans-serif;
 }
 
 body {
     margin: 0;
     padding: 0;
-    display: flex;               /* ใช้ Flexbox เพื่อจัดวาง Sidebar ไว้ซ้าย Content ไว้ขวา */
-    min-height: 100vh;           /* ให้ความสูงอย่างน้อยเต็มหน้าจอเสมอ */
+    display: flex;               /* จัดวาง Sidebar และ Content คู่กัน */
+    min-height: 100vh;
     background-color: var(--bg-light);
     color: var(--text-main);
 }
 
-/* --- Sidebar Styling: จัดการแถบเมนูด้านข้าง --- */
+/* ============================================================
+   2. AUTH PAGES (Login & Register)
+   สไตล์เฉพาะสำหรับหน้าจอเข้าสู่ระบบและลงทะเบียน
+   ============================================================ */
+
+/* พื้นหลังไล่เฉดสีสำหรับหน้าล็อคอิน */
+.auth-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    margin: 0;
+}
+
+/* การ์ดสีขาวสำหรับฟอร์มลงทะเบียน */
+.auth-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 450px;
+}
+
+/* กล่องสีเขียวสำหรับแจ้งข้อมูลสำคัญ */
+.info-box {
+    background: #ecfdf5;
+    color: #065f46;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--primary-green);
+}
+
+/* ปุ่มสำหรับหน้าล็อคอิน/ลงทะเบียน */
+.btn-auth {
+    width: 100%;
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-auth:hover {
+    background: var(--dark-green);
+    transform: translateY(-1px);
+}
+
+.btn-auth:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.auth-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.auth-footer a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ============================================================
+   3. SIDEBAR (เมนูด้านข้าง)
+   จัดการแถบนำทางหลักสำหรับ Admin และ Sale
+   ============================================================ */
+
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--sidebar-bg);
     color: var(--white);
     display: flex;
-    flex-direction: column;      /* จัดเรียงเมนูจากบนลงล่าง */
-    position: fixed;             /* ล็อกตำแหน่งให้อยู่กับที่แม้จะเลื่อนหน้าจอ (Scroll) */
-    height: 100vh;               /* สูงเต็มหน้าจอ */
-    transition: 0.3s;            /* เพิ่มความนุ่มนวลเวลาเปลี่ยนขนาด (Responsive) */
-    z-index: 1000;               /* ให้อยู่เลเยอร์บนสุดเสมอ */
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    transition: 0.3s;
+    z-index: 1000;
 }
 
 .sidebar-header {
@@ -48,24 +126,22 @@ body {
     font-size: 1.4rem;
     font-weight: 600;
     text-align: center;
-    border-bottom: 1px solid #374151; /* เส้นคั่นระหว่างหัวข้อกับเมนู */
+    border-bottom: 1px solid #374151;
     color: var(--primary-green);
-    letter-spacing: 1px;         /* เพิ่มระยะห่างตัวอักษรให้ดูโปร่ง */
 }
 
 .sidebar-menu {
-    flex: 1;                     /* ให้เมนูขยายพื้นที่จนเต็มส่วนกลาง */
+    flex: 1;
     padding: 20px 0;
 }
 
 .sidebar-menu a {
     display: flex;
-    align-items: center;         /* ให้ไอคอนและข้อความอยู่กึ่งกลางบรรทัด */
+    align-items: center;
     padding: 14px 25px;
     color: #D1D5DB;
-    text-decoration: none;       /* เอาขีดเส้นใต้ลิงก์ออก */
-    transition: all 0.2s;
-    font-size: 0.95rem;
+    text-decoration: none;
+    transition: 0.2s;
 }
 
 .sidebar-menu a:hover {
@@ -76,230 +152,99 @@ body {
 .sidebar-menu a.active {
     background-color: var(--sidebar-hover);
     color: var(--white);
-    border-left: 5px solid var(--primary-green); /* เพิ่มแถบสีเขียวด้านซ้ายเพื่อบอกว่าอยู่เมนูนี้ */
+    border-left: 5px solid var(--primary-green);
 }
 
-.sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid #374151;
-}
+/* ============================================================
+   4. CONTENT & UI ELEMENTS (ส่วนเนื้อหาและองค์ประกอบ)
+   ตาราง, การ์ดข้อมูล และปุ่มมาตรฐาน
+   ============================================================ */
 
-/* --- Main Content Area: พื้นที่แสดงเนื้อหาหลัก --- */
 .main-content {
-    margin-left: var(--sidebar-width); /* ดันเนื้อหาไปทางขวาตามความกว้าง Sidebar */
-    flex: 1;                     /* ให้เนื้อหากินพื้นที่ส่วนที่เหลือทั้งหมด */
+    margin-left: var(--sidebar-width);
+    flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0;                /* ป้องกันเนื้อหาที่ใหญ่เกินไป (เช่น Table) ดันหน้าจอจนเสียรูป */
-}
-
-.top-bar {
-    height: 65px;
-    background: var(--white);
-    display: flex;
-    justify-content: flex-end;   /* จัดปุ่มหรือชื่อผู้ใช้ไปไว้ทางขวาสุด */
-    align-items: center;
-    padding: 0 30px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .container {
     padding: 30px;
-    max-width: 1200px;           /* จำกัดความกว้างเนื้อหาไม่ให้แผ่กว้างเกินไปในจอใหญ่ */
+    max-width: 1200px;
     width: 100%;
-    margin: 0 auto;              /* จัด Content ให้อยู่กึ่งกลางหน้าจอ */
+    margin: 0 auto;
 }
 
-/* --- Cards: กล่องใส่เนื้อหา --- */
 .card {
     background: var(--white);
     padding: 25px;
     border-radius: 12px;
     box-shadow: var(--shadow);
-    margin-bottom: 25px;         /* เว้นระยะห่างระหว่างแต่ละ Card */
+    margin-bottom: 25px;
 }
 
-/* --- Forms & Inputs: จัดการช่องกรอกข้อมูล --- */
+/* ฟอร์มกรอกข้อมูล */
 .input-field {
     width: 100%;
     padding: 12px 15px;
     margin: 10px 0 20px 0;
     border: 1px solid #D1D5DB;
     border-radius: 8px;
-    font-size: 0.95rem;
-    outline: none;               /* เอาขอบเส้นสีฟ้าพื้นฐานของ Browser ออก */
-    transition: border-color 0.2s;
+    outline: none;
+    transition: 0.2s;
 }
 
 .input-field:focus {
-    border-color: var(--primary-green); /* เปลี่ยนสีขอบเมื่อกำลังพิมพ์ */
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); /* เพิ่มเงาสีเขียวจางๆ รอบช่องกรอก */
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-label {
-    font-weight: 600;
-    color: #4B5563;
-    font-size: 0.9rem;
-}
-
-/* --- Buttons: จัดการปุ่มกด --- */
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary {
-    background-color: var(--primary-green);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--dark-green);
-    transform: translateY(-1px); /* เมื่อชี้แล้วปุ่มจะลอยขึ้นเล็กน้อย */
-}
-
-.btn-outline {
-    background-color: transparent;
-    border: 1px solid #D1D5DB;
-    color: #4B5563;
-}
-
-.btn-outline:hover {
-    background-color: #F9FAFB;
-}
-
-/* --- Tables: จัดการตารางแสดงข้อมูล --- */
+/* ตารางแสดงผลข้อมูล */
 table {
     width: 100%;
-    border-collapse: collapse;   /* ให้เส้นขอบตารางรวมเป็นเส้นเดียว ไม่ซ้อนกัน */
+    border-collapse: collapse;
     margin-top: 10px;
-    background: var(--white);
 }
 
 th {
     text-align: left;
     padding: 15px;
-    background-color: #F9FAFB;   /* พื้นหลังหัวตารางสีเทาจาง */
+    background-color: #F9FAFB;
     border-bottom: 2px solid #E5E7EB;
     color: #4B5563;
     font-size: 0.85rem;
-    text-transform: uppercase;   /* ปรับตัวอังกฤษเป็นตัวพิมพ์ใหญ่ทั้งหมด */
+    text-transform: uppercase;
 }
 
 td {
     padding: 15px;
     border-bottom: 1px solid #E5E7EB;
-    font-size: 0.95rem;
 }
 
-tr:hover {
-    background-color: #FBFBFF;   /* ไฮไลท์แถวเมื่อเอาเมาส์ไปชี้ */
-}
-
-/* --- Status Badges: ป้ายบอกสถานะ --- */
+/* ป้ายแสดงสถานะงาน */
 .status-badge {
     padding: 5px 12px;
-    border-radius: 20px;         /* ทรงมนรีเหมือนแคปซูล */
+    border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
     color: white;
 }
 
-.bg-open { background-color: #EF4444; }    /* สถานะ Open: สีแดง */
-.bg-process { background-color: #F59E0B; } /* สถานะ Process: สีส้ม */
-.bg-closed { background-color: #10B981; }  /* สถานะ Closed: สีเขียว */
+.bg-open { background-color: #EF4444; }    /* สีแดง: รอรับงาน */
+.bg-process { background-color: #F59E0B; } /* สีส้ม: กำลังทำ */
+.bg-closed { background-color: #10B981; }  /* สีเขียว: ปิดงานแล้ว */
 
-/* --- Responsive: ปรับแต่งการแสดงผลบนหน้าจอมือถือ --- */
+/* ============================================================
+   5. RESPONSIVE (การแสดงผลบนมือถือ)
+   ============================================================ */
+
 @media (max-width: 768px) {
     .sidebar {
-        width: 70px;             /* ยุบ Sidebar ให้แคบลงเหลือแต่ไอคอน */
+        width: 70px;
     }
     .sidebar-header, .sidebar-menu a span {
-        display: none;           /* ซ่อนข้อความหัวข้อและเมนู เหลือแต่ตัวย่อหรือไอคอน */
+        display: none;
     }
     .main-content {
-        margin-left: 70px;       /* ปรับเนื้อหาให้เข้าชิดซ้ายมากขึ้นตาม Sidebar ที่ยุบลง */
+        margin-left: 70px;
     }
-}
-/* ==========================================
-   AUTH PAGES (Login & Register)
-   ส่วนหน้าจอลงทะเบียนและเข้าสู่ระบบ
-   ========================================== */
-
-/* คลาสสำหรับ Body ในหน้า Login/Register เพื่อทำพื้นหลังเต็มจอ */
-.auth-body {
-    display: flex;                /* จัดวางเนื้อหาภายในแบบ Flexible Box */
-    justify-content: center;      /* จัดเนื้อหาให้อยู่กึ่งกลางในแนวนอน */
-    align-items: center;          /* จัดเนื้อหาให้อยู่กึ่งกลางในแนวตั้ง */
-    min-height: 100vh;            /* กำหนดความสูงอย่างน้อยเท่ากับความสูงหน้าจอ */
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* ไล่เฉดสีพื้นหลัง น้ำเงินเข้ม-ดำ */
-    margin: 0;                    /* เอาขอบขาวรอบตัวเว็บออก */
-}
-
-/* คลาสการ์ดสีขาวที่ครอบฟอร์มลงทะเบียน */
-.auth-card {
-    background: var(--white);     /* ใช้สีขาวจากตัวแปรกลาง */
-    padding: 40px;                /* เว้นระยะห่างระหว่างขอบการ์ดกับเนื้อหาภายใน */
-    border-radius: 20px;          /* ปรับขอบการ์ดให้มีความโค้งมน */
-    box-shadow: 0 25px 50px rgba(0,0,0,0.2); /* เพิ่มเงาฟุ้งใต้การ์ดเพื่อให้ดูมีมิติ (Floating) */
-    width: 100%;                  /* ให้ขยายเต็มพื้นที่ที่มี */
-    max-width: 450px;             /* แต่จำกัดความกว้างสูงสุดไว้ที่ 450px ไม่ให้ใหญ่เกินไป */
-}
-
-/* กล่องสีเขียวอ่อนสำหรับแสดงคำแนะนำหรือหมายเหตุ */
-.info-box {
-    background: #ecfdf5;          /* พื้นหลังสีเขียวอ่อนมาก */
-    color: #065f46;               /* ตัวอักษรสีเขียวเข้มเพื่อให้ขัดกับพื้นหลังและอ่านง่าย */
-    padding: 12px;                /* ระยะห่างภายในกล่อง */
-    border-radius: 8px;           /* ขอบกล่องมนเล็กน้อย */
-    font-size: 0.85rem;           /* ปรับขนาดตัวอักษรให้เล็กลงกว่าปกติเล็กน้อย */
-    margin-bottom: 20px;          /* ระยะห่างด้านล่างก่อนถึงองค์ประกอบถัดไป */
-    border-left: 4px solid var(--primary-green); /* เพิ่มเส้นขอบหนาด้านซ้ายเพื่อเน้นว่าเป็นข้อความสำคัญ */
-}
-
-/* ปุ่มสำหรับกดล็อคอินหรือลงทะเบียน (ขยายเต็มหน้าการ์ด) */
-.btn-auth {
-    width: 100%;                  /* ให้ปุ่มกว้างเท่ากับการ์ด */
-    background: var(--primary-green); /* ใช้สีเขียวหลักจากตัวแปรกลาง */
-    color: white;                 /* ตัวอักษรบนปุ่มสีขาว */
-    border: none;                 /* เอาขอบเส้นของปุ่มออก */
-    padding: 14px;                /* ความหนาของปุ่ม */
-    border-radius: 10px;          /* ปรับขอบปุ่มให้มน */
-    cursor: pointer;              /* เปลี่ยนรูปเมาส์เป็นรูปมือเมื่อชี้ */
-    font-weight: 600;             /* ตัวอักษรบนปุ่มเป็นตัวหนา */
-    transition: 0.3s;             /* กำหนดเวลาในการแสดงเอฟเฟกต์ (เช่น ตอนเปลี่ยนสี) ให้ดูนุ่มนวล */
-}
-
-/* เอฟเฟกต์เมื่อเอาเมาส์มาชี้ที่ปุ่มลงทะเบียน */
-.btn-auth:hover {
-    background: var(--dark-green); /* เปลี่ยนเป็นสีเขียวเข้มขึ้น */
-    transform: translateY(-1px);  /* ให้ปุ่มขยับขึ้นข้างบน 1 พิกเซล ให้ความรู้สึกเหมือนปุ่มลอยได้ */
-}
-
-/* สถานะปุ่มเมื่อถูกสั่งปิดการใช้งาน (เช่น ขณะกำลังรอเซิฟเวอร์) */
-.btn-auth:disabled {
-    background: #9ca3af;         /* เปลี่ยนเป็นสีเทา */
-    cursor: not-allowed;         /* เปลี่ยนรูปเมาส์เป็นสัญลักษณ์ห้าม */
-}
-
-/* ส่วนท้ายของการ์ด (สำหรับลิงก์สลับหน้า Login/Register) */
-.auth-footer {
-    margin-top: 25px;             /* ระยะห่างด้านบน */
-    text-align: center;           /* จัดตัวอักษรให้อยู่กึ่งกลาง */
-    font-size: 0.9rem;            /* ขนาดตัวอักษรเล็กจาง */
-    color: var(--text-muted);     /* ใช้สีเทาจางจากตัวแปรกลาง */
-}
-
-/* สไตล์เฉพาะสำหรับลิงก์ในหน้าลงทะเบียน */
-.auth-footer a {
-    color: var(--primary-green);  /* ใช้สีเขียวหลัก */
-    text-decoration: none;        /* ไม่ให้มีขีดเส้นใต้ */
-    font-weight: bold;            /* เน้นเป็นตัวหนาเพื่อให้สังเกตง่ายว่าเป็นจุดที่กดได้ */
 }
