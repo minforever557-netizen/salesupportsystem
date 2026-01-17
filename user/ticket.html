@@ -28,27 +28,26 @@
 
         <div class="container">
             <div class="card">
-                <h2 class="ticket-header">📝 ส่งคำขอจัดการ Case ใหม่</h2>
-                <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
-                
-                <form id="ticketForm">
-                    <label for="issueType">หัวข้อปัญหา:</label>
-                    <select id="issueType" class="input-field" required>
-                        <option value="">-- กำลังโหลดหัวข้อ --</option>
-                    </select>
+    <h2 class="ticket-header">📝 ส่งคำขอจัดการ Case ใหม่</h2>
+    <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
+    
+    <form id="ticketForm">
+        <label for="issueType">หัวข้อปัญหา:</label>
+        <select id="issueType" class="input-field" required>
+            <option value="">-- เลือกหัวข้อ --</option>
+        </select>
 
-                    <label for="internetNo">หมายเลข Internet (10 หลัก):</label>
-                    <input type="text" id="internetNo" class="input-field" 
-                           placeholder="เช่น 88XXXXXXXX" required pattern="[0-9]{10}" 
-                           title="กรุณากรอกตัวเลขให้ครบ 10 หลัก">
+        <label for="internetNo">หมายเลข Internet (10 หลัก):</label>
+        <input type="text" id="internetNo" class="input-field" 
+               placeholder="เช่น 88XXXXXXXX" required pattern="[0-9]{10}">
 
-                    <label for="details">รายละเอียดเพิ่มเติม:</label>
-                    <textarea id="details" class="input-field" rows="5" 
-                              placeholder="ระบุรายละเอียดของปัญหาหรือความต้องการ..." required></textarea>
+        <label for="details">รายละเอียดเพิ่มเติม:</label>
+        <textarea id="details" class="input-field" rows="5" 
+                  placeholder="ระบุรายละเอียดของปัญหาหรือความต้องการ..." required></textarea>
 
-                    <button type="submit" class="btn-primary" id="submitBtn">ส่งข้อมูลแจ้งเรื่อง</button>
-                </form>
-            </div>
+        <button type="submit" class="btn-primary" id="submitBtn">ส่งข้อมูลแจ้งเรื่อง</button>
+    </form>
+</div>
         </div>
     </div>
 
