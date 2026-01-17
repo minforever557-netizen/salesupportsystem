@@ -1,44 +1,46 @@
-/* --- Google Font --- */
+/* --- Google Font: นำเข้าฟอนต์ Sarabun เพื่อใช้แสดงผลภาษาไทยให้สวยงาม --- */
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
 
+/* --- Root Variables: กำหนดตัวแปรกลางสำหรับค่าสีและขนาด เพื่อให้ง่ายต่อการแก้ไขจุดเดียวทั้งเว็บ --- */
 :root {
-    --primary-green: #10B981;
-    --dark-green: #059669;
-    --sidebar-bg: #1F2937;
-    --sidebar-hover: #374151;
-    --text-main: #111827;
-    --text-muted: #6B7280;
-    --bg-light: #F3F4F6;
-    --white: #ffffff;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --sidebar-width: 260px;
+    --primary-green: #10B981;    /* สีเขียวหลัก (เขียวสว่าง) */
+    --dark-green: #059669;       /* สีเขียวเข้ม (ใช้ตอน Hover ปุ่ม) */
+    --sidebar-bg: #1F2937;       /* สีพื้นหลังแถบเมนูด้านข้าง */
+    --sidebar-hover: #374151;    /* สีเมื่อเอาเมาส์ไปชี้ที่เมนู */
+    --text-main: #111827;        /* สีตัวอักษรหลัก (เกือบดำ) */
+    --text-muted: #6B7280;       /* สีตัวอักษรจาง (สำหรับคำบรรยาย) */
+    --bg-light: #F3F4F6;         /* สีพื้นหลังของหน้าเว็บ (เทาอ่อน) */
+    --white: #ffffff;            /* สีขาว */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* เงาของ Card */
+    --sidebar-width: 260px;      /* ความกว้างของเมนูด้านข้าง */
 }
 
+/* --- Global Reset: ตั้งค่าพื้นฐานให้ทุก Element คำนวณขนาดรวม Padding และใช้ฟอนต์เดียวกัน --- */
 * {
-    box-sizing: border-box;
+    box-sizing: border-box;      /* ให้ความกว้างรวม Padding และ Border ไม่ให้ขนาดเพี้ยน */
     font-family: 'Sarabun', sans-serif;
 }
 
 body {
     margin: 0;
     padding: 0;
-    display: flex; /* แบ่ง Sidebar และ Content */
-    min-height: 100vh;
+    display: flex;               /* ใช้ Flexbox เพื่อจัดวาง Sidebar ไว้ซ้าย Content ไว้ขวา */
+    min-height: 100vh;           /* ให้ความสูงอย่างน้อยเต็มหน้าจอเสมอ */
     background-color: var(--bg-light);
     color: var(--text-main);
 }
 
-/* --- Sidebar Styling --- */
+/* --- Sidebar Styling: จัดการแถบเมนูด้านข้าง --- */
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--sidebar-bg);
     color: var(--white);
     display: flex;
-    flex-direction: column;
-    position: fixed;
-    height: 100vh;
-    transition: 0.3s;
-    z-index: 1000;
+    flex-direction: column;      /* จัดเรียงเมนูจากบนลงล่าง */
+    position: fixed;             /* ล็อกตำแหน่งให้อยู่กับที่แม้จะเลื่อนหน้าจอ (Scroll) */
+    height: 100vh;               /* สูงเต็มหน้าจอ */
+    transition: 0.3s;            /* เพิ่มความนุ่มนวลเวลาเปลี่ยนขนาด (Responsive) */
+    z-index: 1000;               /* ให้อยู่เลเยอร์บนสุดเสมอ */
 }
 
 .sidebar-header {
@@ -46,22 +48,22 @@ body {
     font-size: 1.4rem;
     font-weight: 600;
     text-align: center;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid #374151; /* เส้นคั่นระหว่างหัวข้อกับเมนู */
     color: var(--primary-green);
-    letter-spacing: 1px;
+    letter-spacing: 1px;         /* เพิ่มระยะห่างตัวอักษรให้ดูโปร่ง */
 }
 
 .sidebar-menu {
-    flex: 1;
+    flex: 1;                     /* ให้เมนูขยายพื้นที่จนเต็มส่วนกลาง */
     padding: 20px 0;
 }
 
 .sidebar-menu a {
     display: flex;
-    align-items: center;
+    align-items: center;         /* ให้ไอคอนและข้อความอยู่กึ่งกลางบรรทัด */
     padding: 14px 25px;
     color: #D1D5DB;
-    text-decoration: none;
+    text-decoration: none;       /* เอาขีดเส้นใต้ลิงก์ออก */
     transition: all 0.2s;
     font-size: 0.95rem;
 }
@@ -74,7 +76,7 @@ body {
 .sidebar-menu a.active {
     background-color: var(--sidebar-hover);
     color: var(--white);
-    border-left: 5px solid var(--primary-green);
+    border-left: 5px solid var(--primary-green); /* เพิ่มแถบสีเขียวด้านซ้ายเพื่อบอกว่าอยู่เมนูนี้ */
 }
 
 .sidebar-footer {
@@ -82,20 +84,20 @@ body {
     border-top: 1px solid #374151;
 }
 
-/* --- Main Content Area --- */
+/* --- Main Content Area: พื้นที่แสดงเนื้อหาหลัก --- */
 .main-content {
-    margin-left: var(--sidebar-width); /* เว้นที่ให้ Sidebar */
-    flex: 1;
+    margin-left: var(--sidebar-width); /* ดันเนื้อหาไปทางขวาตามความกว้าง Sidebar */
+    flex: 1;                     /* ให้เนื้อหากินพื้นที่ส่วนที่เหลือทั้งหมด */
     display: flex;
     flex-direction: column;
-    min-width: 0; /* ป้องกันเนื้อหาดันหน้าจอ */
+    min-width: 0;                /* ป้องกันเนื้อหาที่ใหญ่เกินไป (เช่น Table) ดันหน้าจอจนเสียรูป */
 }
 
 .top-bar {
     height: 65px;
     background: var(--white);
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end;   /* จัดปุ่มหรือชื่อผู้ใช้ไปไว้ทางขวาสุด */
     align-items: center;
     padding: 0 30px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -103,26 +105,21 @@ body {
 
 .container {
     padding: 30px;
-    max-width: 1200px;
+    max-width: 1200px;           /* จำกัดความกว้างเนื้อหาไม่ให้แผ่กว้างเกินไปในจอใหญ่ */
     width: 100%;
-    margin: 0 auto;
+    margin: 0 auto;              /* จัด Content ให้อยู่กึ่งกลางหน้าจอ */
 }
 
-/* --- Cards & Elements --- */
+/* --- Cards: กล่องใส่เนื้อหา --- */
 .card {
     background: var(--white);
     padding: 25px;
     border-radius: 12px;
     box-shadow: var(--shadow);
-    margin-bottom: 25px;
+    margin-bottom: 25px;         /* เว้นระยะห่างระหว่างแต่ละ Card */
 }
 
-h2, h3 {
-    margin-top: 0;
-    color: var(--text-main);
-}
-
-/* --- Forms & Inputs --- */
+/* --- Forms & Inputs: จัดการช่องกรอกข้อมูล --- */
 .input-field {
     width: 100%;
     padding: 12px 15px;
@@ -130,13 +127,13 @@ h2, h3 {
     border: 1px solid #D1D5DB;
     border-radius: 8px;
     font-size: 0.95rem;
-    outline: none;
+    outline: none;               /* เอาขอบเส้นสีฟ้าพื้นฐานของ Browser ออก */
     transition: border-color 0.2s;
 }
 
 .input-field:focus {
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    border-color: var(--primary-green); /* เปลี่ยนสีขอบเมื่อกำลังพิมพ์ */
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); /* เพิ่มเงาสีเขียวจางๆ รอบช่องกรอก */
 }
 
 label {
@@ -145,7 +142,7 @@ label {
     font-size: 0.9rem;
 }
 
-/* --- Buttons --- */
+/* --- Buttons: จัดการปุ่มกด --- */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -165,7 +162,7 @@ label {
 
 .btn-primary:hover {
     background-color: var(--dark-green);
-    transform: translateY(-1px);
+    transform: translateY(-1px); /* เมื่อชี้แล้วปุ่มจะลอยขึ้นเล็กน้อย */
 }
 
 .btn-outline {
@@ -178,10 +175,10 @@ label {
     background-color: #F9FAFB;
 }
 
-/* --- Tables --- */
+/* --- Tables: จัดการตารางแสดงข้อมูล --- */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse;   /* ให้เส้นขอบตารางรวมเป็นเส้นเดียว ไม่ซ้อนกัน */
     margin-top: 10px;
     background: var(--white);
 }
@@ -189,11 +186,11 @@ table {
 th {
     text-align: left;
     padding: 15px;
-    background-color: #F9FAFB;
+    background-color: #F9FAFB;   /* พื้นหลังหัวตารางสีเทาจาง */
     border-bottom: 2px solid #E5E7EB;
     color: #4B5563;
     font-size: 0.85rem;
-    text-transform: uppercase;
+    text-transform: uppercase;   /* ปรับตัวอังกฤษเป็นตัวพิมพ์ใหญ่ทั้งหมด */
 }
 
 td {
@@ -203,31 +200,31 @@ td {
 }
 
 tr:hover {
-    background-color: #FBFBFF;
+    background-color: #FBFBFF;   /* ไฮไลท์แถวเมื่อเอาเมาส์ไปชี้ */
 }
 
-/* --- Status Badges --- */
+/* --- Status Badges: ป้ายบอกสถานะ --- */
 .status-badge {
     padding: 5px 12px;
-    border-radius: 20px;
+    border-radius: 20px;         /* ทรงมนรีเหมือนแคปซูล */
     font-size: 0.75rem;
     font-weight: 600;
     color: white;
 }
 
-.bg-open { background-color: #EF4444; }
-.bg-process { background-color: #F59E0B; }
-.bg-closed { background-color: #10B981; }
+.bg-open { background-color: #EF4444; }    /* สถานะ Open: สีแดง */
+.bg-process { background-color: #F59E0B; } /* สถานะ Process: สีส้ม */
+.bg-closed { background-color: #10B981; }  /* สถานะ Closed: สีเขียว */
 
-/* --- Responsive --- */
+/* --- Responsive: ปรับแต่งการแสดงผลบนหน้าจอมือถือ --- */
 @media (max-width: 768px) {
     .sidebar {
-        width: 70px;
+        width: 70px;             /* ยุบ Sidebar ให้แคบลงเหลือแต่ไอคอน */
     }
     .sidebar-header, .sidebar-menu a span {
-        display: none;
+        display: none;           /* ซ่อนข้อความหัวข้อและเมนู เหลือแต่ตัวย่อหรือไอคอน */
     }
     .main-content {
-        margin-left: 70px;
+        margin-left: 70px;       /* ปรับเนื้อหาให้เข้าชิดซ้ายมากขึ้นตาม Sidebar ที่ยุบลง */
     }
 }
