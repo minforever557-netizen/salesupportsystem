@@ -29,7 +29,7 @@
         <div class="container" style="max-width: 1100px;">
             <div class="card">
                 <h3>🔍 รายการข้อมูลในระบบ</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">* คลิกที่แถวเพื่อดูรายละเอียดเพิ่มเติม</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">* คลิกที่แถวหรือปุ่มเพื่อดูรายละเอียดเพิ่มเติม</p>
                 
                 <div class="view-filter">
                     <button id="viewAllBtn" class="filter-btn active">🌐 งานทั้งหมด</button>
@@ -38,7 +38,7 @@
 
                 <div style="margin-bottom: 20px;">
                     <input type="text" id="searchInput" class="input-field" 
-                           placeholder="🔎 ค้นหาเบอร์ Internet หรือชื่อผู้แจ้ง..." style="margin:0;">
+                           placeholder="🔎 ค้นหาเบอร์ Internet..." style="margin:0;">
                 </div>
                 
                 <div class="table-responsive">
@@ -61,8 +61,8 @@
         </div>
     </div>
 
-    <div id="detailModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
+    <div id="detailModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px; margin: 5% auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
                 <h3 style="margin:0; color: var(--primary-green);">📄 รายละเอียดเคส</h3>
                 <span id="closeModal" style="cursor:pointer; font-size: 24px;">&times;</span>
@@ -71,7 +71,7 @@
             <div id="modalData">
                 </div>
             
-            <button onclick="document.getElementById('detailModal').style.display='none'" class="btn-primary" style="margin-top:20px;">ปิดหน้าต่าง</button>
+            <button id="closeModalBtn" class="btn-primary" style="margin-top:20px;">ปิดหน้าต่าง</button>
         </div>
     </div>
 
@@ -96,18 +96,22 @@
         let currentView = 'all'; 
         let currentUserEmail = "";
 
+        // ตรวจสอบการ Login
         onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "../index.html";
-            else {
+            if (!user) {
+                window.location.href = "../index.html";
+            } else {
                 currentUserEmail = user.email;
                 document.getElementById('userEmail').innerText = currentUserEmail;
                 loadHistory();
             }
         });
 
+        // ฟังก์ชันโหลดข้อมูลเข้าตาราง
         function loadHistory() {
             const tbody = document.getElementById('historyBody');
             const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
             let q = currentView === 'all' 
                 ? query(collection(db, "tickets"), orderBy("createdAt", "desc"))
                 : query(collection(db, "tickets"), where("email", "==", currentUserEmail), orderBy("createdAt", "desc"));
@@ -122,69 +126,93 @@
                 snapshot.forEach(docSnap => {
                     const t = docSnap.data();
                     const id = docSnap.id;
-                    if (searchText && !t.internetNo.includes(searchText) && !t.email.toLowerCase().includes(searchText)) return;
+                    
+                    // Filter ค้นหาเฉพาะเบอร์ Internet
+                    if (searchText && !t.internetNo.includes(searchText)) return;
 
                     const date = t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-                    let statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'In Progress' ? 'bg-process' : 'bg-closed');
+                    const statusClass = t.status === 'Open' ? 'bg-open' : (t.status === 'In Progress' ? 'bg-process' : 'bg-closed');
 
                     html += `
-                        <tr onclick="viewDetails('${id}')" style="cursor:pointer;">
+                        <tr class="ticket-row" data-id="${id}" style="cursor:pointer;">
                             <td><small>${date}</small></td>
                             <td><b>${t.internetNo}</b></td>
                             <td>${t.issueType}</td>
                             <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                            <td><button class="filter-btn" style="padding: 5px 10px; font-size: 12px;">ดูรายละเอียด</button></td>
+                            <td><button class="filter-btn view-btn" data-id="${id}" style="padding: 5px 10px; font-size: 12px;">ดูรายละเอียด</button></td>
                         </tr>`;
                 });
                 tbody.innerHTML = html;
+
+                // เพิ่ม Event Listener ให้กับแถวและปุ่ม (วิธีที่ชัวร์ที่สุดสำหรับ Module Script)
+                document.querySelectorAll('.ticket-row, .view-btn').forEach(element => {
+                    element.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const ticketId = element.getAttribute('data-id');
+                        viewDetails(ticketId);
+                    });
+                });
             });
         }
 
         // ฟังก์ชันดึงรายละเอียดมาโชว์ใน Modal
-        window.viewDetails = async (id) => {
-            const docRef = doc(db, "tickets", id);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const modal = document.getElementById('detailModal');
-                const content = document.getElementById('modalData');
+        async function viewDetails(id) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modalData');
+            content.innerHTML = '<p style="text-align:center;">⏳ กำลังโหลด...</p>';
+            modal.style.display = 'block';
+
+            try {
+                const docRef = doc(db, "tickets", id);
+                const docSnap = await getDoc(docRef);
                 
-                content.innerHTML = `
-                    <div style="background:#f9fafb; padding:15px; border-radius:10px; margin-bottom:15px;">
-                        <p><strong>📌 ข้อมูลจากผู้แจ้ง (Sale):</strong></p>
-                        <p style="margin: 5px 0;">หัวข้อ: ${data.issueType}</p>
-                        <p style="margin: 5px 0;">เบอร์ Internet: ${data.internetNo}</p>
-                        <p style="margin: 10px 0; padding:10px; background:white; border-left:4px solid var(--primary-green); font-style:italic;">
-                            "${data.details || 'ไม่มีรายละเอียด'}"
-                        </p>
-                    </div>
-                    
-                    <div style="background:#ecfdf5; padding:15px; border-radius:10px; border: 1px solid #10B981;">
-                        <p style="color:#065f46;"><strong>✅ ผลการดำเนินการ (Supervisor):</strong></p>
-                        <p style="margin: 10px 0; font-weight:600;">
-                            ${data.supNote || 'ยังไม่มีการตอบกลับจากทีมสนับสนุน'}
-                        </p>
-                        <p style="font-size:12px; color:#666;">สถานะปัจจุบัน: ${data.status}</p>
-                    </div>
-                `;
-                modal.style.display = 'block';
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    content.innerHTML = `
+                        <div style="background:#f9fafb; padding:15px; border-radius:10px; margin-bottom:15px;">
+                            <p><strong>📌 ข้อมูลจากผู้แจ้ง (Sale):</strong></p>
+                            <p style="margin: 5px 0;">หัวข้อ: ${data.issueType}</p>
+                            <p style="margin: 5px 0;">เบอร์ Internet: ${data.internetNo}</p>
+                            <p style="margin: 10px 0; padding:10px; background:white; border-left:4px solid var(--primary-green); font-style:italic;">
+                                "${data.details || 'ไม่มีรายละเอียดเพิ่มเติม'}"
+                            </p>
+                        </div>
+                        <div style="background:#ecfdf5; padding:15px; border-radius:10px; border: 1px solid #10B981;">
+                            <p style="color:#065f46;"><strong>✅ ผลการดำเนินการ (Supervisor):</strong></p>
+                            <p style="margin: 10px 0; font-weight:600; color:#1e293b;">
+                                ${data.supNote || '⚠️ ยังไม่มีการตอบกลับจากทีมสนับสนุน'}
+                            </p>
+                            <p style="font-size:12px; color:#666;">สถานะ: ${data.status}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                content.innerHTML = '<p style="color:red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
             }
-        };
+        }
 
-        // ปิด Modal
-        document.getElementById('closeModal').onclick = () => document.getElementById('detailModal').style.display = 'none';
-        window.onclick = (event) => { if (event.target == document.getElementById('detailModal')) document.getElementById('detailModal').style.display = 'none'; };
-
-        // ปุ่ม Filter และ Search
-        document.getElementById('viewAllBtn').onclick = () => { currentView = 'all'; updateBtn(); loadHistory(); };
-        document.getElementById('viewMineBtn').onclick = () => { currentView = 'mine'; updateBtn(); loadHistory(); };
-        function updateBtn() {
+        // การควบคุมปุ่มต่างๆ
+        document.getElementById('viewAllBtn').onclick = () => { currentView = 'all'; updateBtnUI(); loadHistory(); };
+        document.getElementById('viewMineBtn').onclick = () => { currentView = 'mine'; updateBtnUI(); loadHistory(); };
+        
+        function updateBtnUI() {
             document.getElementById('viewAllBtn').classList.toggle('active', currentView === 'all');
             document.getElementById('viewMineBtn').classList.toggle('active', currentView === 'mine');
         }
+
         document.getElementById('searchInput').oninput = () => loadHistory();
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
+        
+        // ปิด Modal
+        const closeModal = () => { document.getElementById('detailModal').style.display = 'none'; };
+        document.getElementById('closeModal').onclick = closeModal;
+        document.getElementById('closeModalBtn').onclick = closeModal;
+        window.onclick = (e) => { if (e.target == document.getElementById('detailModal')) closeModal(); };
+
+        // Logout
+        document.getElementById('logoutBtn').onclick = (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => window.location.href = "../index.html");
+        };
     </script>
 </body>
 </html>
