@@ -2,9 +2,9 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ส่ง Ticket ใหม่ - Sale Support</title>
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css?v=1.1">
 </head>
 <body>
     <div class="sidebar">
@@ -13,30 +13,40 @@
             <a href="main.html">🏠 <span>หน้าหลัก</span></a>
             <a href="ticket.html" class="active">📝 <span>ส่ง Ticket ใหม่</span></a>
             <a href="history.html">🔍 <span>ค้นหา/ติดตามงาน</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+            <div style="margin-top: auto; padding: 10px;">
+                <hr style="border:0; border-top:1px solid #374151; margin-bottom:15px;">
+                <a href="#" id="logoutBtn" style="color: #ef4444; padding: 10px;">🚪 <span>ออกจากระบบ</span></a>
+            </div>
         </div>
     </div>
 
     <div class="main-content">
-        <div class="top-bar"><span id="userEmailTop"></span></div>
-        <div class="container" style="max-width: 800px;">
+        <div class="top-bar">
+            <h3 style="margin:0;">แจ้งเรื่องสนับสนุน</h3>
+            <div id="userEmailTop" style="font-weight: 600; color: var(--text-muted);">Loading...</div>
+        </div>
+
+        <div class="container">
             <div class="card">
-                <h2 style="color: var(--primary-green);">📝 ส่งคำขอจัดการ Case ใหม่</h2>
+                <h2 class="ticket-header">📝 ส่งคำขอจัดการ Case ใหม่</h2>
                 <p style="color: var(--text-muted); margin-bottom: 25px;">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้ทีมงานตรวจสอบ</p>
+                
                 <form id="ticketForm">
-                    <label>หัวข้อปัญหา:</label>
+                    <label for="issueType">หัวข้อปัญหา:</label>
                     <select id="issueType" class="input-field" required>
                         <option value="">-- กำลังโหลดหัวข้อ --</option>
                     </select>
 
-                    <label>หมายเลข Internet (10 หลัก):</label>
-                    <input type="text" id="internetNo" class="input-field" placeholder="88XXXXXXXX" required pattern="[0-9]{10}">
+                    <label for="internetNo">หมายเลข Internet (10 หลัก):</label>
+                    <input type="text" id="internetNo" class="input-field" 
+                           placeholder="เช่น 88XXXXXXXX" required pattern="[0-9]{10}" 
+                           title="กรุณากรอกตัวเลขให้ครบ 10 หลัก">
 
-                    <label>รายละเอียดเพิ่มเติม:</label>
-                    <textarea id="details" class="input-field" rows="5" placeholder="ระบุรายละเอียด..." required></textarea>
+                    <label for="details">รายละเอียดเพิ่มเติม:</label>
+                    <textarea id="details" class="input-field" rows="5" 
+                              placeholder="ระบุรายละเอียดของปัญหาหรือความต้องการ..." required></textarea>
 
-                    <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; margin-top: 10px;">ส่งข้อมูลแจ้งเรื่อง</button>
+                    <button type="submit" class="btn-primary" id="submitBtn">ส่งข้อมูลแจ้งเรื่อง</button>
                 </form>
             </div>
         </div>
@@ -47,44 +57,78 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = { /* ใช้ของคุณ */ apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw", authDomain: "sale-support-system.firebaseapp.com", projectId: "sale-support-system", storageBucket: "sale-support-system.firebasestorage.app", messagingSenderId: "640337786680", appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd" };
+        // 1. Firebase Configuration
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw", 
+            authDomain: "sale-support-system.firebaseapp.com", 
+            projectId: "sale-support-system", 
+            storageBucket: "sale-support-system.firebasestorage.app", 
+            messagingSenderId: "640337786680", 
+            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd" 
+        };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // 2. ตรวจสอบสถานะการเข้าสู่ระบบและโหลดข้อมูลตัวเลือก (Options)
         onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "../index.html";
-            else {
+            if (!user) {
+                window.location.href = "../index.html"; // ถ้าไม่ได้ล็อกอินให้เด้งกลับหน้าแรก
+            } else {
                 document.getElementById('userEmailTop').innerText = user.email;
+                
+                // โหลดหัวข้อปัญหาจาก Firestore (Collection settings -> Document issueOptions)
                 onSnapshot(doc(db, "settings", "issueOptions"), (snap) => {
                     if (snap.exists()) {
                         const opts = snap.data().options || [];
-                        document.getElementById('issueType').innerHTML = '<option value="">-- เลือกหัวข้อ --</option>' + opts.map(o => `<option value="${o}">${o}</option>`).join('');
+                        const issueSelect = document.getElementById('issueType');
+                        issueSelect.innerHTML = '<option value="">-- เลือกหัวข้อ --</option>' + 
+                            opts.map(o => `<option value="${o}">${o}</option>`).join('');
                     }
                 });
             }
         });
 
+        // 3. ฟังก์ชันบันทึก Ticket ใหม่
         document.getElementById('ticketForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "กำลังส่ง...";
+            
+            // ป้องกันการกดซ้ำระหว่างส่งข้อมูล
+            btn.disabled = true; 
+            btn.innerText = "กำลังบันทึกข้อมูล...";
+
             try {
+                // บันทึกข้อมูลลงใน Collection "tickets"
                 await addDoc(collection(db, "tickets"), {
                     internetNo: document.getElementById('internetNo').value,
                     issueType: document.getElementById('issueType').value,
                     details: document.getElementById('details').value,
-                    status: "Open",
+                    status: "Open", // สถานะเริ่มต้น
                     email: auth.currentUser.email,
-                    createdAt: serverTimestamp(),
-                    comment: ""
+                    createdAt: serverTimestamp(), // เวลาจาก Server
+                    supNote: "", // สำหรับ Supervisor เขียนตอบกลับ
+                    isReadSale: true, // แจ้งเตือนฝั่ง Sale (อ่านแล้วเพราะเป็นคนส่งเอง)
+                    isReadSup: false  // แจ้งเตือนฝั่ง Supervisor (ยังไม่ได้อ่าน)
                 });
-                alert("ส่งเรื่องสำเร็จ!");
-                document.getElementById('ticketForm').reset();
-            } catch (err) { alert(err.message); }
-            btn.disabled = false; btn.innerText = "ส่งข้อมูลแจ้งเรื่อง";
+
+                alert("ส่งเรื่องสำเร็จ! คุณสามารถติดตามสถานะได้ที่เมนูติดตามงาน");
+                document.getElementById('ticketForm').reset(); // ล้างฟอร์ม
+            } catch (err) { 
+                console.error(err);
+                alert("เกิดข้อผิดพลาด: " + err.message); 
+            } finally {
+                btn.disabled = false; 
+                btn.innerText = "ส่งข้อมูลแจ้งเรื่อง";
+            }
         };
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
+
+        // 4. ฟังก์ชันออกจากระบบ
+        document.getElementById('logoutBtn').onclick = () => {
+            if(confirm("ยืนยันต้องการออกจากระบบ?")) {
+                signOut(auth).then(() => window.location.href = "../index.html");
+            }
+        };
     </script>
 </body>
 </html>
