@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sale Dashboard - Sale Support</title>
-    <link rel="stylesheet" href="../style.css"> </head>
+    <link rel="stylesheet" href="../style.css?v=1.1">
+</head>
 <body>
     <div class="sidebar">
         <div class="sidebar-header">SALE PORTAL</div>
@@ -12,44 +13,70 @@
             <a href="main.html" class="active">🏠 <span>หน้าหลัก</span></a>
             <a href="ticket.html">📝 <span>ส่ง Ticket ใหม่</span></a>
             <a href="history.html">🔍 <span>ค้นหา/ติดตามงาน</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+            <div style="margin-top: auto; padding: 10px;">
+                <hr style="border:0; border-top:1px solid #374151; margin-bottom:15px;">
+                <a href="#" id="logoutBtn" style="color: #ef4444; padding: 10px;">🚪 <span>ออกจากระบบ</span></a>
+            </div>
         </div>
     </div>
 
     <div class="main-content">
         <div class="top-bar">
-            <h3 style="margin:0;">ยินดีต้อนรับ</h3>
-            <div style="display: flex; align-items: center;">
+            <h3 style="margin:0;">Dashboard</h3>
+            <div style="display: flex; align-items: center; gap: 20px;">
                 <div class="notif-wrapper" id="notifBell">
-                    <span style="font-size:20px;">🔔</span>
+                    <span style="font-size:20px; cursor: pointer;">🔔</span>
                     <span class="notif-badge-icon" id="notifCount">0</span>
                     <div class="notif-dropdown" id="notifDropdown">
-                        <div style="padding:10px; font-weight:bold; border-bottom:1px solid #eee;">อัปเดตงาน</div>
-                        <div id="notifList"></div>
+                        <div style="padding:12px; font-weight:bold; border-bottom:1px solid #f1f5f9; color: #1e293b;">
+                            การแจ้งเตือน
+                        </div>
+                        <div id="notifList" style="max-height: 300px; overflow-y: auto;">
+                            </div>
                     </div>
                 </div>
-                <span id="userEmail" style="font-weight: 600; color: #6B7280;">Loading...</span>
+                <div style="text-align: right;">
+                    <div id="userEmail" style="font-weight: 600; color: #111827;">Loading...</div>
+                    <small style="color: #6B7280;">Sale Representative</small>
+                </div>
             </div>
         </div>
 
         <div class="stat-grid">
-            <div class="stat-box" style="background: #3B82F6;">ทั้งหมด<div id="countAll" class="stat-number">0</div></div>
-            <div class="stat-box" style="background: #EF4444;">รอดำเนินการ<div id="countOpen" class="stat-number">0</div></div>
-            <div class="stat-box" style="background: #10B981;">เสร็จสิ้น<div id="countClosed" class="stat-number">0</div></div>
+            <div class="stat-box" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+                <small>งานทั้งหมด</small>
+                <div id="countAll" class="stat-number">0</div>
+            </div>
+            <div class="stat-box" style="background: linear-gradient(135deg, #F87171, #EF4444);">
+                <small>รอดำเนินการ</small>
+                <div id="countOpen" class="stat-number">0</div>
+            </div>
+            <div class="stat-box" style="background: linear-gradient(135deg, #34D399, #10B981);">
+                <small>งานที่เสร็จสิ้น</small>
+                <div id="countClosed" class="stat-number">0</div>
+            </div>
         </div>
 
         <div class="menu-grid">
-            <a href="ticket.html" class="menu-card"><h3>📝</h3><b>ส่ง Ticket ใหม่</b></a>
-            <a href="history.html" class="menu-card"><h3>🔍</h3><b>ติดตามงาน</b></a>
+            <a href="ticket.html" class="menu-card">
+                <div style="font-size: 40px; margin-bottom: 10px;">📝</div>
+                <b>ส่ง Ticket ใหม่</b>
+                <p style="font-size: 12px; color: #6B7280; margin-top: 5px;">แจ้งเคสงานใหม่เข้าสู่ระบบ</p>
+            </a>
+            <a href="history.html" class="menu-card">
+                <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
+                <b>ติดตามสถานะงาน</b>
+                <p style="font-size: 12px; color: #6B7280; margin-top: 5px;">ตรวจสอบประวัติและอัปเดต</p>
+            </a>
         </div>
     </div>
 
     <div id="viewModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle">รายละเอียด</h3>
-            <div id="modalBody"></div>
-            <button onclick="closeModal()" class="btn-auth" style="margin-top:20px;">ปิด</button>
+            <h3 id="modalTitle" style="color: var(--primary-green); margin-top: 0;">รายละเอียดงาน</h3>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+            <div id="modalBody" style="line-height: 1.6;"></div>
+            <button onclick="closeModal()" class="btn-auth" style="margin-top:25px;">ตกลง / ปิดหน้าต่าง</button>
         </div>
     </div>
 
@@ -58,7 +85,6 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Config (ตรวจสอบให้แน่ใจว่าตรงกับโปรเจกต์คุณ)
         const firebaseConfig = {
             apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
             authDomain: "sale-support-system.firebaseapp.com",
@@ -72,7 +98,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ตรวจสอบล็อกอิน
+        // 1. ตรวจสอบสถานะการ Login
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('userEmail').innerText = user.email;
@@ -83,7 +109,7 @@
             }
         });
 
-        // โหลดตัวเลขสถิติ
+        // 2. โหลดสถิติแบบ Real-time
         function loadStats(email) {
             const q = query(collection(db, "tickets"), where("email", "==", email));
             onSnapshot(q, (snap) => {
@@ -97,7 +123,7 @@
             });
         }
 
-        // ระบบแจ้งเตือนกระดิ่ง
+        // 3. ระบบแจ้งเตือน (Notification)
         function watchNotifications(email) {
             const q = query(collection(db, "tickets"), where("email", "==", email), where("isReadSale", "==", false));
             onSnapshot(q, (snap) => {
@@ -108,25 +134,45 @@
                 let html = '';
                 snap.forEach(d => {
                     const data = d.data();
-                    html += `<div class="notif-item" onclick="readNotif('${d.id}')">📢 งาน ${data.internetNo} อัปเดตสถานะเป็น ${data.status}</div>`;
+                    html += `
+                        <div class="notif-item" onclick="readNotif('${d.id}')">
+                            <b>🔔 อัปเดตสถานะงาน</b><br>
+                            <small>Internet No: ${data.internetNo}</small><br>
+                            <span style="color: var(--primary-green)">สถานะ: ${data.status}</span>
+                        </div>`;
                 });
-                document.getElementById('notifList').innerHTML = html || '<div style="padding:10px; color:#999;">ไม่มีแจ้งเตือน</div>';
+                document.getElementById('notifList').innerHTML = html || '<div style="padding:20px; color:#999; text-align:center;">ไม่มีการแจ้งเตือนใหม่</div>';
             });
         }
 
-        // ฟังก์ชันอ่านแจ้งเตือน
+        // 4. ฟังก์ชันอ่านแจ้งเตือนและเปิด Modal
         window.readNotif = async (id) => {
-            await updateDoc(doc(db, "tickets", id), { isReadSale: true });
-            const d = await getDoc(doc(db, "tickets", id));
-            document.getElementById('modalTitle').innerText = "งานหมายเลข " + d.data().internetNo;
-            document.getElementById('modalBody').innerHTML = `สถานะ: ${d.data().status}<br>หมายเหตุ: ${d.data().supNote || '-'}`;
+            const docRef = doc(db, "tickets", id);
+            await updateDoc(docRef, { isReadSale: true });
+            const d = await getDoc(docRef);
+            const data = d.data();
+            
+            document.getElementById('modalTitle').innerText = "📌 งานหมายเลข " + data.internetNo;
+            document.getElementById('modalBody').innerHTML = `
+                <b>สถานะปัจจุบัน:</b> <span style="color:blue">${data.status}</span><br>
+                <b>รายละเอียดจากทีม Support:</b><br>
+                <div style="background:#f9fafb; padding:10px; border-radius:8px; margin-top:5px;">
+                    ${data.supNote || 'ไม่มีหมายเหตุเพิ่มเติม'}
+                </div>
+            `;
             document.getElementById('viewModal').style.display = 'block';
+            document.getElementById('notifDropdown').style.display = 'none';
         };
 
-        // UI Helpers
+        // 5. UI Event Listeners
         const bell = document.getElementById('notifBell');
         const dropdown = document.getElementById('notifDropdown');
-        bell.onclick = (e) => { e.stopPropagation(); dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; };
+        
+        bell.onclick = (e) => { 
+            e.stopPropagation(); 
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; 
+        };
+        
         window.onclick = () => dropdown.style.display = 'none';
         window.closeModal = () => document.getElementById('viewModal').style.display = 'none';
         document.getElementById('logoutBtn').onclick = () => signOut(auth);
