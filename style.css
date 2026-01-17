@@ -116,6 +116,7 @@ body {
     padding: 14px 25px;
     color: #D1D5DB;
     text-decoration: none;
+    transition: 0.2s;
 }
 
 .sidebar-menu a:hover, .sidebar-menu a.active {
@@ -123,9 +124,14 @@ body {
     color: var(--white);
 }
 
+.sidebar-menu a.active {
+    border-left: 4px solid var(--primary-green);
+}
+
 .main-content {
     margin-left: var(--sidebar-width);
     padding: 30px;
+    transition: 0.3s;
 }
 
 .top-bar {
@@ -150,8 +156,9 @@ body {
 .menu-card {
     background: white; padding: 30px; border-radius: 15px; text-align: center;
     text-decoration: none; color: var(--text-main); transition: 0.3s; box-shadow: var(--shadow);
+    border: 1px solid transparent;
 }
-.menu-card:hover { transform: translateY(-5px); border-bottom: 4px solid var(--primary-green); }
+.menu-card:hover { transform: translateY(-5px); border-color: var(--primary-green); }
 
 /* Notification Bell System */
 .notif-wrapper { position: relative; cursor: pointer; margin-right: 20px; }
@@ -163,15 +170,19 @@ body {
     position: absolute; top: 40px; right: 0; width: 300px; background: white;
     border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: none; z-index: 1001;
 }
-.notif-item { padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; }
+.notif-item { padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; text-align: left; }
 .notif-item:hover { background: #f0fdf4; }
 
 /* Modal */
 .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
 .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; }
 
+/* ============================================================
+   5. RESPONSIVE
+   ============================================================ */
 @media (max-width: 768px) {
     .sidebar { width: 70px; }
     .sidebar-header, .sidebar-menu a span { display: none; }
     .main-content { margin-left: 70px; }
+    .stat-grid { grid-template-columns: 1fr; } /* ปรับสถิติเป็นแถวเดี่ยวในมือถือ */
 }
