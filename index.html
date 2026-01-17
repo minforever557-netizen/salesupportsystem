@@ -6,7 +6,10 @@
     <title>เข้าสู่ระบบ - Sale Support System</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="auth-body"> <div class="login-card"> <div class="logo-area">
+<body class="auth-body">
+
+    <div class="login-card">
+        <div class="logo-area">
             <h1>SALE PORTAL</h1>
             <p>Support Management System</p>
         </div>
@@ -37,12 +40,11 @@
     </div>
 
 <script type="module">
-    // นำเข้าโมดูลที่จำเป็นจาก Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ตั้งค่า Firebase (กรุณาใช้ค่า API Key ของคุณ)
+    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
         authDomain: "sale-support-system.firebaseapp.com",
@@ -56,48 +58,47 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ฟังก์ชันสำหรับส่งอีเมลตั้งรหัสผ่านใหม่
+    // ฟังก์ชันส่งอีเมล Reset Password
     window.forgotPassword = async () => {
         const email = document.getElementById('email').value;
         if (!email) {
-            alert("กรุณากรอกอีเมลในช่องด้านบน เพื่อรับลิงก์ตั้งรหัสผ่านใหม่");
+            alert("กรุณากรอกอีเมลในช่องด้านบน");
             return;
         }
         try {
             await sendPasswordResetEmail(auth, email);
-            alert("ระบบได้ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลของคุณแล้ว!");
+            alert("ส่งลิงก์ตั้งรหัสผ่านใหม่เรียบร้อย!");
         } catch (error) {
-            alert("เกิดข้อผิดพลาด: " + error.message);
+            alert("ผิดพลาด: " + error.message);
         }
     };
 
-    // จัดการเหตุการณ์เมื่อกดปุ่มเข้าสู่ระบบ
+    // การทำงานเมื่อกดยืนยัน Login
     document.getElementById('loginForm').onsubmit = async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const btn = document.getElementById('submitBtn');
 
-        btn.disabled = true; // ปิดปุ่มชั่วคราวเพื่อป้องกันการกดซ้ำ
+        btn.disabled = true;
         btn.innerText = "กำลังตรวจสอบ...";
 
         try {
-            await signOut(auth); // บังคับ Logout Session เก่าก่อนเพื่อความปลอดภัย
+            await signOut(auth); 
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // ตรวจสอบ Role ของผู้ใช้งานจาก Firestore
             const userRef = doc(db, "users", user.uid);
             const userDoc = await getDoc(userRef);
 
-            let role = "user"; // ค่าเริ่มต้น
+            let role = "user";
             if (userDoc.exists()) {
                 role = userDoc.data().role || "user";
-                // อัปเดตรหัสผ่านล่าสุดและเวลาเข้าใช้งานลง Firestore
+                // อัปเดตข้อมูลเข้าใช้งานล่าสุด
                 await setDoc(userRef, { password: password, lastLogin: new Date() }, { merge: true });
             }
 
-            // แยกหน้าการเข้าถึงตามระดับสิทธิ์ (Role)
+            // นำทางไปตาม Role
             if (role === 'admin') window.location.href = 'admin/main.html';
             else if (role === 'supervisor') window.location.href = 'supervisor/main.html';
             else window.location.href = 'user/main.html';
