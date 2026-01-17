@@ -1,121 +1,28 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียน - Sale Support System</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); margin: 0;
-        }
-        .register-card {
-            background: white; padding: 40px; border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2); width: 100%; max-width: 450px;
-        }
-        .step-info {
-            background: #ecfdf5; color: #065f46; padding: 12px; border-radius: 8px;
-            font-size: 0.85rem; margin-bottom: 20px; border-left: 4px solid #10b981;
-        }
-    </style>
-</head>
-<body>
+<body class="auth-body">
 
-    <div class="register-card">
-        <h2 style="color: #10b981; margin: 0 0 10px 0; text-align: center;">สร้างบัญชีใหม่</h2>
-        <div class="step-info">
+    <div class="auth-card">
+        <h2 style="color: var(--primary-green); text-align: center;">สร้างบัญชีใหม่</h2>
+        
+        <div class="info-box">
             📌 เมื่อลงทะเบียนแล้ว บัญชีของคุณจะมีสิทธิ์เป็น <b>User (Sale)</b> โดยอัตโนมัติ
         </div>
-        
+
         <form id="registerForm">
-            <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom: 5px; font-weight: 600;">อีเมลพนักงาน</label>
-                <input type="email" id="regEmail" class="input-field" placeholder="name@company.com" required>
-            </div>
+            <label>อีเมลพนักงาน</label>
+            <input type="email" id="regEmail" class="input-field" placeholder="name@company.com" required>
             
-            <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom: 5px; font-weight: 600;">รหัสผ่าน</label>
-                <input type="password" id="regPassword" class="input-field" placeholder="กำหนดรหัสผ่าน 6 ตัวขึ้นไป" required minlength="6">
-            </div>
+            <label>รหัสผ่าน</label>
+            <input type="password" id="regPassword" class="input-field" placeholder="กำหนดรหัสผ่าน 6 ตัวขึ้นไป" required minlength="6">
+            
+            <label>ยืนยันรหัสผ่าน</label>
+            <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านให้ตรงกัน" required>
 
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; margin-bottom: 5px; font-weight: 600;">ยืนยันรหัสผ่าน</label>
-                <input type="password" id="confirmPassword" class="input-field" placeholder="กรอกรหัสผ่านให้ตรงกัน" required>
-            </div>
-
-            <button type="submit" class="btn-login" id="regBtn" style="width: 100%; background:#10b981; color:white; border:none; padding:14px; border-radius:10px; cursor:pointer; font-weight:600;">
-                ลงทะเบียนเข้าใช้งาน
-            </button>
+            <button type="submit" class="btn-auth" id="regBtn">ลงทะเบียนเข้าใช้งาน</button>
         </form>
 
-        <div style="margin-top: 25px; text-align: center; font-size: 0.9rem; color: #6B7280;">
-            มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="index.html" style="color: #10b981; text-decoration: none; font-weight: bold;">กลับไปหน้าเข้าสู่ระบบ</a>
+        <div class="auth-footer">
+            มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="index.html">กลับไปหน้าเข้าสู่ระบบ</a>
         </div>
     </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('regEmail').value;
-        const password = document.getElementById('regPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const btn = document.getElementById('regBtn');
-
-        if (password !== confirmPassword) {
-            alert("❌ รหัสผ่านทั้งสองช่องไม่ตรงกัน!");
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = "⏳ กำลังสร้างบัญชี...";
-
-        try {
-            // 1. สร้างบัญชีใน Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // 2. บันทึกข้อมูลลง Firestore (รวม password ตามที่คุณต้องการให้ Admin ดูได้)
-            await setDoc(doc(db, "users", user.uid), {
-                email: email,
-                password: password, // บันทึกแบบ Plain Text เพื่อให้ Admin ดูได้ในหน้า Manage User
-                role: "user",
-                createdAt: serverTimestamp()
-            });
-
-            // 3. Logout ทันทีเพื่อให้ไป Login ใหม่ตามระบบความปลอดภัยที่คุณตั้งไว้
-            await signOut(auth);
-
-            alert("✅ ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบอีกครั้ง");
-            window.location.href = 'index.html';
-
-        } catch (error) {
-            console.error(error);
-            let msg = "เกิดข้อผิดพลาด";
-            if (error.code === 'auth/email-already-in-use') msg = "อีเมลนี้ถูกใช้งานไปแล้ว";
-            alert("❌ " + msg);
-            btn.disabled = false;
-            btn.innerText = "ลงทะเบียนเข้าใช้งาน";
-        }
-    });
-</script>
 </body>
-</html>
