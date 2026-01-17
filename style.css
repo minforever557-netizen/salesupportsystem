@@ -1,8 +1,6 @@
 /* ============================================================
    1. GLOBAL SETTINGS & VARIABLES
-   นำเข้าฟอนต์และกำหนดค่าสีกลางเพื่อให้ง่ายต่อการแก้ไขจุดเดียว
    ============================================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
 
 :root {
@@ -19,14 +17,13 @@
 }
 
 * {
-    box-sizing: border-box;      /* คำนวณขนาดรวม Padding ไม่ให้ขนาดเพี้ยน */
+    box-sizing: border-box;      /* คำนวณขนาดรวม Padding */
     font-family: 'Sarabun', sans-serif;
 }
 
 body {
     margin: 0;
     padding: 0;
-    display: flex;               /* จัดวาง Sidebar และ Content คู่กัน */
     min-height: 100vh;
     background-color: var(--bg-light);
     color: var(--text-main);
@@ -34,10 +31,10 @@ body {
 
 /* ============================================================
    2. AUTH PAGES (Login & Register)
-   สไตล์เฉพาะสำหรับหน้าจอเข้าสู่ระบบและลงทะเบียน
+   ใช้สำหรับหน้าจอเข้าสู่ระบบและหน้าสร้างบัญชี
    ============================================================ */
 
-/* พื้นหลังไล่เฉดสีสำหรับหน้าล็อคอิน */
+/* พื้นหลังไล่เฉดสี และจัดกึ่งกลางหน้าจอสำหรับหน้า Auth */
 .auth-body {
     display: flex;
     justify-content: center;
@@ -47,17 +44,23 @@ body {
     margin: 0;
 }
 
-/* การ์ดสีขาวสำหรับฟอร์มลงทะเบียน */
-.auth-card {
-    background: var(--white);
+/* การ์ดสีขาว (ใช้ร่วมกันทั้ง Login และ Register) */
+.auth-card, .login-card {
+    background: rgba(255, 255, 255, 0.95);
     padding: 40px;
     border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-    width: 100%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    width: 90%;
     max-width: 450px;
+    text-align: center;
 }
 
-/* กล่องสีเขียวสำหรับแจ้งข้อมูลสำคัญ */
+/* หัวข้อและคำบรรยายหน้า Login */
+.logo-area { margin-bottom: 30px; }
+.logo-area h1 { color: #1e293b; font-size: 24px; margin: 0; letter-spacing: 1px; }
+.logo-area p { color: #64748b; font-size: 14px; margin: 5px 0 0 0; }
+
+/* กล่องแจ้งข้อมูลสำคัญ (หน้า Register) */
 .info-box {
     background: #ecfdf5;
     color: #065f46;
@@ -66,9 +69,28 @@ body {
     font-size: 0.85rem;
     margin-bottom: 20px;
     border-left: 4px solid var(--primary-green);
+    text-align: left;
 }
 
-/* ปุ่มสำหรับหน้าล็อคอิน/ลงทะเบียน */
+/* ฟอร์มและอินพุต */
+.form-group { text-align: left; margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px; }
+
+.input-field {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.input-field:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* ปุ่มสำหรับหน้า Auth */
 .btn-auth {
     width: 100%;
     background: var(--primary-green);
@@ -91,22 +113,35 @@ body {
     cursor: not-allowed;
 }
 
-.auth-footer {
+/* ส่วนลิงก์ด้านล่าง */
+.auth-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.auth-links a, .auth-footer a {
+    color: #64748b;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.auth-links a:hover, .auth-footer a:hover {
+    color: var(--primary-green);
+    text-decoration: underline;
+}
+
+.register-section, .auth-footer {
     margin-top: 25px;
-    text-align: center;
-    font-size: 0.9rem;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 14px;
     color: var(--text-muted);
 }
 
-.auth-footer a {
-    color: var(--primary-green);
-    text-decoration: none;
-    font-weight: bold;
-}
-
 /* ============================================================
-   3. SIDEBAR (เมนูด้านข้าง)
-   จัดการแถบนำทางหลักสำหรับ Admin และ Sale
+   3. SIDEBAR & MAIN CONTENT (หน้าหลักหลัง Login)
    ============================================================ */
 
 .sidebar {
@@ -130,11 +165,6 @@ body {
     color: var(--primary-green);
 }
 
-.sidebar-menu {
-    flex: 1;
-    padding: 20px 0;
-}
-
 .sidebar-menu a {
     display: flex;
     align-items: center;
@@ -144,83 +174,22 @@ body {
     transition: 0.2s;
 }
 
-.sidebar-menu a:hover {
+.sidebar-menu a:hover, .sidebar-menu a.active {
     background-color: var(--sidebar-hover);
     color: var(--white);
 }
 
 .sidebar-menu a.active {
-    background-color: var(--sidebar-hover);
-    color: var(--white);
     border-left: 5px solid var(--primary-green);
 }
-
-/* ============================================================
-   4. CONTENT & UI ELEMENTS (ส่วนเนื้อหาและองค์ประกอบ)
-   ตาราง, การ์ดข้อมูล และปุ่มมาตรฐาน
-   ============================================================ */
 
 .main-content {
     margin-left: var(--sidebar-width);
     flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.container {
     padding: 30px;
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
 }
 
-.card {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    margin-bottom: 25px;
-}
-
-/* ฟอร์มกรอกข้อมูล */
-.input-field {
-    width: 100%;
-    padding: 12px 15px;
-    margin: 10px 0 20px 0;
-    border: 1px solid #D1D5DB;
-    border-radius: 8px;
-    outline: none;
-    transition: 0.2s;
-}
-
-.input-field:focus {
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-}
-
-/* ตารางแสดงผลข้อมูล */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th {
-    text-align: left;
-    padding: 15px;
-    background-color: #F9FAFB;
-    border-bottom: 2px solid #E5E7EB;
-    color: #4B5563;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-}
-
-td {
-    padding: 15px;
-    border-bottom: 1px solid #E5E7EB;
-}
-
-/* ป้ายแสดงสถานะงาน */
+/* ป้ายสถานะ */
 .status-badge {
     padding: 5px 12px;
     border-radius: 20px;
@@ -228,151 +197,15 @@ td {
     font-weight: 600;
     color: white;
 }
-
-.bg-open { background-color: #EF4444; }    /* สีแดง: รอรับงาน */
-.bg-process { background-color: #F59E0B; } /* สีส้ม: กำลังทำ */
-.bg-closed { background-color: #10B981; }  /* สีเขียว: ปิดงานแล้ว */
+.bg-open { background-color: #EF4444; }
+.bg-process { background-color: #F59E0B; }
+.bg-closed { background-color: #10B981; }
 
 /* ============================================================
-   5. RESPONSIVE (การแสดงผลบนมือถือ)
+   4. RESPONSIVE
    ============================================================ */
-
 @media (max-width: 768px) {
-    .sidebar {
-        width: 70px;
-    }
-    .sidebar-header, .sidebar-menu a span {
-        display: none;
-    }
-    .main-content {
-        margin-left: 70px;
-    }
-}
-/* ============================================================
-   AUTH PAGES: LOGIN SPECIFIC (หน้าเข้าสู่ระบบ)
-   ============================================================ */
-
-/* พื้นหลังหน้า Login แบบไล่เฉดสีเต็มจอ */
-.auth-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Sarabun', sans-serif;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* การ์ดล็อคอินสีขาวขุ่นแบบโปร่งแสงเล็กน้อย */
-.login-card {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-}
-
-/* ส่วนหัวข้อและโลโก้ */
-.logo-area { margin-bottom: 30px; }
-.logo-area h1 { color: #1e293b; font-size: 24px; margin: 0; letter-spacing: 1px; }
-.logo-area p { color: #64748b; font-size: 14px; margin-top: 5px; }
-
-/* การจัดการระยะห่างฟอร์ม */
-.form-group { text-align: left; margin-bottom: 20px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px; }
-
-/* ลิงก์ลืมรหัสผ่านและลงทะเบียน */
-.auth-links {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-}
-
-.auth-links a { color: #64748b; text-decoration: none; transition: 0.2s; }
-.auth-links a:hover { color: var(--primary-green); text-decoration: underline; }
-
-/* เส้นคั่นและส่วนสมัครสมาชิกใหม่ */
-.register-section {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #e2e8f0;
-    font-size: 14px;
-}
-
-.register-section a {
-    color: var(--primary-green);
-    text-decoration: none;
-    font-weight: 600;
-}
-/* ============================================================
-   AUTH PAGES: LOGIN SPECIFIC (หน้าเข้าสู่ระบบ)
-   ============================================================ */
-
-/* 1. ตั้งค่าพื้นหลังหน้า Login ให้เป็นสีน้ำเงินเข้มไล่เฉดสี และจัดกึ่งกลางหน้าจอ */
-.auth-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Sarabun', sans-serif;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* สีพื้นหลังตามภาพตัวอย่าง */
-    height: 100vh; /* ให้ความสูงเต็มหน้าจอ */
-    display: flex;
-    align-items: center; /* จัดกึ่งกลางแนวตั้ง */
-    justify-content: center; /* จัดกึ่งกลางแนวนอน */
-}
-
-/* 2. การ์ดล็อคอินสีขาวขุ่น (Login Card) เพื่อให้ข้อความอ่านง่ายบนพื้นหลังมืด */
-.login-card {
-    background: rgba(255, 255, 255, 0.95); /* สีขาวโปร่งแสง 95% */
-    padding: 40px;
-    border-radius: 20px; /* ขอบโค้งมนตามเทรนด์สมัยใหม่ */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* เงาฟุ้งด้านล่างเพิ่มมิติ */
-    width: 90%;
-    max-width: 400px; /* จำกัดความกว้างไม่ให้แผ่กว้างเกินไป */
-    text-align: center;
-}
-
-/* 3. ส่วนหัวข้อและโลโก้ระบบ */
-.logo-area h1 { 
-    color: #1e293b; 
-    font-size: 24px; 
-    margin: 0; 
-    letter-spacing: 1px; /* เพิ่มระยะห่างตัวอักษรให้ดู Professional */
-}
-.logo-area p { 
-    color: #64748b; 
-    font-size: 14px; 
-    margin: 5px 0 30px 0; 
-}
-
-/* 4. การจัดการกลุ่มฟอร์มกรอกข้อมูล */
-.form-group { 
-    text-align: left; /* บังคับให้หัวข้อชิดซ้าย */
-    margin-bottom: 20px; 
-}
-.form-group label { 
-    display: block; 
-    margin-bottom: 8px; 
-    font-weight: 600; 
-    color: #1e293b; 
-}
-
-/* 5. ส่วนลิงก์สมัครสมาชิกและลืมรหัสผ่านด้านล่าง */
-.auth-links {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between; /* กระจายลิงก์ไปซ้ายและขวา */
-    font-size: 13px;
-}
-.auth-links a { color: #64748b; text-decoration: none; }
-.auth-links a:hover { color: var(--primary-green); text-decoration: underline; }
-
-.register-section {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #e2e8f0; /* เส้นคั่นบางๆ แบ่งส่วนฟอร์มกับลิงก์สมัคร */
-    font-size: 14px;
+    .sidebar { width: 70px; }
+    .sidebar-header, .sidebar-menu a span { display: none; }
+    .main-content { margin-left: 70px; }
 }
