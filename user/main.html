@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sale Dashboard - Sale Support</title>
-    <link rel="stylesheet" href="../style.css">
-</head>
+    <link rel="stylesheet" href="../style.css"> </head>
 <body>
     <div class="sidebar">
         <div class="sidebar-header">SALE PORTAL</div>
@@ -20,60 +19,46 @@
 
     <div class="main-content">
         <div class="top-bar">
-            <h3 style="margin:0;">ระบบจัดการ Sale Support</h3>
+            <h3 style="margin:0;">ยินดีต้อนรับ</h3>
             <div style="display: flex; align-items: center;">
                 <div class="notif-wrapper" id="notifBell">
-                    <span class="notif-icon">🔔</span>
+                    <span style="font-size:20px;">🔔</span>
                     <span class="notif-badge-icon" id="notifCount">0</span>
                     <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">
-                            <span>📢 รายการอัปเดต</span>
-                            <button class="read-all-btn" id="readAllBtn">อ่านทั้งหมด</button>
-                        </div>
-                        <div id="notifList">
-                            <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">ไม่มีแจ้งเตือนใหม่</div>
-                        </div>
+                        <div style="padding:10px; font-weight:bold; border-bottom:1px solid #eee;">อัปเดตงาน</div>
+                        <div id="notifList"></div>
                     </div>
                 </div>
-                <span id="userEmail" style="font-weight: 600; color: #6B7280;">กำลังโหลด...</span>
+                <span id="userEmail" style="font-weight: 600; color: #6B7280;">Loading...</span>
             </div>
         </div>
 
-        <div class="container">
-            <h2>ยินดีต้อนรับ</h2>
-            <p style="color: #6B7280; margin-bottom: 30px;">ภาพรวมสถานะงานที่คุณแจ้งเรื่องไว้</p>
+        <div class="stat-grid">
+            <div class="stat-box" style="background: #3B82F6;">ทั้งหมด<div id="countAll" class="stat-number">0</div></div>
+            <div class="stat-box" style="background: #EF4444;">รอดำเนินการ<div id="countOpen" class="stat-number">0</div></div>
+            <div class="stat-box" style="background: #10B981;">เสร็จสิ้น<div id="countClosed" class="stat-number">0</div></div>
+        </div>
 
-            <div class="stat-grid">
-                <div class="stat-box" style="background: #3B82F6;"><small>งานทั้งหมด</small><div id="countAll" class="stat-number">0</div></div>
-                <div class="stat-box" style="background: #EF4444;"><small>รอดำเนินการ</small><div id="countOpen" class="stat-number">0</div></div>
-                <div class="stat-box" style="background: #10B981;"><small>ปิดงานแล้ว</small><div id="countClosed" class="stat-number">0</div></div>
-            </div>
-
-            <div class="menu-grid">
-                <a href="ticket.html" class="menu-card"><span style="font-size: 2rem;">📝</span><br><b>ส่ง Ticket ใหม่</b></a>
-                <a href="history.html" class="menu-card"><span style="font-size: 2rem;">🔍</span><br><b>ค้นหา/ติดตามงาน</b></a>
-            </div>
+        <div class="menu-grid">
+            <a href="ticket.html" class="menu-card"><h3>📝</h3><b>ส่ง Ticket ใหม่</b></a>
+            <a href="history.html" class="menu-card"><h3>🔍</h3><b>ติดตามงาน</b></a>
         </div>
     </div>
 
     <div id="viewModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">รายละเอียดงาน</h3>
-                <span style="cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</span>
-            </div>
-            <div id="modalBody" style="margin-top:20px; line-height: 1.6;"></div>
-            <button onclick="closeModal()" class="btn-auth" style="margin-top:20px;">รับทราบ</button>
+            <h3 id="modalTitle">รายละเอียด</h3>
+            <div id="modalBody"></div>
+            <button onclick="closeModal()" class="btn-auth" style="margin-top:20px;">ปิด</button>
         </div>
     </div>
 
     <script type="module">
-        // นำเข้า Firebase และฟังก์ชันที่จำเป็น
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, doc, getDoc, getDocs, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ตั้งค่า Firebase
+        // Firebase Config (ตรวจสอบให้แน่ใจว่าตรงกับโปรเจกต์คุณ)
         const firebaseConfig = {
             apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
             authDomain: "sale-support-system.firebaseapp.com",
@@ -87,41 +72,24 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let isInitialLoad = true; // ตัวแปรเช็คการโหลดครั้งแรก (เพื่อไม่ให้เสียงแจ้งเตือนดังตอนเปิดเว็บบ่อยๆ)
-
-        // --- ระบบควบคุม UI ---
-        const bell = document.getElementById('notifBell');
-        const dropdown = document.getElementById('notifDropdown');
-        
-        // เปิด-ปิด Dropdown แจ้งเตือน
-        bell.onclick = (e) => { 
-            e.stopPropagation(); 
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; 
-        };
-        window.onclick = () => dropdown.style.display = 'none';
-
-        // ตรวจสอบสถานะการเข้าสู่ระบบ
+        // ตรวจสอบล็อกอิน
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('userEmail').innerText = user.email;
-                fetchStats(user.email);         // โหลดสถิติ
-                watchStatusChanges(user.email); // เฝ้าดูแจ้งเตือน
-                if ("Notification" in window) Notification.requestPermission(); // ขอสิทธิ์แจ้งเตือน Browser
+                loadStats(user.email);
+                watchNotifications(user.email);
             } else {
-                window.location.href = "../index.html"; // ถ้าไม่ได้ Login ให้เด้งไปหน้าแรก
+                window.location.href = "../index.html";
             }
         });
 
-        // --- ฟังก์ชันดึงข้อมูล (Logic) ---
-
-        // 1. ดึงสถิติสรุปงาน
-        function fetchStats(email) {
+        // โหลดตัวเลขสถิติ
+        function loadStats(email) {
             const q = query(collection(db, "tickets"), where("email", "==", email));
             onSnapshot(q, (snap) => {
                 let all = snap.size, open = 0, closed = 0;
                 snap.forEach(doc => {
-                    const s = doc.data().status;
-                    if (s === 'Closed') closed++; else open++;
+                    if (doc.data().status === 'Closed') closed++; else open++;
                 });
                 document.getElementById('countAll').innerText = all;
                 document.getElementById('countOpen').innerText = open;
@@ -129,88 +97,40 @@
             });
         }
 
-        // 2. ระบบแจ้งเตือน Real-time (กรองเฉพาะที่ Supervisor อัปเดตและเรายังไม่ได้อ่าน)
-        function watchStatusChanges(email) {
-            const q = query(
-                collection(db, "tickets"), 
-                where("email", "==", email),
-                where("status", "in", ["In Progress", "Closed"]),
-                where("isReadSale", "!=", true) 
-            );
-
+        // ระบบแจ้งเตือนกระดิ่ง
+        function watchNotifications(email) {
+            const q = query(collection(db, "tickets"), where("email", "==", email), where("isReadSale", "==", false));
             onSnapshot(q, (snap) => {
                 const badge = document.getElementById('notifCount');
-                const list = document.getElementById('notifList');
-
-                if (!snap.empty) {
-                    badge.innerText = snap.size;
-                    badge.style.display = 'block';
-
-                    let html = '';
-                    snap.forEach(docSnap => {
-                        const d = docSnap.data();
-                        const color = d.status === 'Closed' ? '#10B981' : '#F59E0B';
-                        html += `
-                            <div class="notif-item" onclick="viewAndMarkRead('${docSnap.id}')">
-                                <b>✅ หมายเลข ${d.internetNo}</b>
-                                <span>สถานะปัจจุบัน: <b style="color:${color}">${d.status}</b></span>
-                                <small>อัปเดตเมื่อ: ${d.updatedAt?.toDate().toLocaleString('th-TH')}</small>
-                            </div>`;
-                    });
-                    list.innerHTML = html;
-
-                    // แจ้งเตือนด้วยเสียงและการสั่นเฉพาะเมื่อมีการอัปเดตใหม่
-                    if (!isInitialLoad) {
-                        bell.classList.add('shake');
-                        setTimeout(() => bell.classList.remove('shake'), 500);
-                        new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(()=>{});
-                    }
-                } else {
-                    badge.style.display = 'none';
-                    list.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8;">ไม่มีแจ้งเตือนใหม่</div>';
-                }
-                isInitialLoad = false;
+                badge.innerText = snap.size;
+                badge.style.display = snap.size > 0 ? 'block' : 'none';
+                
+                let html = '';
+                snap.forEach(d => {
+                    const data = d.data();
+                    html += `<div class="notif-item" onclick="readNotif('${d.id}')">📢 งาน ${data.internetNo} อัปเดตสถานะเป็น ${data.status}</div>`;
+                });
+                document.getElementById('notifList').innerHTML = html || '<div style="padding:10px; color:#999;">ไม่มีแจ้งเตือน</div>';
             });
         }
 
-        // 3. ฟังก์ชันคลิกที่แจ้งเตือน (Mark as Read + Show Modal)
-        window.viewAndMarkRead = async (id) => {
+        // ฟังก์ชันอ่านแจ้งเตือน
+        window.readNotif = async (id) => {
             await updateDoc(doc(db, "tickets", id), { isReadSale: true });
-            
-            const docSnap = await getDoc(doc(db, "tickets", id));
-            if (docSnap.exists()) {
-                const d = docSnap.data();
-                document.getElementById('modalTitle').innerText = "งานหมายเลข: " + d.internetNo;
-                document.getElementById('modalBody').innerHTML = `
-                    <p><b>สถานะ:</b> <span style="color:#10B981">${d.status}</span></p>
-                    <p><b>ข้อความจากผู้ดูแล:</b></p>
-                    <div style="background:#f3f4f6; padding:15px; border-radius:8px; border-left: 4px solid #10B981;">
-                        ${d.supNote || 'ไม่มีรายละเอียดเพิ่มเติม'}
-                    </div>
-                `;
-                document.getElementById('viewModal').style.display = 'block';
-                dropdown.style.display = 'none';
-            }
+            const d = await getDoc(doc(db, "tickets", id));
+            document.getElementById('modalTitle').innerText = "งานหมายเลข " + d.data().internetNo;
+            document.getElementById('modalBody').innerHTML = `สถานะ: ${d.data().status}<br>หมายเหตุ: ${d.data().supNote || '-'}`;
+            document.getElementById('viewModal').style.display = 'block';
         };
 
-        // 4. ปุ่ม "อ่านทั้งหมด"
-        document.getElementById('readAllBtn').onclick = async (e) => {
-            e.stopPropagation();
-            const q = query(
-                collection(db, "tickets"), 
-                where("email", "==", auth.currentUser.email),
-                where("isReadSale", "!=", true)
-            );
-            const querySnapshot = await getDocs(q);
-            const batch = writeBatch(db);
-            querySnapshot.forEach((doc) => batch.update(doc.ref, { isReadSale: true }));
-            await batch.commit();
-            dropdown.style.display = 'none';
-        };
+        // UI Helpers
+        const bell = document.getElementById('notifBell');
+        const dropdown = document.getElementById('notifDropdown');
+        bell.onclick = (e) => { e.stopPropagation(); dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; };
+        window.onclick = () => dropdown.style.display = 'none';
+        window.closeModal = () => document.getElementById('viewModal').style.display = 'none';
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
-        // ปิด Modal และ Logout
-        window.closeModal = () => { document.getElementById('viewModal').style.display = 'none'; };
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
     </script>
 </body>
 </html>
