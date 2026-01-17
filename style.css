@@ -248,3 +248,63 @@ td {
         margin-left: 70px;
     }
 }
+/* ============================================================
+   AUTH PAGES: LOGIN SPECIFIC (หน้าเข้าสู่ระบบ)
+   ============================================================ */
+
+/* พื้นหลังหน้า Login แบบไล่เฉดสีเต็มจอ */
+.auth-body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Sarabun', sans-serif;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* การ์ดล็อคอินสีขาวขุ่นแบบโปร่งแสงเล็กน้อย */
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* ส่วนหัวข้อและโลโก้ */
+.logo-area { margin-bottom: 30px; }
+.logo-area h1 { color: #1e293b; font-size: 24px; margin: 0; letter-spacing: 1px; }
+.logo-area p { color: #64748b; font-size: 14px; margin-top: 5px; }
+
+/* การจัดการระยะห่างฟอร์ม */
+.form-group { text-align: left; margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px; }
+
+/* ลิงก์ลืมรหัสผ่านและลงทะเบียน */
+.auth-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.auth-links a { color: #64748b; text-decoration: none; transition: 0.2s; }
+.auth-links a:hover { color: var(--primary-green); text-decoration: underline; }
+
+/* เส้นคั่นและส่วนสมัครสมาชิกใหม่ */
+.register-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.register-section a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+}
