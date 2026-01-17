@@ -308,3 +308,71 @@ td {
     text-decoration: none;
     font-weight: 600;
 }
+/* ============================================================
+   AUTH PAGES: LOGIN SPECIFIC (หน้าเข้าสู่ระบบ)
+   ============================================================ */
+
+/* 1. ตั้งค่าพื้นหลังหน้า Login ให้เป็นสีน้ำเงินเข้มไล่เฉดสี และจัดกึ่งกลางหน้าจอ */
+.auth-body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Sarabun', sans-serif;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* สีพื้นหลังตามภาพตัวอย่าง */
+    height: 100vh; /* ให้ความสูงเต็มหน้าจอ */
+    display: flex;
+    align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+    justify-content: center; /* จัดกึ่งกลางแนวนอน */
+}
+
+/* 2. การ์ดล็อคอินสีขาวขุ่น (Login Card) เพื่อให้ข้อความอ่านง่ายบนพื้นหลังมืด */
+.login-card {
+    background: rgba(255, 255, 255, 0.95); /* สีขาวโปร่งแสง 95% */
+    padding: 40px;
+    border-radius: 20px; /* ขอบโค้งมนตามเทรนด์สมัยใหม่ */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* เงาฟุ้งด้านล่างเพิ่มมิติ */
+    width: 90%;
+    max-width: 400px; /* จำกัดความกว้างไม่ให้แผ่กว้างเกินไป */
+    text-align: center;
+}
+
+/* 3. ส่วนหัวข้อและโลโก้ระบบ */
+.logo-area h1 { 
+    color: #1e293b; 
+    font-size: 24px; 
+    margin: 0; 
+    letter-spacing: 1px; /* เพิ่มระยะห่างตัวอักษรให้ดู Professional */
+}
+.logo-area p { 
+    color: #64748b; 
+    font-size: 14px; 
+    margin: 5px 0 30px 0; 
+}
+
+/* 4. การจัดการกลุ่มฟอร์มกรอกข้อมูล */
+.form-group { 
+    text-align: left; /* บังคับให้หัวข้อชิดซ้าย */
+    margin-bottom: 20px; 
+}
+.form-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    font-weight: 600; 
+    color: #1e293b; 
+}
+
+/* 5. ส่วนลิงก์สมัครสมาชิกและลืมรหัสผ่านด้านล่าง */
+.auth-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between; /* กระจายลิงก์ไปซ้ายและขวา */
+    font-size: 13px;
+}
+.auth-links a { color: #64748b; text-decoration: none; }
+.auth-links a:hover { color: var(--primary-green); text-decoration: underline; }
+
+.register-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0; /* เส้นคั่นบางๆ แบ่งส่วนฟอร์มกับลิงก์สมัคร */
+    font-size: 14px;
+}
