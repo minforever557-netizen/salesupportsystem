@@ -1,191 +1,207 @@
-/* =====================================================
-   BASE / RESET (ปลอดภัย ไม่ทำ UI พัง)
-===================================================== */
+/* =========================
+   Global Reset & Base
+========================= */
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-  background: linear-gradient(135deg, #e8f5ef, #f4fbf8);
-  color: #1f2937;
+    background: linear-gradient(135deg, #e9fdf4, #f0fdf9);
+    color: #064e3b;
+    min-height: 100vh;
 }
 
-/* =====================================================
-   AUTH LAYOUT (Index / Register เท่านั้น)
-===================================================== */
-.auth-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+/* =========================
+   Layout
+========================= */
+.center-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-.auth-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  padding: 40px 36px;
-  border-radius: 18px;
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+/* =========================
+   Card
+========================= */
+.card {
+    background: #ffffff;
+    width: 100%;
+    padding: 36px 34px;
+    border-radius: 22px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+    animation: fadeUp 0.4s ease;
 }
 
-/* =====================================================
-   AUTH TEXT
-===================================================== */
-.auth-title {
-  text-align: center;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1e7f5c;
-  margin-bottom: 4px;
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   Title
+========================= */
+.card-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #10b981;
+    letter-spacing: 1px;
 }
 
 .card-subtitle {
-  text-align: center;
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 24px;
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #64748b;
 }
 
-/* =====================================================
-   FORM
-===================================================== */
+/* =========================
+   Form
+========================= */
 .form-group {
-  margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.input-field,
-input,
-select {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  font-size: 15px;
-  background: #f9fafb;
+.input {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #d1fae5;
+    background: #fafff6;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-.input-field:focus,
-input:focus,
-select:focus {
-  outline: none;
-  border-color: #1e7f5c;
-  background: #ffffff;
+.input:focus {
+    border-color: #10b981;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
-/* =====================================================
-   BUTTON
-===================================================== */
-.btn-auth {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  background: #1e7f5c;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
+/* =========================
+   Button
+========================= */
+.btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.25s ease;
 }
 
-.btn-auth:hover {
-  background: #166d4f;
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(16, 185, 129, 0.35);
 }
 
-.btn-auth:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
-/* =====================================================
-   LINK / TEXT
-===================================================== */
+/* =========================
+   Links
+========================= */
 .text-center {
-  text-align: center;
+    text-align: center;
 }
 
 .link {
-  color: #1e7f5c;
-  text-decoration: none;
-  font-weight: 500;
+    font-size: 14px;
+    color: #10b981;
+    text-decoration: none;
+    font-weight: 500;
 }
 
 .link:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
-/* =====================================================
-   OVERLAY / MODAL (ใช้เฉพาะ Auth)
-===================================================== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+.divider {
+    margin: 0 10px;
+    color: #9ca3af;
 }
 
-.hidden {
-  display: none;
+/* =========================
+   Loading Overlay
+========================= */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
 }
 
-.success-card {
-  background: #ffffff;
-  padding: 32px;
-  border-radius: 18px;
-  text-align: center;
-  width: 90%;
-  max-width: 360px;
+.loading-box {
+    background: #ffffff;
+    padding: 28px 36px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
-/* =====================================================
-   LOADING
-===================================================== */
 .spinner {
-  width: 52px;
-  height: 52px;
-  border: 5px solid #e5e7eb;
-  border-top: 5px solid #1e7f5c;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.overlay p {
-  margin-top: 16px;
-  color: #ffffff;
-  font-size: 15px;
+    width: 44px;
+    height: 44px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 14px;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-/* =====================================================
-   DASHBOARD SAFE ZONE
-   (ไม่กระทบ layout Dashboard เดิม)
-===================================================== */
-.sidebar,
-.main-content,
-.top-bar,
-.stat-grid,
-.menu-grid,
-.modal {
-  box-sizing: border-box;
+.loading-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #065f46;
 }
 
-/* ❌ ไม่ reset tag พวก a, button, h1-h6 แบบ global
-   เพื่อไม่ให้ Dashboard พัง */
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 480px) {
+    .card {
+        padding: 28px 22px;
+        border-radius: 18px;
+    }
+
+    .card-title {
+        font-size: 24px;
+    }
+}
