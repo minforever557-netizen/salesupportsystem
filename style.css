@@ -1,207 +1,207 @@
 /* =========================
-   GLOBAL
+   Global Reset & Base
 ========================= */
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-  background: linear-gradient(135deg, #e8f5ef, #f4fbf8);
-  color: #1f2937;
+    background: linear-gradient(135deg, #e9fdf4, #f0fdf9);
+    color: #064e3b;
+    min-height: 100vh;
 }
 
 /* =========================
-   AUTH LAYOUT
+   Layout
 ========================= */
-.auth-body,
 .center-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
 /* =========================
-   CARD
+   Card
 ========================= */
-.auth-card,
 .card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  padding: 40px 36px;
-  border-radius: 18px;
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    width: 100%;
+    padding: 36px 34px;
+    border-radius: 22px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+    animation: fadeUp 0.4s ease;
 }
 
-.card-title,
-.auth-title {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 700;
-  color: #1e7f5c;
-  margin-bottom: 6px;
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   Title
+========================= */
+.card-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #10b981;
+    letter-spacing: 1px;
 }
 
 .card-subtitle {
-  text-align: center;
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 24px;
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #64748b;
 }
 
 /* =========================
-   FORM
+   Form
 ========================= */
 .form-group {
-  margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 6px;
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.input,
-.input-field,
-select {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  font-size: 15px;
-  background: #f9fafb;
+.input {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #d1fae5;
+    background: #fafff6;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-.input:focus,
-.input-field:focus,
-select:focus {
-  outline: none;
-  border-color: #1e7f5c;
-  background: #ffffff;
+.input:focus {
+    border-color: #10b981;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 /* =========================
-   BUTTON
+   Button
 ========================= */
-.btn,
-.btn-auth {
-  width: 100%;
-  padding: 14px;
-  margin-top: 6px;
-  border-radius: 14px;
-  border: none;
-  background: #1e7f5c;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.25s ease;
 }
 
-.btn:hover,
-.btn-auth:hover {
-  background: #166d4f;
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(16, 185, 129, 0.35);
 }
 
-.btn:disabled,
-.btn-auth:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* =========================
-   TEXT / LINK
+   Links
 ========================= */
 .text-center {
-  text-align: center;
+    text-align: center;
 }
 
 .link {
-  color: #1e7f5c;
-  text-decoration: none;
-  font-weight: 500;
+    font-size: 14px;
+    color: #10b981;
+    text-decoration: none;
+    font-weight: 500;
 }
 
 .link:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 .divider {
-  margin: 0 8px;
-  color: #9ca3af;
+    margin: 0 10px;
+    color: #9ca3af;
 }
 
 /* =========================
-   OVERLAY (LOADING / SUCCESS)
+   Loading Overlay
 ========================= */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
 }
 
-.hidden {
-  display: none;
+.loading-box {
+    background: #ffffff;
+    padding: 28px 36px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
-/* =========================
-   LOADING
-========================= */
 .spinner {
-  width: 54px;
-  height: 54px;
-  border: 5px solid #e5e7eb;
-  border-top: 5px solid #1e7f5c;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+    width: 44px;
+    height: 44px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 14px;
 }
 
-.overlay p {
-  margin-top: 16px;
-  color: #ffffff;
-  font-size: 16px;
-}
-
-/* =========================
-   SUCCESS
-========================= */
-.success-card {
-  background: #ffffff;
-  padding: 32px;
-  border-radius: 18px;
-  text-align: center;
-  width: 90%;
-  max-width: 360px;
-}
-
-.checkmark {
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 12px;
-  background: #1e7f5c;
-  color: #ffffff;
-  font-size: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* =========================
-   ANIMATION
-========================= */
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #065f46;
+}
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 480px) {
+    .card {
+        padding: 28px 22px;
+        border-radius: 18px;
+    }
+
+    .card-title {
+        font-size: 24px;
+    }
 }
