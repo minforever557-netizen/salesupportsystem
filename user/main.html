@@ -2,189 +2,112 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard User - Sale Support System</title>
+    <title>Dashboard - Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
 </head>
 
-<body class="dashboard-body">
+<body>
 
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar">
-        <div class="sidebar-header">SALE PORTAL</div>
+<div style="display:flex; min-height:100vh;">
 
-        <nav class="sidebar-menu">
-            <a href="main.html" class="active">🏠 <span>หน้าหลัก</span></a>
-            <a href="ticket.html">📝 <span>ส่ง Ticket ใหม่</span></a>
-            <a href="history.html">🔍 <span>ค้นหา / ติดตามงาน</span></a>
+    <!-- ========== SIDEBAR ========== -->
+    <aside style="width:260px; background:#111827; color:#fff; padding:20px;">
+        <h2 style="margin:0 0 30px;">SALE PORTAL</h2>
 
-            <div class="sidebar-footer">
-                <hr class="sidebar-divider">
-                <a href="#" id="logoutBtn" class="logout-link">🚪 <span>ออกจากระบบ</span></a>
-            </div>
+        <nav style="display:flex; flex-direction:column; gap:12px;">
+            <a href="main.html" style="color:#4ade80;">🏠 หน้าหลัก</a>
+            <a href="ticket.html" style="color:#fff;">📝 ส่ง Ticket</a>
+            <a href="history.html" style="color:#fff;">🔍 ติดตามงาน</a>
+
+            <hr style="margin:20px 0; border-color:#374151;">
+            <a href="#" id="logoutBtn" style="color:#ef4444;">🚪 ออกจากระบบ</a>
         </nav>
     </aside>
 
-    <!-- ================= MAIN CONTENT ================= -->
-    <main class="main-content">
+    <!-- ========== MAIN ========== -->
+    <main style="flex:1; padding:24px;">
 
-        <!-- TOP BAR -->
-        <header class="top-bar">
-            <h3 class="page-title">Dashboard</h3>
+        <!-- TOP -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h2>Dashboard</h2>
 
-            <div class="top-right">
-                <!-- Notification -->
-                <div class="notif-wrapper" id="notifBell">
-                    <span class="notif-icon">🔔</span>
-                    <span class="notif-badge-icon" id="notifCount">0</span>
-
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">การแจ้งเตือน</div>
-                        <div id="notifList" class="notif-list"></div>
-                    </div>
-                </div>
-
-                <!-- User -->
-                <div class="user-info">
-                    <div id="userEmail" class="user-email">Loading...</div>
-                    <small class="user-role">Sale Representative</small>
-                </div>
+            <div>
+                <div id="userEmail" style="font-weight:600;">Loading...</div>
+                <small class="text-muted">Sale Representative</small>
             </div>
-        </header>
-
-        <!-- ================= STATS ================= -->
-        <section class="stat-grid">
-            <div class="stat-box stat-blue">
-                <small>งานทั้งหมด</small>
-                <div id="countAll" class="stat-number">0</div>
-            </div>
-
-            <div class="stat-box stat-red">
-                <small>รอดำเนินการ</small>
-                <div id="countOpen" class="stat-number">0</div>
-            </div>
-
-            <div class="stat-box stat-green">
-                <small>งานที่เสร็จสิ้น</small>
-                <div id="countClosed" class="stat-number">0</div>
-            </div>
-        </section>
-
-        <!-- ================= QUICK MENU ================= -->
-        <section class="menu-grid">
-            <a href="ticket.html" class="menu-card">
-                <div class="menu-icon">📝</div>
-                <b>ส่ง Ticket ใหม่</b>
-                <p>แจ้งเคสงานใหม่เข้าสู่ระบบ</p>
-            </a>
-
-            <a href="history.html" class="menu-card">
-                <div class="menu-icon">🔍</div>
-                <b>ติดตามสถานะงาน</b>
-                <p>ตรวจสอบประวัติและอัปเดต</p>
-            </a>
-        </section>
-    </main>
-
-    <!-- ================= MODAL ================= -->
-    <div id="viewModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle" class="modal-title">รายละเอียดงาน</h3>
-            <hr class="modal-divider">
-            <div id="modalBody" class="modal-body"></div>
-            <button onclick="closeModal()" class="btn-auth modal-btn">ตกลง / ปิดหน้าต่าง</button>
         </div>
-    </div>
 
-    <!-- ================= SCRIPT ================= -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        <!-- STATS -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+            <div class="card text-center">
+                <small>งานทั้งหมด</small>
+                <h2 id="countAll">0</h2>
+            </div>
+            <div class="card text-center">
+                <small>รอดำเนินการ</small>
+                <h2 id="countOpen">0</h2>
+            </div>
+            <div class="card text-center">
+                <small>เสร็จสิ้น</small>
+                <h2 id="countClosed">0</h2>
+            </div>
+        </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-            authDomain: "sale-support-system.firebaseapp.com",
-            projectId: "sale-support-system",
-            storageBucket: "sale-support-system.firebasestorage.app",
-            messagingSenderId: "640337786680",
-            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-        };
+        <!-- MENU -->
+        <div style="margin-top:32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;">
+            <a href="ticket.html" class="card text-center">
+                <div style="font-size:40px;">📝</div>
+                <b>ส่ง Ticket ใหม่</b>
+                <p class="text-muted">แจ้งเคสงานใหม่</p>
+            </a>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            <a href="history.html" class="card text-center">
+                <div style="font-size:40px;">🔍</div>
+                <b>ติดตามงาน</b>
+                <p class="text-muted">ดูสถานะทั้งหมด</p>
+            </a>
+        </div>
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('userEmail').innerText = user.email;
-                loadStats(user.email);
-                watchNotifications(user.email);
-            } else {
-                window.location.href = "../index.html";
-            }
-        });
+    </main>
+</div>
 
-        function loadStats(email) {
-            const q = query(collection(db, "tickets"), where("email", "==", email));
-            onSnapshot(q, snap => {
-                let all = snap.size, open = 0, closed = 0;
-                snap.forEach(d => d.data().status === 'Closed' ? closed++ : open++);
-                countAll.innerText = all;
-                countOpen.innerText = open;
-                countClosed.innerText = closed;
-            });
-        }
+<!-- ========== SCRIPT ========== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        function watchNotifications(email) {
-            const q = query(
-                collection(db, "tickets"),
-                where("email", "==", email),
-                where("isReadSale", "==", false)
-            );
+const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system"
+};
 
-            onSnapshot(q, snap => {
-                notifCount.innerText = snap.size;
-                notifCount.style.display = snap.size ? 'block' : 'none';
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-                notifList.innerHTML = snap.size
-                    ? [...snap.docs].map(d => {
-                        const data = d.data();
-                        return `
-                            <div class="notif-item" onclick="readNotif('${d.id}')">
-                                <b>🔔 อัปเดตสถานะงาน</b>
-                                <small>Internet No: ${data.internetNo}</small>
-                                <span class="notif-status">${data.status}</span>
-                            </div>`;
-                    }).join('')
-                    : '<div class="notif-empty">ไม่มีการแจ้งเตือนใหม่</div>';
-            });
-        }
+onAuthStateChanged(auth, user => {
+    if (!user) location.href = "../index.html";
+    userEmail.innerText = user.email;
+    loadStats(user.email);
+});
 
-        window.readNotif = async (id) => {
-            const ref = doc(db, "tickets", id);
-            await updateDoc(ref, { isReadSale: true });
-            const data = (await getDoc(ref)).data();
+function loadStats(email){
+    const q = query(collection(db,"tickets"), where("email","==",email));
+    onSnapshot(q,snap=>{
+        let all=0,open=0,closed=0;
+        snap.forEach(d=> d.data().status==="Closed"?closed++:open++);
+        all = snap.size;
+        countAll.innerText = all;
+        countOpen.innerText = open;
+        countClosed.innerText = closed;
+    });
+}
 
-            modalTitle.innerText = "📌 งานหมายเลข " + data.internetNo;
-            modalBody.innerHTML = `
-                <b>สถานะปัจจุบัน:</b> ${data.status}<br><br>
-                <b>รายละเอียดจากทีม Support:</b>
-                <div class="note-box">${data.supNote || 'ไม่มีหมายเหตุเพิ่มเติม'}</div>
-            `;
-            viewModal.style.display = 'block';
-            notifDropdown.style.display = 'none';
-        };
-
-        notifBell.onclick = e => {
-            e.stopPropagation();
-            notifDropdown.classList.toggle('show');
-        };
-
-        window.onclick = () => notifDropdown.classList.remove('show');
-        window.closeModal = () => viewModal.style.display = 'none';
-        logoutBtn.onclick = () => signOut(auth);
-    </script>
+logoutBtn.onclick = ()=> signOut(auth);
+</script>
 
 </body>
 </html>
