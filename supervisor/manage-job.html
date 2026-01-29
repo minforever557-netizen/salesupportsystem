@@ -1,119 +1,173 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>Manage Job - Supervisor</title>
-    <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Manage Job | Supervisor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- CSS กลาง -->
+<link rel="stylesheet" href="../style.css">
 </head>
+
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">SUPERVISOR</div>
-        <div class="sidebar-menu">
-            <a href="main.html" class="active">📥 <span>งานรอดำเนินการ</span></a>
-            <a href="history_all.html">📊 <span>ประวัติงานทั้งหมด</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
-        </div>
-    </div>
 
-    <div class="main-content">
-        <div class="top-bar">
-            <a href="main.html" style="text-decoration:none; color:var(--primary-green); font-weight:600;">⬅️ กลับหน้ารายการ</a>
-        </div>
-        <div class="container" style="max-width: 800px;">
-            <h2 style="margin-bottom: 25px;">🛠️ ดำเนินการจัดการเคส</h2>
-            
-            <div class="card" id="jobDetailBox" style="background: #f9fafb; border: 1px dashed #ccc;">
-                กำลังโหลดรายละเอียดงาน...
-            </div>
+<!-- overlay mobile -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-            <div class="card">
-                <form id="actionForm">
-                    <label>อัปเดตสถานะงาน:</label>
-                    <select id="statusSelect" class="input-field" required>
-                        <option value="Open">🔴 Open (รับเรื่องแล้ว)</option>
-                        <option value="In Progress">🟡 In Progress (กำลังแก้ไข)</option>
-                        <option value="Closed">🟢 Closed (ปิดงานสำเร็จ)</option>
-                    </select>
+<div class="dashboard-layout">
 
-                    <label>ระบุข้อความตอบกลับถึง Sale:</label>
-                    <textarea id="supComment" class="input-field" rows="5" placeholder="ใส่รายละเอียดการแก้ไข หรือหมายเหตุที่นี่..." required></textarea>
+    <!-- ========== SIDEBAR (ของเดิม) ========== -->
+    <aside id="sidebar" class="dashboard-sidebar">
+        <h2>SUPERVISOR</h2>
+        <nav class="dashboard-nav">
+            <a href="main.html">📊 Dashboard</a>
+            <a href="manage-job.html" class="active">🛠️ Manage Job</a>
+            <a href="history_all.html">📂 History</a>
+            <a href="#" class="dashboard-logout">🚪 Logout</a>
+        </nav>
+    </aside>
 
-                    <div style="display: flex; gap: 15px; margin-top: 10px;">
-                        <button type="submit" class="btn btn-primary" id="saveBtn" style="flex: 2;">บันทึกและอัปเดต</button>
-                        <button type="button" class="btn btn-outline" onclick="location.href='main.html'" style="flex: 1;">ยกเลิก</button>
-                    </div>
-                </form>
+    <!-- ========== MAIN ========== -->
+    <main class="dashboard-main">
+
+        <div class="dashboard-top">
+            <button id="hamburger" class="hamburger">☰</button>
+            <div class="dashboard-user">
+                <b id="userEmail">supervisor@email.com</b><br>
+                <small>Supervisor</small>
             </div>
         </div>
+
+        <h2>จัดการงาน (Open / Pending)</h2>
+        <p class="text-muted">คลิกที่งานเพื่อเปลี่ยนสถานะและบันทึกการแก้ไข</p>
+
+        <!-- JOB LIST -->
+        <div id="jobList" class="dashboard-stats"></div>
+
+    </main>
+</div>
+
+<!-- ========== MODAL ========== -->
+<div id="jobModal" class="modal hidden">
+    <div class="modal-card">
+
+        <h3 id="modalTitle">-</h3>
+
+        <div class="form-group">
+            <label>สถานะงาน</label>
+            <select id="modalStatus" class="input">
+                <option value="Open">Open</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Closed">Closed</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>รายละเอียดการดำเนินการ</label>
+            <textarea
+                id="modalComment"
+                class="input"
+                rows="4"
+                placeholder="อธิบายการแก้ไข / การดำเนินการ / หมายเหตุ"></textarea>
+        </div>
+
+        <button class="btn-primary" onclick="saveJob()">บันทึก</button>
+        <button class="btn-secondary" onclick="closeModal()">ยกเลิก</button>
+
     </div>
+</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script>
+/* ========== MOBILE MENU ========== */
+hamburger.onclick = () => {
+    sidebar.classList.add("show");
+    sidebarOverlay.classList.add("show");
+};
+sidebarOverlay.onclick = () => {
+    sidebar.classList.remove("show");
+    sidebarOverlay.classList.remove("show");
+};
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
+/* ========== MOCK DATA (แทน Firestore) ========== */
+const jobs = [
+    { id:"T001", internetNo:"8800996377", title:"Internet ช้า", status:"Open" },
+    { id:"T002", internetNo:"8800123456", title:"Router มีปัญหา", status:"Pending" },
+    { id:"T003", internetNo:"8800778899", title:"สายขาด", status:"Closed" }
+];
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const ticketId = localStorage.getItem('currentTicketId');
+let currentJob = null;
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) loadJobData();
-        else window.location.href = "../index.html";
-    });
+/* ========== RENDER JOB CARD ========== */
+function renderJobs() {
+    const list = document.getElementById("jobList");
+    list.innerHTML = "";
 
-    async function loadJobData() {
-        if(!ticketId) { window.location.href = 'main.html'; return; }
-        const docSnap = await getDoc(doc(db, "tickets", ticketId));
+    const visibleJobs = jobs.filter(j =>
+        j.status === "Open" || j.status === "Pending"
+    );
 
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            document.getElementById('jobDetailBox').innerHTML = `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><small style="color:gray;">Internet No:</small><br><b>${data.internetNo}</b></div>
-                    <div><small style="color:gray;">หัวข้อ:</small><br><b>${data.issueType}</b></div>
-                    <div style="grid-column: span 2; margin-top:10px;">
-                        <small style="color:gray;">รายละเอียดจาก Sale:</small><br>
-                        <div style="padding:10px; background:white; border-radius:5px; margin-top:5px; border:1px solid #eee;">${data.details}</div>
-                    </div>
-                    <div style="margin-top:10px;"><small style="color:gray;">ผู้แจ้ง:</small><br><small>${data.email}</small></div>
-                </div>
-            `;
-            document.getElementById('statusSelect').value = data.status;
-            document.getElementById('supComment').value = data.comment || "";
-        }
+    if (!visibleJobs.length) {
+        list.innerHTML = "<p class='text-muted'>ไม่มีงานที่ต้องจัดการ</p>";
+        return;
     }
 
-    document.getElementById('actionForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = true; saveBtn.innerText = "กำลังบันทึก...";
+    visibleJobs.forEach(job => {
+        const card = document.createElement("div");
+        card.className = "stat-card clickable";
 
-        try {
-            await updateDoc(doc(db, "tickets", ticketId), {
-                status: document.getElementById('statusSelect').value,
-                comment: document.getElementById('supComment').value,
-                updatedAt: serverTimestamp(),
-                processedBy: auth.currentUser.email
-            });
-            alert("✅ อัปเดตงานเรียบร้อย!");
-            window.location.href = 'main.html';
-        } catch (err) {
-            alert("Error: " + err.message);
-            saveBtn.disabled = false;
-        }
-    };
+        card.innerHTML = `
+            <small>${job.status}</small>
+            <h3>${job.internetNo}</h3>
+            <p>${job.title}</p>
+        `;
+
+        card.onclick = () => openModal(job);
+        list.appendChild(card);
+    });
+}
+
+/* ========== MODAL ========== */
+function openModal(job) {
+    currentJob = job;
+    modalTitle.innerText = `Internet No: ${job.internetNo}`;
+    modalStatus.value = job.status;
+    modalComment.value = "";
+    jobModal.classList.remove("hidden");
+}
+
+function closeModal() {
+    jobModal.classList.add("hidden");
+}
+
+/* ========== SAVE ========== */
+function saveJob() {
+    const status = modalStatus.value;
+    const comment = modalComment.value.trim();
+
+    if (!comment) {
+        alert("กรุณากรอกรายละเอียดการดำเนินการ");
+        return;
+    }
+
+    // update local
+    currentJob.status = status;
+
+    console.log("UPDATE JOB", {
+        id: currentJob.id,
+        status,
+        comment
+    });
+
+    // 🔥 Firestore updateDoc ใส่ตรงนี้
+
+    closeModal();
+    renderJobs();
+}
+
+/* ========== INIT ========== */
+renderJobs();
 </script>
+
 </body>
 </html>
