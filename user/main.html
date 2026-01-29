@@ -7,107 +7,110 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
+<body class="dashboard-body">
 
-<div style="display:flex; min-height:100vh;">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-header">SALE PORTAL</div>
 
-    <!-- ========== SIDEBAR ========== -->
-    <aside style="width:260px; background:#111827; color:#fff; padding:20px;">
-        <h2 style="margin:0 0 30px;">SALE PORTAL</h2>
+        <nav class="sidebar-menu">
+            <a href="main.html" class="active">🏠 <span>หน้าหลัก</span></a>
+            <a href="ticket.html">📝 <span>ส่ง Ticket</span></a>
+            <a href="history.html">🔍 <span>ติดตามงาน</span></a>
 
-        <nav style="display:flex; flex-direction:column; gap:12px;">
-            <a href="main.html" style="color:#4ade80;">🏠 หน้าหลัก</a>
-            <a href="ticket.html" style="color:#fff;">📝 ส่ง Ticket</a>
-            <a href="history.html" style="color:#fff;">🔍 ติดตามงาน</a>
-
-            <hr style="margin:20px 0; border-color:#374151;">
-            <a href="#" id="logoutBtn" style="color:#ef4444;">🚪 ออกจากระบบ</a>
+            <div class="sidebar-footer">
+                <hr class="sidebar-divider">
+                <a href="#" id="logoutBtn" class="logout-link">🚪 <span>ออกจากระบบ</span></a>
+            </div>
         </nav>
     </aside>
 
-    <!-- ========== MAIN ========== -->
-    <main style="flex:1; padding:24px;">
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
 
-        <!-- TOP -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-            <h2>Dashboard</h2>
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <h3 class="page-title">Dashboard</h3>
 
-            <div>
-                <div id="userEmail" style="font-weight:600;">Loading...</div>
-                <small class="text-muted">Sale Representative</small>
+            <div class="user-info">
+                <div id="userEmail" class="user-email">Loading...</div>
+                <small class="user-role">Sale Representative</small>
             </div>
-        </div>
+        </header>
 
-        <!-- STATS -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
-            <div class="card text-center">
+        <!-- ================= STATS ================= -->
+        <section class="stat-grid">
+            <div class="stat-box stat-blue">
                 <small>งานทั้งหมด</small>
-                <h2 id="countAll">0</h2>
+                <div id="countAll" class="stat-number">0</div>
             </div>
-            <div class="card text-center">
+
+            <div class="stat-box stat-red">
                 <small>รอดำเนินการ</small>
-                <h2 id="countOpen">0</h2>
+                <div id="countOpen" class="stat-number">0</div>
             </div>
-            <div class="card text-center">
+
+            <div class="stat-box stat-green">
                 <small>เสร็จสิ้น</small>
-                <h2 id="countClosed">0</h2>
+                <div id="countClosed" class="stat-number">0</div>
             </div>
-        </div>
+        </section>
 
-        <!-- MENU -->
-        <div style="margin-top:32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;">
-            <a href="ticket.html" class="card text-center">
-                <div style="font-size:40px;">📝</div>
+        <!-- ================= QUICK MENU ================= -->
+        <section class="menu-grid">
+            <a href="ticket.html" class="menu-card">
+                <div class="menu-icon">📝</div>
                 <b>ส่ง Ticket ใหม่</b>
-                <p class="text-muted">แจ้งเคสงานใหม่</p>
+                <p>แจ้งเคสงานใหม่</p>
             </a>
 
-            <a href="history.html" class="card text-center">
-                <div style="font-size:40px;">🔍</div>
+            <a href="history.html" class="menu-card">
+                <div class="menu-icon">🔍</div>
                 <b>ติดตามงาน</b>
-                <p class="text-muted">ดูสถานะทั้งหมด</p>
+                <p>ดูสถานะทั้งหมด</p>
             </a>
-        </div>
+        </section>
 
     </main>
-</div>
 
-<!-- ========== SCRIPT ========== -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <!-- ================= SCRIPT ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-    authDomain: "sale-support-system.firebaseapp.com",
-    projectId: "sale-support-system"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+            authDomain: "sale-support-system.firebaseapp.com",
+            projectId: "sale-support-system"
+        };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-onAuthStateChanged(auth, user => {
-    if (!user) location.href = "../index.html";
-    userEmail.innerText = user.email;
-    loadStats(user.email);
-});
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                window.location.href = "../index.html";
+                return;
+            }
+            userEmail.innerText = user.email;
+            loadStats(user.email);
+        });
 
-function loadStats(email){
-    const q = query(collection(db,"tickets"), where("email","==",email));
-    onSnapshot(q,snap=>{
-        let all=0,open=0,closed=0;
-        snap.forEach(d=> d.data().status==="Closed"?closed++:open++);
-        all = snap.size;
-        countAll.innerText = all;
-        countOpen.innerText = open;
-        countClosed.innerText = closed;
-    });
-}
+        function loadStats(email){
+            const q = query(collection(db,"tickets"), where("email","==",email));
+            onSnapshot(q, snap => {
+                let open = 0, closed = 0;
+                snap.forEach(d => d.data().status === "Closed" ? closed++ : open++);
+                countAll.innerText = snap.size;
+                countOpen.innerText = open;
+                countClosed.innerText = closed;
+            });
+        }
 
-logoutBtn.onclick = ()=> signOut(auth);
-</script>
+        logoutBtn.onclick = () => signOut(auth);
+    </script>
 
 </body>
 </html>
