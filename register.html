@@ -1,151 +1,170 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>สมัครเข้าใช้งาน | Sale Portal</title>
-    <link rel="stylesheet" href="../style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>สมัครเข้าใช้งาน | Sale Portal</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="auth-body">
 
-<div class="auth-card">
-    <h2 class="auth-title">สมัครเข้าใช้งาน</h2>
+  <!-- ================= CARD ================= -->
+  <div class="auth-card">
+    <h1 class="auth-title">สมัครเข้าใช้งาน</h1>
+    <p class="card-subtitle">Sale Support Management System</p>
 
     <form id="registerForm">
-        <div class="form-group">
-            <label>ชื่อ - นามสกุล</label>
-            <input type="text" id="fullName" class="input" required>
-        </div>
 
-        <div class="form-group">
-            <label>หน่วยงาน</label>
-            <select id="department" required>
-                <option value="">-- เลือก --</option>
-                <option value="FBB Telesale">FBB Telesale</option>
-                <option value="Support">Support</option>
-            </select>
-        </div>
+      <div class="form-group">
+        <label>ชื่อ - นามสกุล</label>
+        <input type="text" id="fullName" class="input" required>
+      </div>
 
-        <div class="form-group" id="teamGroup">
-            <label>ทีม</label>
-            <select id="team">
-                <option value="">-- เลือกทีม --</option>
-                <option value="Team A">Team A</option>
-                <option value="Team B">Team B</option>
-            </select>
-        </div>
+      <div class="form-group">
+        <label>หน่วยงาน</label>
+        <select id="department" class="input" required>
+          <option value="">-- เลือกหน่วยงาน --</option>
+          <option value="FBB Telesale">FBB Telesale</option>
+          <option value="FBB Dealer Sale">FBB Dealer Sale</option>
+          <option value="FBB Direct Sale">FBB Direct Sale</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-            <label>เบอร์โทรศัพท์</label>
-            <input type="tel" id="phone" class="input" required>
-        </div>
+      <div class="form-group" id="teamGroup">
+        <label>ทีม</label>
+        <select id="team" class="input">
+          <option value="">-- เลือกทีม --</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-            <label>อีเมลพนักงาน</label>
-            <input type="email" id="email" class="input" required>
-        </div>
+      <div class="form-group">
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="phone" class="input" required>
+      </div>
 
-        <div class="form-group">
-            <label>รหัสผ่าน</label>
-            <input type="password" id="password" class="input" required>
-        </div>
+      <div class="form-group">
+        <label>อีเมลพนักงาน</label>
+        <input type="email" id="email" class="input" required>
+      </div>
 
-        <button type="submit" class="btn-auth">ลงทะเบียนเข้าใช้งาน</button>
+      <div class="form-group">
+        <label>รหัสผ่าน</label>
+        <input type="password" id="password" class="input" required minlength="6">
+      </div>
 
-        <div class="text-center" style="margin-top:15px">
-            มีบัญชีแล้ว? <a href="../index.html" class="link">เข้าสู่ระบบ</a>
-        </div>
+      <button type="submit" class="btn-auth">ลงทะเบียนเข้าใช้งาน</button>
     </form>
-</div>
 
-<!-- POPUP EMAIL EXISTS -->
-<div id="emailExistPopup" class="overlay hidden">
-    <div class="success-card">
-        <h3 style="color:#f97316">อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว</h3>
-
-        <button class="btn-auth" onclick="goLogin()">เข้าสู่ระบบ</button>
-        <button class="btn-auth" style="margin-top:10px" onclick="resetPassword()">รีเซ็ตรหัสผ่าน</button>
+    <div class="text-center" style="margin-top:16px;">
+      มีบัญชีแล้ว?
+      <a href="index.html" class="link">เข้าสู่ระบบ</a>
     </div>
-</div>
+  </div>
 
-<!-- LOADING -->
-<div id="loading" class="overlay hidden">
+  <!-- ================= LOADING ================= -->
+  <div id="loading" class="overlay hidden">
     <div class="spinner"></div>
     <p>กำลังดำเนินการ...</p>
-</div>
+  </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import {
-    getFirestore,
-    doc,
-    setDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <!-- ================= EMAIL EXISTS POPUP ================= -->
+  <div id="emailExistPopup" class="overlay hidden">
+    <div class="success-card">
+      <h3 style="color:#f97316;margin-bottom:10px;">
+        อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว
+      </h3>
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-    authDomain: "sale-support-system.firebaseapp.com",
-    projectId: "sale-support-system"
-};
+      <button class="btn-auth" onclick="goLogin()">เข้าสู่ระบบ</button>
+      <button class="btn-auth" style="margin-top:10px;" onclick="goReset()">
+        รีเซ็ตรหัสผ่าน
+      </button>
+    </div>
+  </div>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  <!-- ================= FIREBASE ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ซ่อนทีมถ้าเลือก FBB
-department.onchange = () => {
-    teamGroup.style.display =
-        department.value === 'FBB Telesale' ? 'none' : 'block';
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+      authDomain: "sale-support-system.firebaseapp.com",
+      projectId: "sale-support-system",
+      storageBucket: "sale-support-system.firebasestorage.app",
+      messagingSenderId: "640337786680",
+      appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
 
-registerForm.onsubmit = async (e) => {
-    e.preventDefault();
-    loading.classList.remove('hidden');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const email = email.value;
-    const password = password.value;
+    const form = document.getElementById("registerForm");
+    const loading = document.getElementById("loading");
+    const popup = document.getElementById("emailExistPopup");
 
-    try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const department = document.getElementById("department");
+    const teamGroup = document.getElementById("teamGroup");
+    const team = document.getElementById("team");
+
+    department.onchange = () => {
+      team.innerHTML = '<option value="">-- เลือกทีม --</option>';
+      if (department.value === "FBB Telesale") {
+        teamGroup.style.display = "none";
+        team.value = "";
+      } else {
+        teamGroup.style.display = "block";
+        const max = department.value === "FBB Dealer Sale" ? 10 : 6;
+        for (let i = 1; i <= max; i++) {
+          team.innerHTML += `<option value="Team ${i}">Team ${i}</option>`;
+        }
+      }
+    };
+
+    function hideAll() {
+      loading.classList.add("hidden");
+      popup.classList.add("hidden");
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      hideAll();
+      loading.classList.remove("hidden");
+
+      try {
+        const cred = await createUserWithEmailAndPassword(
+          auth,
+          email.value,
+          password.value
+        );
 
         await setDoc(doc(db, "users", cred.user.uid), {
-            name: fullName.value,
-            department: department.value,
-            team: team.value || '',
-            phone: phone.value,
-            email: email,
-            role: 'sale',
-            createdAt: new Date()
+          fullName: fullName.value,
+          email: email.value,
+          phone: phone.value,
+          department: department.value,
+          team: team.value || null,
+          role: "sale",
+          createdAt: new Date()
         });
 
-        // สมัครสำเร็จ → กลับหน้า Login
-        window.location.href = "../index.html";
+        window.location.href = "index.html";
 
-    } catch (err) {
-        loading.classList.add('hidden');
-
-        if (err.code === 'auth/email-already-in-use') {
-            emailExistPopup.classList.remove('hidden');
+      } catch (err) {
+        hideAll();
+        if (err.code === "auth/email-already-in-use") {
+          popup.classList.remove("hidden");
         } else {
-            alert(err.message);
+          alert(err.message);
         }
-    }
-};
+      }
+    };
 
-window.goLogin = () => {
-    window.location.href = "../index.html";
-};
-
-window.resetPassword = async () => {
-    await sendPasswordResetEmail(auth, email.value);
-    alert('ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว');
-};
-</script>
+    window.goLogin = () => window.location.href = "index.html";
+    window.goReset = () => window.location.href = "forgot.html";
+  </script>
 
 </body>
 </html>
