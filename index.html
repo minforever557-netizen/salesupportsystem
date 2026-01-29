@@ -13,25 +13,36 @@
     <div class="card-title">SALE PORTAL</div>
     <div class="card-subtitle">Support Management System</div>
 
-    <div class="form-group">
-        <label>อีเมลผู้ใช้งาน</label>
-        <input class="input" placeholder="example@email.com">
-    </div>
+    <form id="loginForm">
 
-    <div class="form-group">
-        <label>รหัสผ่าน</label>
-        <input class="input" type="password">
-    </div>
+        <div class="form-group">
+            <label>อีเมลผู้ใช้งาน</label>
+            <input class="input" type="email" required>
+        </div>
 
-    <button class="btn">เข้าสู่ระบบ</button>
+        <div class="form-group">
+            <label>รหัสผ่าน</label>
+            <input class="input" type="password" required>
+        </div>
+
+        <button type="submit" class="btn">เข้าสู่ระบบ</button>
+
+    </form>
 
     <div class="text-center" style="margin-top:20px">
-        <a class="link" href="#">ลืมรหัสผ่าน?</a>
+        <a class="link" href="#" onclick="alert('Forgot password')">ลืมรหัสผ่าน?</a>
         <span class="divider">|</span>
-        <a class="link" href="#">สมัครสมาชิก</a>
+        <a class="link" href="#" onclick="alert('Register')">สมัครสมาชิก</a>
     </div>
 
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Login button works');
+});
+</script>
 
 </body>
 </html>
