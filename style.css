@@ -1,354 +1,191 @@
-/* ===============================
-   ROOT & GLOBAL
-================================ */
-:root {
-    --primary-green: #10b981;
-    --primary-dark: #065f46;
-    --bg-soft: #ecfdf5;
-    --bg-card: #ffffff;
-    --text-dark: #111827;
-    --text-muted: #6b7280;
-    --border-soft: #e5e7eb;
-    --danger: #ef4444;
-}
-
+/* =====================================================
+   BASE / RESET (ปลอดภัย ไม่ทำ UI พัง)
+===================================================== */
 * {
-    box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, sans-serif;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    background: linear-gradient(135deg, #e6fff4, #f0fdfa);
-    color: var(--text-dark);
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: linear-gradient(135deg, #e8f5ef, #f4fbf8);
+  color: #1f2937;
 }
 
-/* ===============================
-   AUTH (LOGIN / REGISTER)
-================================ */
+/* =====================================================
+   AUTH LAYOUT (Index / Register เท่านั้น)
+===================================================== */
 .auth-body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .auth-card {
-    width: 100%;
-    max-width: 460px;
-    background: var(--bg-card);
-    padding: 40px;
-    border-radius: 22px;
-    box-shadow: 0 25px 50px rgba(0,0,0,.12);
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 36px;
+  border-radius: 18px;
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
 }
 
+/* =====================================================
+   AUTH TEXT
+===================================================== */
 .auth-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--primary-green);
-    margin-bottom: 8px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e7f5c;
+  margin-bottom: 4px;
 }
 
-.auth-subtitle {
-    color: var(--text-muted);
-    margin-bottom: 25px;
+.card-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 24px;
 }
 
+/* =====================================================
+   FORM
+===================================================== */
 .form-group {
-    margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
-.form-group label {
-    font-weight: 600;
-    margin-bottom: 6px;
-    display: block;
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
-.input {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 14px;
-    border: 1px solid var(--border-soft);
-    background: #fff;
-    font-size: 15px;
+.input-field,
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  background: #f9fafb;
 }
 
-.input:focus {
-    outline: none;
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 2px rgba(16,185,129,.15);
+.input-field:focus,
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #1e7f5c;
+  background: #ffffff;
 }
 
-.input.yellow {
-    background: #fef9c3;
-}
-
-select.input {
-    appearance: none;
-}
-
-/* ===============================
-   BUTTONS
-================================ */
+/* =====================================================
+   BUTTON
+===================================================== */
 .btn-auth {
-    width: 100%;
-    padding: 14px;
-    border-radius: 16px;
-    border: none;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    background: var(--primary-green);
-    color: #fff;
-    transition: all .2s ease;
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: #1e7f5c;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .btn-auth:hover {
-    background: #059669;
-    transform: translateY(-1px);
+  background: #166d4f;
 }
 
-.btn-outline {
-    background: #fff;
-    border: 2px solid var(--primary-green);
-    color: var(--primary-green);
+.btn-auth:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
-.btn-outline:hover {
-    background: var(--primary-green);
-    color: #fff;
+/* =====================================================
+   LINK / TEXT
+===================================================== */
+.text-center {
+  text-align: center;
 }
 
-.btn-disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
+.link {
+  color: #1e7f5c;
+  text-decoration: none;
+  font-weight: 500;
 }
 
-/* ===============================
-   AUTH LINKS
-================================ */
-.auth-links {
-    margin-top: 18px;
-    text-align: center;
-    font-size: 14px;
+.link:hover {
+  text-decoration: underline;
 }
 
-.auth-links a {
-    color: var(--primary-green);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.auth-links a:hover {
-    text-decoration: underline;
-}
-
-/* ===============================
-   LOADING ANIMATION
-================================ */
-.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.loading span {
-    width: 10px;
-    height: 10px;
-    background: var(--primary-green);
-    border-radius: 50%;
-    animation: bounce 1.2s infinite;
-}
-
-.loading span:nth-child(2) { animation-delay: .15s; }
-.loading span:nth-child(3) { animation-delay: .3s; }
-
-@keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-}
-
-/* ===============================
-   OVERLAY / MODAL
-================================ */
+/* =====================================================
+   OVERLAY / MODAL (ใช้เฉพาะ Auth)
+===================================================== */
 .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
-.modal-card {
-    background: #fff;
-    padding: 30px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+.hidden {
+  display: none;
 }
 
-.modal-card h3 {
-    margin-top: 0;
-    color: #f97316;
+.success-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 18px;
+  text-align: center;
+  width: 90%;
+  max-width: 360px;
 }
 
-/* ===============================
-   DASHBOARD LAYOUT
-================================ */
-.sidebar {
-    width: 240px;
-    height: 100vh;
-    background: #1f2933;
-    color: #fff;
-    position: fixed;
-    left: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
+/* =====================================================
+   LOADING
+===================================================== */
+.spinner {
+  width: 52px;
+  height: 52px;
+  border: 5px solid #e5e7eb;
+  border-top: 5px solid #1e7f5c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.sidebar-header {
-    padding: 20px;
-    font-size: 22px;
-    font-weight: 800;
-    background: #111827;
+.overlay p {
+  margin-top: 16px;
+  color: #ffffff;
+  font-size: 15px;
 }
 
-.sidebar-menu {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.sidebar-menu a {
-    padding: 14px 20px;
-    color: #d1d5db;
-    text-decoration: none;
-    display: flex;
-    gap: 10px;
+/* =====================================================
+   DASHBOARD SAFE ZONE
+   (ไม่กระทบ layout Dashboard เดิม)
+===================================================== */
+.sidebar,
+.main-content,
+.top-bar,
+.stat-grid,
+.menu-grid,
+.modal {
+  box-sizing: border-box;
 }
 
-.sidebar-menu a.active,
-.sidebar-menu a:hover {
-    background: #374151;
-    color: #fff;
-}
-
-.main-content {
-    margin-left: 240px;
-    padding: 30px;
-}
-
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-/* ===============================
-   STATS & CARDS
-================================ */
-.stat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-    gap: 20px;
-}
-
-.stat-box {
-    padding: 20px;
-    border-radius: 16px;
-    color: #fff;
-}
-
-.stat-number {
-    font-size: 34px;
-    font-weight: 800;
-}
-
-.menu-grid {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-    gap: 20px;
-}
-
-.menu-card {
-    background: #fff;
-    border-radius: 18px;
-    padding: 25px;
-    text-align: center;
-    text-decoration: none;
-    color: var(--text-dark);
-    box-shadow: 0 10px 20px rgba(0,0,0,.08);
-    transition: all .2s ease;
-}
-
-.menu-card:hover {
-    transform: translateY(-4px);
-}
-
-/* ===============================
-   NOTIFICATION
-================================ */
-.notif-wrapper {
-    position: relative;
-}
-
-.notif-badge-icon {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: var(--danger);
-    color: #fff;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 999px;
-}
-
-.notif-dropdown {
-    position: absolute;
-    right: 0;
-    top: 30px;
-    width: 320px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.15);
-    display: none;
-    overflow: hidden;
-}
-
-.notif-item {
-    padding: 12px;
-    cursor: pointer;
-}
-
-.notif-item:hover {
-    background: #f1f5f9;
-}
-
-/* ===============================
-   RESPONSIVE
-================================ */
-@media (max-width: 768px) {
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .auth-card {
-        border-radius: 0;
-        height: 100vh;
-        box-shadow: none;
-    }
-}
+/* ❌ ไม่ reset tag พวก a, button, h1-h6 แบบ global
+   เพื่อไม่ให้ Dashboard พัง */
