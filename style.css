@@ -451,3 +451,120 @@ body {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+/* ===============================
+   RESPONSIVE - GLOBAL
+================================ */
+@media (max-width: 768px) {
+
+    body {
+        font-size: 15px;
+    }
+
+    .card {
+        padding: 24px 20px;
+        border-radius: 16px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+    }
+
+    .card-subtitle {
+        font-size: 0.9rem;
+    }
+}
+
+/* ===============================
+   RESPONSIVE - DASHBOARD
+================================ */
+@media (max-width: 768px) {
+
+    /* Layout */
+    .dashboard-body {
+        flex-direction: column;
+    }
+
+    /* Sidebar → ซ่อน */
+    .sidebar {
+        display: none;
+    }
+
+    /* Main */
+    .main-content {
+        padding: 16px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .top-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* User Info */
+    .user-info {
+        text-align: left;
+    }
+
+    /* Notification */
+    .notif-dropdown {
+        width: 100%;
+        right: 0;
+        left: 0;
+        top: 42px;
+        border-radius: 0 0 16px 16px;
+    }
+
+    /* Stats */
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    /* Menu */
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-card {
+        padding: 20px;
+    }
+}
+
+/* ===============================
+   RESPONSIVE - MODAL
+================================ */
+@media (max-width: 768px) {
+
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+        border-radius: 14px;
+    }
+}
+
+/* ===============================
+   RESPONSIVE - NOTIFICATION
+================================ */
+@media (max-width: 480px) {
+
+    .notif-item b {
+        font-size: 0.9rem;
+    }
+
+    .notif-item small {
+        font-size: 0.8rem;
+    }
+
+    .notif-status {
+        font-size: 0.75rem;
+    }
+}
