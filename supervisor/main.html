@@ -2,290 +2,147 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <title>Supervisor Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor Dashboard - Sale Support</title>
+
+    <!-- Remix Icon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Global CSS -->
     <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* สไตล์สำหรับกระดิ่งแจ้งเตือน */
-        .notif-wrapper {
-            position: relative;
-            cursor: pointer !important;
-            margin-right: 20px;
-            display: flex;
-            align-items: center;
-            z-index: 1001;
-            padding: 5px;
-            transition: transform 0.2s ease;
-        }
-        .notif-wrapper:hover { transform: scale(1.1); }
-        .notif-icon { font-size: 26px; color: #4b5563; }
-        .notif-badge-icon {
-            position: absolute;
-            top: -2px;
-            right: -5px;
-            background: #ef4444;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 11px;
-            font-weight: bold;
-            display: none;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* Dropdown รายการแจ้งเตือน */
-        .notif-dropdown {
-            position: absolute;
-            top: 60px;
-            right: 0;
-            width: 320px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            display: none; /* ซ่อนไว้ก่อน */
-            z-index: 1000;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-        }
-        .notif-dropdown.show { display: block; animation: slideDown 0.3s ease-out; }
-        
-        .notif-header {
-            padding: 12px 15px;
-            background: #f9fafb;
-            border-bottom: 1px solid #eee;
-            font-weight: 600;
-            color: #374151;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .notif-list { max-height: 400px; overflow-y: auto; }
-        
-        .notif-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f3f4f6;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .notif-item:hover { background: #f0fdf4; }
-        .notif-item:last-child { border-bottom: none; }
-        .notif-item .notif-title { font-weight: 600; color: #10b981; font-size: 0.9rem; }
-        .notif-item .notif-desc { font-size: 0.8rem; color: #6b7280; }
-        .notif-item .notif-time { font-size: 0.7rem; color: #9ca3af; text-align: right; }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .shake { animation: shake-animation 0.5s ease-in-out; }
-        @keyframes shake-animation {
-            0%, 100% { transform: rotate(0); }
-            20%, 60% { transform: rotate(15deg); }
-            40%, 80% { transform: rotate(-15deg); }
-        }
-    </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">SUPERVISOR</div>
-        <div class="sidebar-menu">
-            <a href="main.html" class="active">📥 <span>งานรอดำเนินการ</span></a>
-            <a href="history_all.html">📊 <span>ประวัติงานทั้งหมด</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<div class="dashboard-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" class="dashboard-sidebar">
+        <h2>SUPERVISOR</h2>
+
+        <nav class="dashboard-nav">
+            <a href="main.html" class="active">
+                <i class="ri-dashboard-line"></i> Dashboard
+            </a>
+            <a href="history_all.html">
+                <i class="ri-ticket-line"></i> Ticket ทั้งหมด
+            </a>
+            <a href="manage-job.html">
+                <i class="ri-settings-3-line"></i> จัดการงาน
+            </a>
+            <a href="#" id="logoutBtn" class="dashboard-logout">
+                <i class="ri-logout-box-line"></i> ออกจากระบบ
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <main class="dashboard-main">
+
+        <!-- TOP BAR -->
+        <div class="dashboard-top">
+            <button id="hamburger" class="hamburger">
+                <i class="ri-menu-line"></i>
+            </button>
+            <div class="dashboard-user" id="userEmail">-</div>
         </div>
-    </div>
 
-    <div class="main-content">
-        <div class="top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 0 25px; height: 70px; position: relative;">
-            
-            <div style="position: relative;">
-                <div class="notif-wrapper" id="notifBell">
-                    <span class="notif-icon">🔔</span>
-                    <span class="notif-badge-icon" id="notifCountIcon">0</span>
-                </div>
+        <h1 class="dashboard-title">📊 Supervisor Dashboard</h1>
+        <p class="dashboard-desc">ภาพรวมงานทั้งหมดในระบบ</p>
 
-                <div class="notif-dropdown" id="notifDropdown">
-                    <div class="notif-header">
-                        <span>งานใหม่รอดำเนินการ</span>
-                        <span id="notifTotal" style="color:#ef4444;">0</span>
-                    </div>
-                    <div class="notif-list" id="notifList">
-                        <div style="padding: 20px; text-align: center; color: #9ca3af; font-size: 0.9rem;">ไม่มีการแจ้งเตือนใหม่</div>
-                    </div>
-                </div>
+        <!-- STATS -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <small>Ticket ทั้งหมด</small>
+                <h2 id="totalTicket">0</h2>
             </div>
-
-            <span id="supEmail" style="font-weight: 600; color: #4B5563;">กำลังโหลด...</span>
-        </div>
-
-        <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <div>
-                    <h2 style="margin:0; color: #111827;">📋 รายการงานค้าง</h2>
-                    <p style="color: #6B7280; margin:0;">เคสสถานะ Open และ In Progress</p>
-                </div>
-                <div id="jobCount" style="background: #10B981; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 600;">0 เคส</div>
+            <div class="stat-card">
+                <small>รอดำเนินการ</small>
+                <h2 id="pendingTicket">0</h2>
             </div>
-
-            <div class="card" id="jobSection">
-                <div class="table-container" style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>วันที่แจ้ง</th>
-                                <th>ผู้แจ้ง</th>
-                                <th>หมายเลข INTERNET</th>
-                                <th>หัวข้อ</th>
-                                <th>สถานะ</th>
-                                <th style="text-align: center;">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="allTicketsList">
-                            <tr><td colspan="6" style="text-align: center; padding: 40px;">กำลังโหลดข้อมูล...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="stat-card">
+                <small>เสร็จสิ้น</small>
+                <h2 id="doneTicket">0</h2>
             </div>
         </div>
-    </div>
+
+        <!-- QUICK MENU -->
+        <div class="dashboard-menu">
+            <a href="history_all.html" class="menu-tile">
+                <i class="ri-file-list-3-line"></i>
+                <b>ดู Ticket ทั้งหมด</b>
+                <p>ตรวจสอบทุก Ticket ในระบบ</p>
+            </a>
+
+            <a href="manage-job.html" class="menu-tile">
+                <i class="ri-tools-line"></i>
+                <b>จัดการงาน</b>
+                <p>Assign / Update Status</p>
+            </a>
+        </div>
+        
+
+    </main>
+</div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
+const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system",
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "../index.html";
-        else {
-            document.getElementById('supEmail').innerText = "Supervisor: " + user.email;
-            loadActiveJobs();
-        }
+/* ===== Auth Guard ===== */
+onAuthStateChanged(auth, user => {
+    if (!user) location.href = "../index.html";
+    userEmail.innerText = user.email;
+});
+
+/* ===== Realtime Ticket Count ===== */
+onSnapshot(collection(db, "tickets"), snap => {
+    let total = 0, pending = 0, done = 0;
+
+    snap.forEach(doc => {
+        total++;
+        const status = doc.data().status;
+        if (status === "Open") pending++;
+        if (status === "Done") done++;
     });
 
-    // เปิด-ปิด Dropdown เมื่อกดกระดิ่ง
-    const bellBtn = document.getElementById('notifBell');
-    const dropdown = document.getElementById('notifDropdown');
-    
-    bellBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('show');
-    });
+    totalTicket.innerText = total;
+    pendingTicket.innerText = pending;
+    doneTicket.innerText = done;
+});
 
-    // ปิด Dropdown เมื่อคลิกที่อื่น
-    document.addEventListener('click', () => dropdown.classList.remove('show'));
+/* ===== Logout ===== */
+logoutBtn.onclick = () => signOut(auth);
 
-    function loadActiveJobs() {
-        const listBody = document.getElementById('allTicketsList');
-        const badge = document.getElementById('notifCountIcon');
-        const notifList = document.getElementById('notifList');
-        const notifTotal = document.getElementById('notifTotal');
+/* ===== Mobile Sidebar ===== */
+hamburger.onclick = () => {
+    sidebar.classList.add("show");
+    sidebarOverlay.classList.add("show");
+};
+sidebarOverlay.onclick = () => {
+    sidebar.classList.remove("show");
+    sidebarOverlay.classList.remove("show");
+};
+function showToast(text, type="success") {
+    const toast = document.getElementById("toast");
+    toast.innerText = text;
+    toast.className = `toast-${type} show`;
+    setTimeout(() => toast.classList.remove("show"), 2500);
+}
 
-        const q = query(
-            collection(db, "tickets"), 
-            where("status", "in", ["Open", "In Progress"]),
-            orderBy("createdAt", "desc")
-        );
-
-        let firstLoad = true;
-
-        onSnapshot(q, (snapshot) => {
-            const allDocs = snapshot.docs;
-            const openJobs = allDocs.filter(d => d.data().status === "Open");
-            
-            // 1. จัดการระบบ Notification (เฉพาะสถานะ Open)
-            if (openJobs.length > 0) {
-                badge.innerText = openJobs.length;
-                badge.style.display = 'block';
-                notifTotal.innerText = openJobs.length;
-                
-                let notifHtml = '';
-                openJobs.forEach(docSnap => {
-                    const t = docSnap.data();
-                    const time = t.createdAt ? t.createdAt.toDate().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) : '';
-                    notifHtml += `
-                        <div class="notif-item" onclick="goToManage('${docSnap.id}')">
-                            <span class="notif-title">📌 ใหม่: ${t.internetNo}</span>
-                            <span class="notif-desc">${t.issueType || 'ไม่ได้ระบุหัวข้อ'}</span>
-                            <span class="notif-time">${time} น.</span>
-                        </div>
-                    `;
-                });
-                notifList.innerHTML = notifHtml;
-
-                if (!firstLoad) {
-                    bellBtn.classList.add('shake');
-                    setTimeout(() => bellBtn.classList.remove('shake'), 500);
-                    playAlertSound();
-                }
-            } else {
-                badge.style.display = 'none';
-                notifTotal.innerText = "0";
-                notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: #9ca3af; font-size: 0.9rem;">ไม่มีงานใหม่</div>';
-            }
-
-            // 2. จัดการตารางหลัก (ทั้ง Open และ In Progress)
-            document.getElementById('jobCount').innerText = `${snapshot.size} เคส`;
-            
-            if (snapshot.empty) {
-                listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">🎉 ไม่มีงานค้าง</td></tr>';
-            } else {
-                let tableHtml = '';
-                allDocs.forEach(docSnap => {
-                    const t = docSnap.data();
-                    const date = t.createdAt ? t.createdAt.toDate().toLocaleDateString('th-TH', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : '-';
-                    const statusClass = t.status === 'Open' ? 'bg-open' : 'bg-process';
-                    tableHtml += `
-                        <tr>
-                            <td><small>${date}</small></td>
-                            <td><small>${t.email.split('@')[0]}</small></td>
-                            <td><b>${t.internetNo}</b></td>
-                            <td>${t.issueType || 'ทั่วไป'}</td>
-                            <td><span class="status-badge ${statusClass}">${t.status}</span></td>
-                            <td style="text-align: center;">
-                                <button class="btn-manage" onclick="goToManage('${docSnap.id}')">จัดการ</button>
-                            </td>
-                        </tr>`;
-                });
-                listBody.innerHTML = tableHtml;
-            }
-            firstLoad = false;
-        });
-    }
-
-    window.goToManage = (id) => {
-        localStorage.setItem('currentTicketId', id);
-        window.location.href = 'manage-job.html';
-    };
-
-    function playAlertSound() {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(() => {});
-    }
-
-    document.getElementById('logoutBtn').onclick = (e) => {
-        e.preventDefault();
-        signOut(auth).then(() => window.location.href = "../index.html");
-    };
 </script>
+<div id="toast" class="toast-success">ข้อความ</div>
+
 </body>
 </html>
