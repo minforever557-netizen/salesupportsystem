@@ -5,19 +5,14 @@
 <title>Register | Sale Support System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Firebase -->
+<link rel="stylesheet" href="css/register.css">
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc,
-  serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
@@ -55,145 +50,23 @@ window.registerUser = async function () {
       phone,
       email,
       role: "user",
-      createdAt: serverTimestamp(),
-      lastLogin: serverTimestamp()
+      createdAt: serverTimestamp()
     });
 
-    showSuccess();
-
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 1800);
+    // ✅ สมัครสำเร็จ → ไปหน้า Login
+    alert("สมัครสำเร็จ กรุณาเข้าสู่ระบบ");
+    window.location.href = "index.html";
 
   } catch (err) {
-    if (err.code === "auth/email-already-in-use") {
-      showDuplicateEmail();
-    } else {
-      showError(err.message);
-    }
+    showRegisterFail();
   }
 }
 </script>
-
-<style>
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg,#e8fff5,#f6fffb);
-  margin: 0;
-}
-
-.container {
-  max-width: 420px;
-  margin: 50px auto;
-  background: #fff;
-  padding: 28px;
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0,0,0,.08);
-}
-
-h1 {
-  text-align: center;
-  color: #1abc9c;
-  margin-bottom: 24px;
-}
-
-label {
-  font-weight: 600;
-  margin-top: 14px;
-  display: block;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #dcdcdc;
-  background: #f9fff9;
-  font-size: 15px;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 24px;
-  border: none;
-  border-radius: 12px;
-  background: #1abc9c;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #17a589;
-}
-
-/* TEAM WRAPPER */
-#teamWrapper {
-  transition: all .3s ease;
-}
-#teamWrapper.hide {
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
-  margin: 0;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-box {
-  background: #fff;
-  padding: 24px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  animation: pop .35s ease;
-}
-
-.modal-box h3 {
-  margin-top: 0;
-  color: #e67e22;
-}
-
-.modal-box button {
-  margin-top: 14px;
-}
-
-@keyframes pop {
-  from { transform: scale(.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* SUCCESS */
-.success {
-  text-align: center;
-  animation: fadeInUp .6s ease;
-}
-
-.success h2 {
-  color: #1abc9c;
-}
-
-@keyframes fadeInUp {
-  from { opacity:0; transform: translateY(30px);}
-  to { opacity:1; transform: translateY(0);}
-}
-</style>
 </head>
 
 <body>
 
-<div class="container" id="formBox">
+<div class="container">
   <h1>สมัครเข้าใช้งาน</h1>
 
   <label>ชื่อ - นามสกุล</label>
@@ -229,17 +102,12 @@ button:hover {
 <!-- ERROR MODAL -->
 <div class="modal" id="errorModal">
   <div class="modal-box">
-    <h3 id="errorText"></h3>
-    <button onclick="closeModal()">ตกลง</button>
-  </div>
-</div>
-
-<!-- DUPLICATE EMAIL -->
-<div class="modal" id="dupModal">
-  <div class="modal-box">
-    <h3>อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว</h3>
-    <button onclick="location.href='login.html'">เข้าสู่ระบบ</button>
-    <button onclick="location.href='forgot.html'">รีเซ็ตรหัสผ่าน</button>
+    <h3>ไม่สามารถสมัครได้</h3>
+    <p>อีเมลนี้อาจมีบัญชีอยู่แล้ว<br>กรุณาเลือกการดำเนินการ</p>
+    <button onclick="location.href='index.html'">เข้าสู่ระบบ</button>
+    <button class="btn-secondary" onclick="location.href='forgot.html'">
+      รีเซ็ตรหัสผ่าน
+    </button>
   </div>
 </div>
 
@@ -254,7 +122,6 @@ departmentEl.addEventListener("change", () => {
 
   if (departmentEl.value === "FBB Telesale") {
     teamWrapper.classList.add("hide");
-    teamEl.value = "";
     return;
   }
 
@@ -264,22 +131,8 @@ departmentEl.addEventListener("change", () => {
   }
 });
 
-function showError(msg) {
-  errorText.innerText = msg;
-  errorModal.style.display = "flex";
-}
-function showDuplicateEmail() {
-  dupModal.style.display = "flex";
-}
-function closeModal() {
-  errorModal.style.display = "none";
-}
-function showSuccess() {
-  formBox.innerHTML = `
-    <div class="success">
-      <h2>สมัครสำเร็จ 🎉</h2>
-      <p>กำลังเข้าสู่ระบบ...</p>
-    </div>`;
+function showRegisterFail() {
+  document.getElementById("errorModal").style.display = "flex";
 }
 </script>
 
