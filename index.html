@@ -1,121 +1,99 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>Login Page - Sale Support System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<title>Login - Sale Support</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Remix Icon -->
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+
+<!-- Main CSS -->
+<link rel="stylesheet" href="style.css">
+
 </head>
 
-<body class="center-layout">
+<body class="auth-page">
+<div class="auth-wrapper">
+    <div class="auth-card">
 
-<div class="card" style="max-width:420px">
+        <h1 class="auth-title">เข้าสู่ระบบ</h1>
+        <p class="auth-subtitle">Sale Support System</p>
 
-    <div class="card-title">SALE PORTAL</div>
-    <div class="card-subtitle">Support Management System</div>
-
-    <form id="loginForm">
-
-        <div class="form-group">
-            <label>อีเมลผู้ใช้งาน</label>
-            <input type="email" class="input" id="email" required>
+        <!-- Email -->
+        <div class="input-group">
+            <i class="ri-mail-line"></i>
+            <input type="email" id="email" placeholder="Email">
         </div>
 
-        <div class="form-group">
-            <label>รหัสผ่าน</label>
-            <input type="password" class="input" id="password" required>
+        <!-- Password -->
+        <div class="input-group">
+            <i class="ri-lock-line"></i>
+            <input type="password" id="password" placeholder="Password">
         </div>
 
-        <button type="submit" class="btn" id="loginBtn">
-            เข้าสู่ระบบ
+        <button id="loginBtn" class="btn-primary">
+            <i class="ri-login-box-line"></i> Login
         </button>
 
-    </form>
-
-    <div class="text-center" style="margin-top:20px">
-        <a class="link" href="forgot-password.html" id="forgotBtn">ลืมรหัสผ่าน?</a>
-        <span class="divider">|</span>
-        <a class="link" href="register.html">สมัครสมาชิก</a>
-    </div>
-
-</div>
-
-<!-- ===== Loading Overlay ===== -->
-<div id="loading" class="loading-overlay">
-    <div class="loading-box">
-        <div class="spinner"></div>
-        <div class="loading-text">กำลังเข้าสู่ระบบ...</div>
+        <p id="errorMsg" class="error-text"></p>
     </div>
 </div>
 
-<!-- ===== Firebase Login Script ===== -->
+<!-- ================= SCRIPT ================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-/* 🔥 Firebase Config (ตัวที่คุณใช้ได้จริง) */
 const firebaseConfig = {
-    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-    authDomain: "sale-support-system.firebaseapp.com",
-    projectId: "sale-support-system",
-    storageBucket: "sale-support-system.appspot.com",
-    messagingSenderId: "640337786680",
-    appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+  authDomain: "sale-support-system.firebaseapp.com",
+  projectId: "sale-support-system"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const form = document.getElementById("loginForm");
-const loading = document.getElementById("loading");
-const btn = document.getElementById("loginBtn");
-
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    btn.disabled = true;
-    btn.innerText = "กำลังเข้าสู่ระบบ...";
-    loading.style.display = "flex";
+loginBtn.onclick = async () => {
+    errorMsg.innerText = "";
+    loginBtn.disabled = true;
 
     try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const cred = await signInWithEmailAndPassword(
+            auth,
+            email.value,
+            password.value
+        );
+
         const uid = cred.user.uid;
 
-        const userSnap = await getDoc(doc(db, "users", uid));
-        if (!userSnap.exists()) {
-            throw new Error("NO_ROLE");
-        }
+        // 🔐 ดึง Role จาก Firestore
+        const snap = await getDoc(doc(db, "users", uid));
+        if (!snap.exists()) throw "ไม่พบข้อมูลผู้ใช้";
 
-        const role = userSnap.data().role;
+        const role = snap.data().role;
 
+        // 🔁 Redirect ตาม Role
         if (role === "admin") {
-            window.location.href = "./admin/main.html";
+            location.href = "admin/dashboard.html";
         } else if (role === "supervisor") {
-            window.location.href = "./supervisor/main.html";
+            location.href = "supervisor/main.html";
         } else {
-            window.location.href = "./user/main.html";
+            location.href = "user/main.html";
         }
 
     } catch (err) {
-        console.error(err);
-
-        let msg = "เข้าสู่ระบบไม่สำเร็จ";
-        if (err.code === "auth/wrong-password") msg = "รหัสผ่านไม่ถูกต้อง";
-        if (err.code === "auth/user-not-found") msg = "ไม่พบผู้ใช้นี้";
-        if (err.message === "NO_ROLE") msg = "ไม่พบสิทธิ์ผู้ใช้งาน";
-
-        alert(msg);
-
-        btn.disabled = false;
-        btn.innerText = "เข้าสู่ระบบ";
-        loading.style.display = "none";
+        errorMsg.innerText = "❌ Email หรือ Password ไม่ถูกต้อง";
+        loginBtn.disabled = false;
     }
-});
+};
+
 </script>
 
 </body>
