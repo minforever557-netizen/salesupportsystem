@@ -14,16 +14,29 @@
     <div class="card-title">SALE PORTAL</div>
     <div class="card-subtitle">Support Management System</div>
 
+    <!-- LOGIN FORM -->
     <form id="loginForm">
 
         <div class="form-group">
             <label>อีเมลผู้ใช้งาน</label>
-            <input type="email" class="input" id="email" required>
+            <input
+                type="email"
+                class="input"
+                id="email"
+                placeholder="example@email.com"
+                required
+            >
         </div>
 
         <div class="form-group">
             <label>รหัสผ่าน</label>
-            <input type="password" class="input" id="password" required>
+            <input
+                type="password"
+                class="input"
+                id="password"
+                placeholder="••••••••"
+                required
+            >
         </div>
 
         <button type="submit" class="btn" id="loginBtn">
@@ -40,8 +53,94 @@
 
 </div>
 
-<!-- Firebase Script (เหมือนเดิม ใช้ได้) -->
-<!-- login + role redirect code ที่ให้ไปก่อนหน้านี้ -->
+<!-- ================= FIREBASE + LOGIN SCRIPT ================= -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import {
+        getFirestore,
+        doc,
+        getDoc
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    /* 🔧 Firebase Config */
+    const firebaseConfig = {
+        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+        authDomain: "sale-support-system.firebaseapp.com",
+        projectId: "sale-support-system",
+        storageBucket: "sale-support-system.appspot.com",
+        messagingSenderId: "640337786680",
+        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    /* ================= LOGIN ================= */
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const btn = document.getElementById("loginBtn");
+
+        btn.disabled = true;
+        btn.innerText = "กำลังเข้าสู่ระบบ...";
+
+        try {
+            // Firebase Auth
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+            const uid = cred.user.uid;
+
+            // อ่าน role จาก Firestore
+            const snap = await getDoc(doc(db, "users", uid));
+
+            let role = "user"; // ค่า default
+            if (snap.exists()) {
+                role = snap.data().role || "user";
+            }
+
+            // Redirect ตาม role
+            if (role === "admin") {
+                window.location.href = "./admin/main.html";
+            } else if (role === "supervisor") {
+                window.location.href = "./supervisor/main.html";
+            } else {
+                window.location.href = "./user/main.html";
+            }
+
+        } catch (error) {
+            alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+            console.error(error);
+            btn.disabled = false;
+            btn.innerText = "เข้าสู่ระบบ";
+        }
+    });
+
+    /* ================= FORGOT PASSWORD ================= */
+    document.getElementById("forgotBtn").addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        if (!email) {
+            alert("กรุณากรอกอีเมลก่อนกดลืมรหัสผ่าน");
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            alert("ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว");
+        } catch (error) {
+            alert("ไม่สามารถส่งอีเมลรีเซ็ตรหัสผ่านได้");
+            console.error(error);
+        }
+    });
+</script>
 
 </body>
 </html>
