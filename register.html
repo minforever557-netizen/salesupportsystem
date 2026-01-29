@@ -1,287 +1,38 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>Register | Sale Support System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Register - Sale Support System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc,
-  serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-  authDomain: "sale-support-system.firebaseapp.com",
-  projectId: "sale-support-system",
-  storageBucket: "sale-support-system.firebasestorage.app",
-  messagingSenderId: "640337786680",
-  appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-window.registerUser = async function () {
-  const fullname = fullnameEl.value.trim();
-  const department = departmentEl.value;
-  const team = teamEl.value || "-";
-  const phone = phoneEl.value.trim();
-  const email = emailEl.value.trim();
-  const password = passwordEl.value;
-
-  if (!fullname || !department || !phone || !email || !password) {
-    showError("กรุณากรอกข้อมูลให้ครบถ้วน");
-    return;
-  }
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-    await setDoc(doc(db, "users", cred.user.uid), {
-      fullname,
-      department,
-      team,
-      phone,
-      email,
-      role: "user",
-      createdAt: serverTimestamp(),
-      lastLogin: serverTimestamp()
-    });
-
-    showSuccess();
-
-    setTimeout(() => {
-      window.location.href = "user/main.html";
-    }, 1800);
-
-  } catch (err) {
-    if (err.code === "auth/email-already-in-use") {
-      showDuplicateEmail();
-    } else {
-      showError(err.message);
-    }
-  }
-}
-</script>
-
-<style>
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg,#e8fff5,#f6fffb);
-  margin: 0;
-}
-
-.container {
-  max-width: 420px;
-  margin: 50px auto;
-  background: #fff;
-  padding: 28px;
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0,0,0,.08);
-}
-
-h1 {
-  text-align: center;
-  color: #1abc9c;
-  margin-bottom: 24px;
-}
-
-label {
-  font-weight: 600;
-  margin-top: 14px;
-  display: block;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #dcdcdc;
-  background: #f9fff9;
-  font-size: 15px;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 24px;
-  border: none;
-  border-radius: 12px;
-  background: #1abc9c;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #17a589;
-}
-
-/* TEAM WRAPPER */
-#teamWrapper {
-  transition: all .3s ease;
-}
-#teamWrapper.hide {
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
-  margin: 0;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-box {
-  background: #fff;
-  padding: 24px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  animation: pop .35s ease;
-}
-
-.modal-box h3 {
-  margin-top: 0;
-  color: #e67e22;
-}
-
-.modal-box button {
-  margin-top: 14px;
-}
-
-@keyframes pop {
-  from { transform: scale(.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* SUCCESS */
-.success {
-  text-align: center;
-  animation: fadeInUp .6s ease;
-}
-
-.success h2 {
-  color: #1abc9c;
-}
-
-@keyframes fadeInUp {
-  from { opacity:0; transform: translateY(30px);}
-  to { opacity:1; transform: translateY(0);}
-}
-</style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-
 <body>
 
-<div class="container" id="formBox">
-  <h1>สมัครเข้าใช้งาน</h1>
+<div class="auth-layout">
+    <div class="auth-card">
 
-  <label>ชื่อ - นามสกุล</label>
-  <input id="fullnameEl">
+        <h2 class="auth-title">สมัครสมาชิก</h2>
+        <p class="auth-subtitle">สร้างบัญชีผู้ใช้งาน</p>
 
-  <label>หน่วยงาน</label>
-  <select id="departmentEl">
-    <option value="">-- กรุณาเลือก --</option>
-    <option>FBB Telesale</option>
-    <option>FBB Dealer Sale</option>
-    <option>FBB Direct Sale</option>
-  </select>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="input" placeholder="example@email.com">
+        </div>
 
-  <div id="teamWrapper">
-    <label>ทีม</label>
-    <select id="teamEl">
-      <option value="">-- กรุณาเลือกทีม --</option>
-    </select>
-  </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="input" placeholder="อย่างน้อย 6 ตัว">
+        </div>
 
-  <label>เบอร์โทรศัพท์</label>
-  <input id="phoneEl">
+        <button class="btn-primary">สมัครสมาชิก</button>
 
-  <label>อีเมลพนักงาน</label>
-  <input id="emailEl">
+        <p class="text-center" style="margin-top:16px">
+            <a href="index.html" class="auth-link">กลับไปหน้า Login</a>
+        </p>
 
-  <label>รหัสผ่าน</label>
-  <input type="password" id="passwordEl">
-
-  <button onclick="registerUser()">ลงทะเบียนเข้าใช้งาน</button>
+    </div>
 </div>
-
-<!-- ERROR MODAL -->
-<div class="modal" id="errorModal">
-  <div class="modal-box">
-    <h3 id="errorText"></h3>
-    <button onclick="closeModal()">ตกลง</button>
-  </div>
-</div>
-
-<!-- DUPLICATE EMAIL -->
-<div class="modal" id="dupModal">
-  <div class="modal-box">
-    <h3>อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว</h3>
-    <button onclick="location.href='index.html'">เข้าสู่ระบบ</button>
-    <button onclick="location.href='forgot-password.html'">รีเซ็ตรหัสผ่าน</button>
-  </div>
-</div>
-
-<script>
-const departmentEl = document.getElementById("departmentEl");
-const teamEl = document.getElementById("teamEl");
-const teamWrapper = document.getElementById("teamWrapper");
-
-departmentEl.addEventListener("change", () => {
-  teamEl.innerHTML = `<option value="">-- กรุณาเลือกทีม --</option>`;
-  teamWrapper.classList.remove("hide");
-
-  if (departmentEl.value === "FBB Telesale") {
-    teamWrapper.classList.add("hide");
-    teamEl.value = "";
-    return;
-  }
-
-  let max = departmentEl.value === "FBB Dealer Sale" ? 10 : 6;
-  for (let i = 1; i <= max; i++) {
-    teamEl.innerHTML += `<option>Team ${i}</option>`;
-  }
-});
-
-function showError(msg) {
-  errorText.innerText = msg;
-  errorModal.style.display = "flex";
-}
-function showDuplicateEmail() {
-  dupModal.style.display = "flex";
-}
-function closeModal() {
-  errorModal.style.display = "none";
-}
-function showSuccess() {
-  formBox.innerHTML = `
-    <div class="success">
-      <h2>สมัครสำเร็จ 🎉</h2>
-      <p>กำลังเข้าสู่ระบบ...</p>
-    </div>`;
-}
-</script>
 
 </body>
 </html>
