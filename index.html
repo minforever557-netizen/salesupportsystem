@@ -7,6 +7,12 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase (ถ้าใช้) -->
+  <!--
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  -->
 </head>
 
 <body class="auth-body">
@@ -25,10 +31,9 @@
         <label>อีเมลผู้ใช้งาน</label>
         <input
           type="email"
-          class="input"
           id="email"
+          class="input"
           required
-          placeholder="example@email.com"
         />
       </div>
 
@@ -36,29 +41,29 @@
         <label>รหัสผ่าน</label>
         <input
           type="password"
-          class="input"
           id="password"
+          class="input"
           required
-          placeholder="••••••••"
         />
       </div>
 
+      <!-- ปุ่ม Login (ไม่มีข้อความ) -->
       <button type="submit" class="btn" id="loginBtn">
-        เข้าสู่ระบบ
+        <div id="btnSpinner" class="spinner hidden" style="width:22px;height:22px;border-width:3px;"></div>
       </button>
 
     </form>
 
     <div class="text-center" style="margin-top:16px;">
-      <a href="#" class="link">ลืมรหัสผ่าน?</a>
+      <a href="reset.html" class="link">ลืมรหัสผ่าน?</a>
       <span class="divider">|</span>
-      <a href="#" class="link">สมัครสมาชิก</a>
+      <a href="register.html" class="link">สมัครสมาชิก</a>
     </div>
 
   </div>
 
   <!-- =========================
-       LOADING OVERLAY
+       FULLSCREEN OVERLAY (optional)
   ========================= -->
   <div id="loadingOverlay" class="overlay hidden">
     <div class="spinner"></div>
@@ -70,40 +75,59 @@
   ========================= -->
   <script>
     const form = document.getElementById("loginForm");
-    const overlay = document.getElementById("loadingOverlay");
     const btn = document.getElementById("loginBtn");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const overlay = document.getElementById("loadingOverlay");
 
-    // ป้องกัน overlay ค้างตอน refresh / logout
+    // ป้องกันค้างตอน refresh / logout
     window.addEventListener("load", () => {
       overlay.classList.add("hidden");
+      btnSpinner.classList.add("hidden");
       btn.disabled = false;
     });
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // show loading
-      overlay.classList.remove("hidden");
-      btn.disabled = true;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-      // ===== ตัวอย่างจำลอง Login =====
-      setTimeout(() => {
-        // ตัวอย่าง login สำเร็จ
+      // ===== UI Loading =====
+      btn.disabled = true;
+      btnSpinner.classList.remove("hidden");
+
+      try {
+        /* =========================
+           AUTHORIZE LOGIN
+           (Firebase ตัวอย่าง)
+        ========================= */
+
+        /*
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+        */
+
+        // ====== MOCK LOGIN (ลบทิ้งเมื่อใช้ Firebase จริง) ======
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            if (email === "admin@test.com" && password === "123456") {
+              resolve();
+            } else {
+              reject(new Error("INVALID_LOGIN"));
+            }
+          }, 1200);
+        });
+
+        // ===== Login สำเร็จ =====
         window.location.href = "dashboard.html";
 
-        // ถ้า login ไม่ผ่าน ให้ใช้แบบนี้แทน
-        // overlay.classList.add("hidden");
-        // btn.disabled = false;
-        // alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+      } catch (err) {
+        // ===== Login ไม่ผ่าน =====
+        btn.disabled = false;
+        btnSpinner.classList.add("hidden");
 
-      }, 1800);
+        alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+      }
     });
-
-    // ใช้ตอน logout (เรียกจากหน้าอื่น)
-    function forceBackToLogin() {
-      overlay.classList.add("hidden");
-      window.location.href = "index.html";
-    }
   </script>
 
 </body>
