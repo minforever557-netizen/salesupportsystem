@@ -42,13 +42,30 @@
     <div class="loading-text">กำลังเข้าสู่ระบบ...</div>
   </div>
 
+  <!-- Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-text" id="modalText"></div>
+      <div class="modal-actions">
+        <button class="btn-outline" id="modalCancel">ยกเลิก</button>
+        <button class="btn" id="modalOk">ตกลง</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged,
+      setPersistence,
+      browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🔹 Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
       authDomain: "sale-support-system.firebaseapp.com",
@@ -62,55 +79,87 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const form = document.getElementById("loginForm");
+    /* 🔹 Remember login */
+    await setPersistence(auth, browserLocalPersistence);
+
     const overlay = document.getElementById("loadingOverlay");
+    const form = document.getElementById("loginForm");
     const btn = document.getElementById("loginBtn");
 
-    /* 🔒 สำคัญมาก : ปิด overlay ทันทีที่โหลดหน้า */
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalOk = document.getElementById("modalOk");
+    const modalCancel = document.getElementById("modalCancel");
+
+    const hideOverlay = () => overlay.classList.add("hidden");
+    const showOverlay = () => overlay.classList.remove("hidden");
+
+    const showModal = (title, text, okFn = null) => {
+      modalTitle.textContent = title;
+      modalText.textContent = text;
+      modal.classList.remove("hidden");
+
+      modalOk.onclick = () => {
+        modal.classList.add("hidden");
+        if (okFn) okFn();
+      };
+
+      modalCancel.onclick = () => modal.classList.add("hidden");
+    };
+
+    /* 🔒 กันค้างทุกกรณี */
     window.addEventListener("load", () => {
-      overlay.classList.add("hidden");
+      hideOverlay();
       btn.disabled = false;
+    });
+
+    /* 🔹 Auto login */
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      showOverlay();
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists()) return hideOverlay();
+
+      const role = snap.data().role;
+      location.href =
+        role === "admin" ? "./admin/main.html" :
+        role === "supervisor" ? "./supervisor/main.html" :
+        "./user/main.html";
     });
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      overlay.classList.remove("hidden");
+      showOverlay();
       btn.disabled = true;
 
       try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const uid = cred.user.uid;
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-        const snap = await getDoc(doc(db, "users", uid));
-        if (!snap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้งาน");
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const snap = await getDoc(doc(db, "users", cred.user.uid));
+
+        if (!snap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้");
 
         const role = snap.data().role;
-
-        if (role === "admin") {
-          window.location.href = "./admin/main.html";
-        } else if (role === "supervisor") {
-          window.location.href = "./supervisor/main.html";
-        } else {
-          window.location.href = "./user/main.html";
-        }
+        location.href =
+          role === "admin" ? "./admin/main.html" :
+          role === "supervisor" ? "./supervisor/main.html" :
+          "./user/main.html";
 
       } catch (err) {
-        overlay.classList.add("hidden");
+        hideOverlay();
         btn.disabled = false;
 
         let msg = "เข้าสู่ระบบไม่สำเร็จ";
-        if (err.code === "auth/user-not-found") msg = "ไม่พบอีเมลในระบบ";
+        if (err.code === "auth/user-not-found") msg = "ไม่พบบัญชีผู้ใช้งาน";
         if (err.code === "auth/wrong-password") msg = "รหัสผ่านไม่ถูกต้อง";
 
-        alert(msg);
-        console.error(err);
+        showModal("เข้าสู่ระบบไม่สำเร็จ", msg);
       }
     });
   </script>
-
 </body>
 </html>
