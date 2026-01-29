@@ -1,134 +1,122 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <title>SALE PORTAL | Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Firebase (ถ้าใช้) -->
-  <!--
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  -->
+    <meta charset="UTF-8">
+    <title>Login - Sale Support System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
 </head>
 
-<body class="auth-body">
+<body class="center-layout">
 
-  <!-- =========================
-       LOGIN CARD
-  ========================= -->
-  <div class="auth-card">
+<div class="card" style="max-width:420px">
 
-    <h1 class="auth-title">SALE PORTAL</h1>
-    <p class="card-subtitle">Support Management System</p>
+    <div class="card-title">SALE PORTAL</div>
+    <div class="card-subtitle">Support Management System</div>
 
     <form id="loginForm">
 
-      <div class="form-group">
-        <label>อีเมลผู้ใช้งาน</label>
-        <input
-          type="email"
-          id="email"
-          class="input"
-          required
-        />
-      </div>
+        <div class="form-group">
+            <label>อีเมลผู้ใช้งาน</label>
+            <input type="email" class="input" id="email" required>
+        </div>
 
-      <div class="form-group">
-        <label>รหัสผ่าน</label>
-        <input
-          type="password"
-          id="password"
-          class="input"
-          required
-        />
-      </div>
+        <div class="form-group">
+            <label>รหัสผ่าน</label>
+            <input type="password" class="input" id="password" required>
+        </div>
 
-      <!-- ปุ่ม Login (ไม่มีข้อความ) -->
-      <button type="submit" class="btn" id="loginBtn">
-        <div id="btnSpinner" class="spinner hidden" style="width:22px;height:22px;border-width:3px;"></div>
-      </button>
+        <button type="submit" class="btn" id="loginBtn">
+            เข้าสู่ระบบ
+        </button>
 
     </form>
 
-    <div class="text-center" style="margin-top:16px;">
-      <a href="reset.html" class="link">ลืมรหัสผ่าน?</a>
-      <span class="divider">|</span>
-      <a href="register.html" class="link">สมัครสมาชิก</a>
+    <div class="text-center" style="margin-top:20px">
+        <a class="link" href="forgot-password.html" id="forgotBtn">ลืมรหัสผ่าน?</a>
+        <span class="divider">|</span>
+        <a class="link" href="register.html">สมัครสมาชิก</a>
     </div>
 
-  </div>
+</div>
 
-  <!-- =========================
-       FULLSCREEN OVERLAY (optional)
-  ========================= -->
-  <div id="loadingOverlay" class="overlay hidden">
-    <div class="spinner"></div>
-    <p>กำลังเข้าสู่ระบบ...</p>
-  </div>
+<!-- ===== Loading Overlay ===== -->
+<div id="loading" class="loading-overlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <div class="loading-text">กำลังเข้าสู่ระบบ...</div>
+    </div>
+</div>
 
-  <!-- =========================
-       SCRIPT
-  ========================= -->
-  <script>
-    const form = document.getElementById("loginForm");
-    const btn = document.getElementById("loginBtn");
-    const btnSpinner = document.getElementById("btnSpinner");
-    const overlay = document.getElementById("loadingOverlay");
+<!-- ===== Firebase Login Script ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ป้องกันค้างตอน refresh / logout
-    window.addEventListener("load", () => {
-      overlay.classList.add("hidden");
-      btnSpinner.classList.add("hidden");
-      btn.disabled = false;
-    });
+/* 🔥 Firebase Config (ตัวที่คุณใช้ได้จริง) */
+const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system",
+    storageBucket: "sale-support-system.appspot.com",
+    messagingSenderId: "640337786680",
+    appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+};
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+const form = document.getElementById("loginForm");
+const loading = document.getElementById("loading");
+const btn = document.getElementById("loginBtn");
 
-      // ===== UI Loading =====
-      btn.disabled = true;
-      btnSpinner.classList.remove("hidden");
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      try {
-        /* =========================
-           AUTHORIZE LOGIN
-           (Firebase ตัวอย่าง)
-        ========================= */
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-        /*
-        await firebase.auth().signInWithEmailAndPassword(email, password);
-        */
+    btn.disabled = true;
+    btn.innerText = "กำลังเข้าสู่ระบบ...";
+    loading.style.display = "flex";
 
-        // ====== MOCK LOGIN (ลบทิ้งเมื่อใช้ Firebase จริง) ======
-        await new Promise((resolve, reject) => {
-          setTimeout(() => {
-            if (email === "admin@test.com" && password === "123456") {
-              resolve();
-            } else {
-              reject(new Error("INVALID_LOGIN"));
-            }
-          }, 1200);
-        });
+    try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
 
-        // ===== Login สำเร็จ =====
-        window.location.href = "dashboard.html";
+        const userSnap = await getDoc(doc(db, "users", uid));
+        if (!userSnap.exists()) {
+            throw new Error("NO_ROLE");
+        }
 
-      } catch (err) {
-        // ===== Login ไม่ผ่าน =====
+        const role = userSnap.data().role;
+
+        if (role === "admin") {
+            window.location.href = "./admin/main.html";
+        } else if (role === "supervisor") {
+            window.location.href = "./supervisor/main.html";
+        } else {
+            window.location.href = "./user/main.html";
+        }
+
+    } catch (err) {
+        console.error(err);
+
+        let msg = "เข้าสู่ระบบไม่สำเร็จ";
+        if (err.code === "auth/wrong-password") msg = "รหัสผ่านไม่ถูกต้อง";
+        if (err.code === "auth/user-not-found") msg = "ไม่พบผู้ใช้นี้";
+        if (err.message === "NO_ROLE") msg = "ไม่พบสิทธิ์ผู้ใช้งาน";
+
+        alert(msg);
+
         btn.disabled = false;
-        btnSpinner.classList.add("hidden");
-
-        alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-      }
-    });
-  </script>
+        btn.innerText = "เข้าสู่ระบบ";
+        loading.style.display = "none";
+    }
+});
+</script>
 
 </body>
 </html>
