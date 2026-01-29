@@ -2,219 +2,144 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <title>Ticket ทั้งหมด</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ประวัติงานทั้งหมด - Supervisor</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* ส่วนค้นหาแบบใหม่: ยาวและไอคอนอยู่ท้าย */
-        .search-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin: 20px 0;
-        }
-        .search-container .input-field {
-            padding-right: 45px; /* เว้นที่ให้แว่นขยาย */
-            border-radius: 12px;
-            border: 1px solid #d1d5db;
-            height: 45px;
-        }
-        .search-icon-inside {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2rem;
-            color: #9ca3af;
-            pointer-events: none;
-        }
-
-        /* Filter Buttons */
-        .filter-group {
-            display: flex;
-            gap: 10px;
-            background: #f3f4f6;
-            padding: 5px;
-            border-radius: 10px;
-            width: fit-content;
-        }
-        .filter-tab {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-            background: transparent;
-            color: #6b7280;
-        }
-        .filter-tab.active {
-            background: white;
-            color: #111827;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* สถานะพิเศษสำหรับหน้านี้ */
-        .bg-closed { background-color: #10B981; }
-        .text-internet { font-size: 1.1rem; font-weight: 700; color: #111827; letter-spacing: 0.5px; }
-    </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">SUPERVISOR</div>
-        <div class="sidebar-menu">
-            <a href="main.html">📥 <span>งานรอดำเนินการ</span></a>
-            <a href="history_all.html" class="active">📊 <span>ประวัติงานทั้งหมด</span></a>
-            <hr style="border:0; border-top:1px solid #374151; margin:10px 0;">
-            <a href="#" id="logoutBtn" style="color: #ef4444;">🚪 <span>ออกจากระบบ</span></a>
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<div class="dashboard-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" class="dashboard-sidebar">
+        <h2>SUPERVISOR</h2>
+        <nav class="dashboard-nav">
+            <a href="main.html"><i class="ri-dashboard-line"></i> Dashboard</a>
+            <a href="history_all.html" class="active"><i class="ri-ticket-line"></i> Ticket ทั้งหมด</a>
+            <a href="manage-job.html"><i class="ri-settings-3-line"></i> จัดการงาน</a>
+            <a href="#" id="logoutBtn" class="dashboard-logout">
+                <i class="ri-logout-box-line"></i> ออกจากระบบ
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <main class="dashboard-main">
+
+        <!-- TOP -->
+        <div class="dashboard-top">
+            <button id="hamburger" class="hamburger">
+                <i class="ri-menu-line"></i>
+            </button>
+            <div class="dashboard-user" id="userEmail">-</div>
         </div>
-    </div>
 
-    <div class="main-content">
-        <div class="top-bar">
-            <div style="flex: 1; font-weight: 600;">ประวัติการจัดการเคส</div>
-            <span id="supEmail" style="color: #6b7280; font-size: 0.9rem;"></span>
+        <h1>📂 Ticket ทั้งหมด</h1>
+        <p class="dashboard-desc">Realtime Update จาก Firestore</p>
+
+        <!-- FILTER -->
+        <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+            <select id="statusFilter" class="input" style="max-width:200px;">
+                <option value="">ทุกสถานะ</option>
+                <option value="Open">รอดำเนินการ</option>
+                <option value="Done">เสร็จสิ้น</option>
+            </select>
+
+            <input id="searchInput" class="input"
+                   placeholder="ค้นหา Internet No"
+                   style="max-width:260px;">
         </div>
 
-        <div class="container">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                    <h3 style="margin: 0;">📋 รายการที่ปิดเคสแล้ว (Closed)</h3>
-                    <div class="filter-group">
-                        <button class="filter-tab active" id="btnAll">🌐 งานทั้งหมด</button>
-                        <button class="filter-tab" id="btnMine">👤 งานของฉัน</button>
-                    </div>
-                </div>
+        <!-- TICKET LIST -->
+        <div id="ticketList" class="dashboard-menu"></div>
 
-                <div class="search-container">
-                    <input type="text" id="searchInput" class="input-field" placeholder="ค้นหาด้วยหมายเลข Internet 10 หลัก...">
-                    <span class="search-icon-inside">🔍</span>
-                </div>
+    </main>
+</div>
 
-                <div class="table-container" style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>วันที่ปิดงาน</th>
-                                <th>Internet No.</th>
-                                <th>Sale ผู้แจ้ง</th>
-                                <th>Supervisor</th>
-                                <th>สถานะ</th>
-                                <th>หมายเหตุการปิดงาน</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyBody">
-                            <tr><td colspan="6" style="text-align: center; padding: 40px;">กำลังดึงข้อมูลประวัติ...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- ===== TOAST (Step 3) ===== -->
+<div id="toast" class="toast-success">สำเร็จ</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-            authDomain: "sale-support-system.firebaseapp.com",
-            projectId: "sale-support-system",
-            storageBucket: "sale-support-system.firebasestorage.app",
-            messagingSenderId: "640337786680",
-            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-        };
+/* Firebase */
+const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system",
+};
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-        let currentMode = 'all'; // 'all' หรือ 'mine'
-        let userEmail = "";
+/* Auth Guard */
+onAuthStateChanged(auth, user => {
+    if (!user) location.href = "../index.html";
+    userEmail.innerText = user.email;
+});
 
-        onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "../index.html";
-            else {
-                userEmail = user.email;
-                document.getElementById('supEmail').innerText = "Logged in as: " + user.email;
-                loadHistory();
-            }
+/* Toast Function (Step 3) */
+function showToast(text, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.innerText = text;
+    toast.className = `toast-${type} show`;
+    setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
+/* Load Tickets (Realtime) */
+onSnapshot(collection(db, "tickets"), snap => {
+    renderTickets(snap.docs.map(d => d.data()));
+});
+
+/* Render */
+function renderTickets(tickets) {
+    const status = statusFilter.value;
+    const keyword = searchInput.value.toLowerCase();
+
+    ticketList.innerHTML = "";
+
+    tickets
+        .filter(t =>
+            (!status || t.status === status) &&
+            (!keyword || t.internetNo.toLowerCase().includes(keyword))
+        )
+        .forEach(t => {
+            const card = document.createElement("a");
+            card.className = "menu-tile";
+            card.innerHTML = `
+                <i class="ri-bug-line"></i>
+                <b>${t.internetNo}</b>
+                <p>สถานะ: <strong>${t.status}</strong></p>
+                <small>${t.email}</small>
+            `;
+            ticketList.appendChild(card);
         });
+}
 
-        function loadHistory() {
-            const tbody = document.getElementById('historyBody');
-            const searchValue = document.getElementById('searchInput').value.trim();
-            
-            let q = query(
-                collection(db, "tickets"),
-                where("status", "==", "Closed"),
-                orderBy("createdAt", "desc")
-            );
+/* Filters */
+statusFilter.onchange = () => showToast("กรองข้อมูลแล้ว");
+searchInput.oninput = () => renderTickets([]);
 
-            // หากเป็นโหมด "งานของฉัน" ให้กรองเพิ่ม
-            if (currentMode === 'mine') {
-                q = query(
-                    collection(db, "tickets"),
-                    where("status", "==", "Closed"),
-                    where("processedBy", "==", userEmail),
-                    orderBy("createdAt", "desc")
-                );
-            }
+/* Logout */
+logoutBtn.onclick = () => signOut(auth);
 
-            onSnapshot(q, (snapshot) => {
-                let html = '';
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">ไม่พบข้อมูลประวัติงาน</td></tr>';
-                    return;
-                }
+/* Mobile Sidebar */
+hamburger.onclick = () => {
+    sidebar.classList.add("show");
+    sidebarOverlay.classList.add("show");
+};
+sidebarOverlay.onclick = () => {
+    sidebar.classList.remove("show");
+    sidebarOverlay.classList.remove("show");
+};
+</script>
 
-                snapshot.forEach(docSnap => {
-                    const t = docSnap.data();
-                    
-                    // Client-side Search Filter
-                    if (searchValue && !t.internetNo.includes(searchValue)) return;
-
-                    const date = t.updatedAt?.toDate().toLocaleDateString('th-TH') || t.createdAt?.toDate().toLocaleDateString('th-TH') || '-';
-                    
-                    html += `
-                        <tr>
-                            <td><small>${date}</small></td>
-                            <td><span class="text-internet">${t.internetNo}</span></td>
-                            <td><small>${t.email}</small></td>
-                            <td><small>${t.processedBy || '-'}</small></td>
-                            <td><span class="status-badge bg-closed">Closed</span></td>
-                            <td style="color: #059669; font-size: 0.85rem; max-width: 250px;">${t.comment || t.supNote || '-'}</td>
-                        </tr>`;
-                });
-                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align: center; padding: 20px;">ไม่พบผลลัพธ์ที่ค้นหา</td></tr>';
-            }, (err) => {
-                console.error(err);
-                if (err.code === "failed-precondition") {
-                    tbody.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">กรุณาสร้าง Index ใน Firebase (กด F12 ดูลิงก์)</td></tr>';
-                }
-            });
-        }
-
-        // Event Listeners
-        document.getElementById('searchInput').addEventListener('input', () => loadHistory());
-
-        document.getElementById('btnAll').onclick = () => {
-            currentMode = 'all';
-            document.getElementById('btnAll').classList.add('active');
-            document.getElementById('btnMine').classList.remove('active');
-            loadHistory();
-        };
-
-        document.getElementById('btnMine').onclick = () => {
-            currentMode = 'mine';
-            document.getElementById('btnMine').classList.add('active');
-            document.getElementById('btnAll').classList.remove('active');
-            loadHistory();
-        };
-
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => window.location.href = "../index.html");
-    </script>
 </body>
 </html>
