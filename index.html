@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>Login - Sale Support System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Global CSS -->
-    <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<title>Login - Sale Support System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./style.css">
 </head>
 
 <body class="center-layout">
@@ -39,81 +37,80 @@
         <span class="divider">|</span>
         <a class="link" href="register.html">สมัครสมาชิก</a>
     </div>
-
 </div>
 
-<!-- ===== Loading Overlay ===== -->
+<!-- Loading -->
 <div class="loading-overlay" id="loading">
     <div class="loading-box">
         <div class="spinner"></div>
-        <div>กำลังเข้าสู่ระบบ...</div>
+        <div class="loading-text">กำลังเข้าสู่ระบบ...</div>
     </div>
 </div>
 
-<!-- ===== Firebase ===== -->
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🔥 Firebase Config (แก้เป็นของคุณ)
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "XXXX",
-        appId: "XXXX"
-    };
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    const form = document.getElementById("loginForm");
-    const loading = document.getElementById("loading");
-    const btn = document.getElementById("loginBtn");
+const form = document.getElementById("loginForm");
+const loading = document.getElementById("loading");
+const btn = document.getElementById("loginBtn");
 
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    btn.disabled = true;
+    loading.style.display = "flex";
 
-        // UI Loading
-        btn.disabled = true;
-        btn.innerText = "กำลังเข้าสู่ระบบ...";
-        loading.style.display = "flex";
+    try {
+        const email = emailInput.value;
+        const password = passwordInput.value;
 
-        try {
-            const cred = await signInWithEmailAndPassword(auth, email, password);
-            const uid = cred.user.uid;
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
 
-            const snap = await getDoc(doc(db, "users", uid));
+        const ref = doc(db, "users", uid);
+        const snap = await getDoc(ref);
 
-            if (!snap.exists()) {
-                throw new Error("ไม่พบข้อมูลผู้ใช้");
-            }
+        let role = "user";
 
-            const role = snap.data().role;
-
-            if (role === "admin") {
-                window.location.href = "./admin/main.html";
-            } else if (role === "supervisor") {
-                window.location.href = "./supervisor/main.html";
-            } else {
-                window.location.href = "./user/main.html";
-            }
-
-        } catch (err) {
-            alert("เข้าสู่ระบบไม่สำเร็จ");
-            console.error(err);
-
-            btn.disabled = false;
-            btn.innerText = "เข้าสู่ระบบ";
-            loading.style.display = "none";
+        // ✅ ถ้ายังไม่มี user → สร้างให้เลย
+        if (!snap.exists()) {
+            await setDoc(ref, {
+                email,
+                role: "user",
+                createdAt: new Date()
+            });
+        } else {
+            role = snap.data().role || "user";
         }
-    });
+
+        // redirect
+        const map = {
+            admin: "./admin/main.html",
+            supervisor: "./supervisor/main.html",
+            user: "./user/main.html"
+        };
+
+        window.location.href = map[role] || map.user;
+
+    } catch (err) {
+        alert("เข้าสู่ระบบไม่สำเร็จ");
+        console.error(err);
+        btn.disabled = false;
+        loading.style.display = "none";
+    }
+});
 </script>
 
 </body>
