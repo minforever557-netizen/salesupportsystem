@@ -5,98 +5,170 @@
     <title>User Dashboard - Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- GitHub Pages CSS -->
+    <!-- Global CSS (ใช้ร่วมทุกหน้า) -->
     <link rel="stylesheet" href="../style.css">
 </head>
 
-<body class="dashboard-body">
+<body>
 
-    <!-- ===== Mobile Overlay ===== -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- ================= MOBILE OVERLAY ================= -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- ================= DASHBOARD LAYOUT ================= -->
+<div class="dashboard-layout">
 
     <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">SALE PORTAL</div>
+    <aside id="sidebar" class="dashboard-sidebar">
+        <h2>SALE PORTAL</h2>
 
-        <nav class="sidebar-menu">
-            <a href="main.html" class="active">🏠 <span>Dashboard</span></a>
-            <a href="ticket.html">📝 <span>แจ้งปัญหา</span></a>
-            <a href="history.html">🔍 <span>ติดตามงาน</span></a>
-
-            <div class="sidebar-footer">
-                <hr class="sidebar-divider">
-                <a href="#" id="logoutBtn" class="logout-link">🚪 <span>ออกจากระบบ</span></a>
-            </div>
+        <nav class="dashboard-nav">
+            <a href="main.html" class="active">🏠 Dashboard</a>
+            <a href="create-ticket.html">📝 แจ้งปัญหา</a>
+            <a href="history.html">📂 ประวัติการแจ้ง</a>
+            <a href="#" id="logoutBtn" class="dashboard-logout">🚪 ออกจากระบบ</a>
         </nav>
     </aside>
 
     <!-- ================= MAIN ================= -->
-    <main class="main-content">
+    <main class="dashboard-main">
 
-        <!-- TOP BAR -->
-        <header class="top-bar">
+        <!-- ===== TOP BAR ===== -->
+        <div class="dashboard-top">
+            <button id="hamburger" class="hamburger">☰</button>
 
-            <!-- ☰ Hamburger (Mobile Only) -->
-            <button class="hamburger" id="hamburgerBtn">☰</button>
-
-            <h3 class="page-title">Dashboard</h3>
-
-            <div class="user-info">
-                <div id="userEmail" class="user-email">Loading...</div>
-                <small class="user-role">Sale Representative</small>
+            <div class="dashboard-user">
+                <b id="userEmail">Loading...</b><br>
+                <small>User</small>
             </div>
-        </header>
+        </div>
 
-        <!-- ================= STATS ================= -->
-        <section class="stat-grid">
-            <div class="stat-box stat-blue">
-                <small>งานทั้งหมด</small>
-                <div id="countAll" class="stat-number">0</div>
+        <!-- ===== STATS ===== -->
+        <section class="dashboard-stats">
+            <div class="stat-card">
+                <small>Ticket ทั้งหมด</small>
+                <h2 id="countAll">0</h2>
             </div>
 
-            <div class="stat-box stat-red">
-                <small>รอดำเนินการ</small>
-                <div id="countOpen" class="stat-number">0</div>
+            <div class="stat-card">
+                <small>กำลังดำเนินการ</small>
+                <h2 id="countOpen">0</h2>
             </div>
 
-            <div class="stat-box stat-green">
+            <div class="stat-card">
                 <small>เสร็จสิ้น</small>
-                <div id="countClosed" class="stat-number">0</div>
+                <h2 id="countClosed">0</h2>
             </div>
         </section>
 
-        <!-- ================= QUICK MENU ================= -->
-        <section class="menu-grid">
-            <a href="ticket.html" class="menu-card">
+        <!-- ===== QUICK MENU ===== -->
+        <section class="dashboard-menu">
+
+            <a href="create-ticket.html" class="menu-tile">
                 <div class="menu-icon">📝</div>
                 <b>แจ้งปัญหาใหม่</b>
-                <p>ส่ง Ticket ขอความช่วยเหลือ</p>
+                <p>สร้าง Ticket ใหม่เข้าสู่ระบบ</p>
             </a>
 
-            <a href="history.html" class="menu-card">
-                <div class="menu-icon">🔍</div>
-                <b>ติดตามงาน</b>
-                <p>ตรวจสอบสถานะทั้งหมด</p>
+            <a href="history.html" class="menu-tile">
+                <div class="menu-icon">📂</div>
+                <b>ประวัติการแจ้ง</b>
+                <p>ติดตามสถานะงานทั้งหมด</p>
             </a>
+
         </section>
+
     </main>
+</div>
 
-    <!-- ================= SCRIPT ================= -->
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const hamburger = document.getElementById('hamburgerBtn');
+<!-- ================= SCRIPT ================= -->
+<script type="module">
+/* ================= FIREBASE IMPORT ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { 
+    getFirestore, 
+    collection, 
+    query, 
+    where, 
+    onSnapshot 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        hamburger.onclick = () => {
-            sidebar.classList.add('show');
-            overlay.classList.add('show');
-        };
+/* ================= FIREBASE CONFIG ================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system",
+    storageBucket: "sale-support-system.firebasestorage.app",
+    messagingSenderId: "640337786680",
+    appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+};
 
-        overlay.onclick = () => {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        };
-    </script>
+/* ================= INIT ================= */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ================= AUTH GUARD ================= */
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        // ถ้าไม่ Login → กลับหน้า index
+        window.location.href = "../index.html";
+        return;
+    }
+
+    // แสดง email user จริง
+    userEmail.innerText = user.email;
+
+    // โหลดสถิติ Ticket
+    loadTicketStats(user.email);
+});
+
+/* ================= LOAD STATS ================= */
+function loadTicketStats(email) {
+
+    const q = query(
+        collection(db, "tickets"),
+        where("email", "==", email)
+    );
+
+    onSnapshot(q, (snap) => {
+        let open = 0;
+        let closed = 0;
+
+        snap.forEach(doc => {
+            doc.data().status === "Closed" ? closed++ : open++;
+        });
+
+        countAll.innerText = snap.size;
+        countOpen.innerText = open;
+        countClosed.innerText = closed;
+    });
+}
+
+/* ================= LOGOUT ================= */
+logoutBtn.onclick = () => {
+    signOut(auth);
+};
+
+/* ================= MOBILE SIDEBAR ================= */
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+const hamburger = document.getElementById("hamburger");
+
+hamburger.onclick = () => {
+    sidebar.classList.add("show");
+    overlay.classList.add("show");
+};
+
+overlay.onclick = () => {
+    sidebar.classList.remove("show");
+    overlay.classList.remove("show");
+};
+</script>
 
 </body>
 </html>
