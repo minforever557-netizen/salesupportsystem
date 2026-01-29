@@ -1,181 +1,109 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>SALE PORTAL | Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="center-layout">
+<body class="auth-body">
 
-  <!-- ================= CARD LOGIN ================= -->
-  <div class="card login-card">
-    <h1 class="title">SALE PORTAL</h1>
-    <p class="subtitle">Support Management System</p>
+  <!-- =========================
+       LOGIN CARD
+  ========================= -->
+  <div class="auth-card">
+
+    <h1 class="auth-title">SALE PORTAL</h1>
+    <p class="card-subtitle">Support Management System</p>
 
     <form id="loginForm">
+
       <div class="form-group">
         <label>อีเมลผู้ใช้งาน</label>
-        <input type="email" id="email" class="input" required>
+        <input
+          type="email"
+          class="input"
+          id="email"
+          required
+          placeholder="example@email.com"
+        />
       </div>
 
       <div class="form-group">
         <label>รหัสผ่าน</label>
-        <input type="password" id="password" class="input" required>
+        <input
+          type="password"
+          class="input"
+          id="password"
+          required
+          placeholder="••••••••"
+        />
       </div>
 
-      <button type="submit" id="btnLogin" class="btn-primary">
+      <button type="submit" class="btn" id="loginBtn">
         เข้าสู่ระบบ
       </button>
+
     </form>
 
-    <div class="login-footer">
-      <a href="forgot.html">ลืมรหัสผ่าน?</a>
-      <span>|</span>
-      <a href="register.html">สมัครสมาชิก</a>
+    <div class="text-center" style="margin-top:16px;">
+      <a href="#" class="link">ลืมรหัสผ่าน?</a>
+      <span class="divider">|</span>
+      <a href="#" class="link">สมัครสมาชิก</a>
     </div>
+
   </div>
 
-  <!-- ================= LOADING ================= -->
-  <div id="loading" class="loading hidden">
+  <!-- =========================
+       LOADING OVERLAY
+  ========================= -->
+  <div id="loadingOverlay" class="overlay hidden">
     <div class="spinner"></div>
     <p>กำลังเข้าสู่ระบบ...</p>
   </div>
 
-  <!-- ================= MODAL ================= -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-box">
-      <h3 id="modalTitle"></h3>
-      <p id="modalMessage"></p>
-      <div class="modal-actions">
-        <button id="modalCancel" class="btn-outline">ยกเลิก</button>
-        <button id="modalConfirm" class="btn-primary">ตกลง</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SCRIPT ================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      setPersistence,
-      browserLocalPersistence
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    /* ---------- Firebase Config ---------- */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-      authDomain: "sale-support-system.firebaseapp.com",
-      projectId: "sale-support-system",
-      storageBucket: "sale-support-system.appspot.com",
-      messagingSenderId: "640337786680",
-      appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    /* ---------- Persist Login ---------- */
-    await setPersistence(auth, browserLocalPersistence);
-
-    /* ---------- Elements ---------- */
+  <!-- =========================
+       SCRIPT
+  ========================= -->
+  <script>
     const form = document.getElementById("loginForm");
-    const btnLogin = document.getElementById("btnLogin");
-    const loading = document.getElementById("loading");
+    const overlay = document.getElementById("loadingOverlay");
+    const btn = document.getElementById("loginBtn");
 
-    const modal = document.getElementById("modal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalMessage = document.getElementById("modalMessage");
-    const modalConfirm = document.getElementById("modalConfirm");
-    const modalCancel = document.getElementById("modalCancel");
-
-    /* ---------- Helpers ---------- */
-    const showLoading = () => loading.classList.remove("hidden");
-    const hideLoading = () => loading.classList.add("hidden");
-
-    const showModal = (title, message, onConfirm = null) => {
-      modalTitle.textContent = title;
-      modalMessage.textContent = message;
-      modal.classList.remove("hidden");
-
-      modalConfirm.onclick = () => {
-        modal.classList.add("hidden");
-        if (onConfirm) onConfirm();
-      };
-
-      modalCancel.onclick = () => modal.classList.add("hidden");
-    };
-
-    /* ---------- FIX LOADING ค้าง ---------- */
-    window.addEventListener("pageshow", () => {
-      hideLoading();
-      btnLogin.disabled = false;
+    // ป้องกัน overlay ค้างตอน refresh / logout
+    window.addEventListener("load", () => {
+      overlay.classList.add("hidden");
+      btn.disabled = false;
     });
 
-    /* ---------- AUTO LOGIN ---------- */
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-
-      showLoading();
-
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (!snap.exists()) {
-        hideLoading();
-        return;
-      }
-
-      const role = snap.data().role;
-
-      if (role === "admin") location.href = "./admin/main.html";
-      else if (role === "supervisor") location.href = "./supervisor/main.html";
-      else location.href = "./user/main.html";
-    });
-
-    /* ---------- LOGIN ---------- */
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      showLoading();
-      btnLogin.disabled = true;
+      // show loading
+      overlay.classList.remove("hidden");
+      btn.disabled = true;
 
-      try {
-        const email = email.value.trim();
-        const password = password.value;
+      // ===== ตัวอย่างจำลอง Login =====
+      setTimeout(() => {
+        // ตัวอย่าง login สำเร็จ
+        window.location.href = "dashboard.html";
 
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const snap = await getDoc(doc(db, "users", cred.user.uid));
+        // ถ้า login ไม่ผ่าน ให้ใช้แบบนี้แทน
+        // overlay.classList.add("hidden");
+        // btn.disabled = false;
+        // alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
 
-        if (!snap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้");
-
-        const role = snap.data().role;
-
-        if (role === "admin") location.href = "./admin/main.html";
-        else if (role === "supervisor") location.href = "./supervisor/main.html";
-        else location.href = "./user/main.html";
-
-      } catch (err) {
-        hideLoading();
-        btnLogin.disabled = false;
-
-        let msg = "เข้าสู่ระบบไม่สำเร็จ";
-        if (err.code === "auth/user-not-found") msg = "ไม่พบบัญชีผู้ใช้งาน";
-        if (err.code === "auth/wrong-password") msg = "รหัสผ่านไม่ถูกต้อง";
-
-        showModal("เกิดข้อผิดพลาด", msg);
-      }
+      }, 1800);
     });
+
+    // ใช้ตอน logout (เรียกจากหน้าอื่น)
+    function forceBackToLogin() {
+      overlay.classList.add("hidden");
+      window.location.href = "index.html";
+    }
   </script>
 
 </body>
