@@ -1,195 +1,171 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>Register | Sale Portal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            background: #f4f6f9;
-        }
-        .card {
-            border-radius: 12px;
-        }
-        .form-control, .form-select {
-            border-radius: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Register - Sale Support System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
 </head>
-<body>
 
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-sm p-4" style="max-width: 480px; width:100%;">
-        <h3 class="text-center mb-4 text-success fw-bold">SALE PORTAL</h3>
+<body class="auth-body">
 
-        <form id="registerForm">
+<div class="auth-card">
+  <h2 class="auth-title">สร้างบัญชีผู้ใช้งาน</h2>
 
-            <!-- Full Name -->
-            <div class="mb-3">
-                <label class="form-label">ชื่อ - นามสกุล</label>
-                <input type="text" id="fullName" class="form-control" placeholder="เช่น นายสมชาย ใจดี" required>
-            </div>
+  <form id="registerForm">
 
-            <!-- Department -->
-            <div class="mb-3">
-                <label class="form-label">หน่วยงาน</label>
-                <select id="department" class="form-select" required>
-                    <option value="">-- เลือกหน่วยงาน --</option>
-                    <option value="FBB Telesale">FBB Telesale</option>
-                    <option value="FBB Dealer Sale">FBB Dealer Sale</option>
-                    <option value="FBB Direct Sale">FBB Direct Sale</option>
-                </select>
-            </div>
-
-            <!-- Team -->
-            <div class="mb-3" id="teamSection" style="display:none;">
-                <label class="form-label">ทีม</label>
-                <select id="team" class="form-select">
-                    <option value="">-- เลือกทีม --</option>
-                </select>
-            </div>
-
-            <!-- Phone -->
-            <div class="mb-3">
-                <label class="form-label">เบอร์โทรศัพท์ที่ติดต่อได้</label>
-                <input type="tel" id="phone" class="form-control" placeholder="เช่น 0812345678" required>
-            </div>
-
-            <!-- Email -->
-            <div class="mb-3">
-                <label class="form-label">อีเมลพนักงาน</label>
-                <input type="email" id="email" class="form-control bg-warning-subtle" required>
-            </div>
-
-            <!-- Password -->
-            <div class="mb-3">
-                <label class="form-label">รหัสผ่าน</label>
-                <input type="password" id="password" class="form-control bg-warning-subtle" required>
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="mb-4">
-                <label class="form-label">ยืนยันรหัสผ่าน</label>
-                <input type="password" id="confirmPassword" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn btn-success w-100 fw-bold">
-                สมัครใช้งานระบบ
-            </button>
-
-        </form>
+    <div class="form-group">
+      <label>ชื่อ - นามสกุล</label>
+      <input type="text" id="fullName" class="input-field" required>
     </div>
+
+    <div class="form-group">
+      <label>หน่วยงาน</label>
+      <select id="department" class="input-field" required>
+        <option value="">-- กรุณาเลือก --</option>
+        <option value="FBB Telesale">FBB Telesale</option>
+        <option value="FBB Dealer Sale">FBB Dealer Sale</option>
+        <option value="FBB Direct Sale">FBB Direct Sale</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>ทีม</label>
+      <select id="team" class="input-field" required disabled>
+        <option value="">-- กรุณาเลือกหน่วยงานก่อน --</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>เบอร์โทรศัพท์</label>
+      <input type="tel" id="phone" class="input-field" required>
+    </div>
+
+    <div class="form-group">
+      <label>อีเมลพนักงาน</label>
+      <input type="email" id="email" class="input-field" required>
+    </div>
+
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="password" class="input-field" required minlength="6">
+    </div>
+
+    <div class="form-group">
+      <label>ยืนยันรหัสผ่าน</label>
+      <input type="password" id="confirmPassword" class="input-field" required>
+    </div>
+
+    <button type="submit" class="btn-auth" id="regBtn">
+      สมัครใช้งาน
+    </button>
+  </form>
 </div>
 
-<!-- Firebase -->
+<!-- Loading -->
+<div id="loadingOverlay" class="overlay hidden">
+  <div class="spinner"></div>
+  <p>กำลังสร้างบัญชี...</p>
+</div>
+
+<!-- Success -->
+<div id="successOverlay" class="overlay hidden">
+  <div class="success-card">
+    <div class="checkmark">✓</div>
+    <h3>สมัครใช้งานสำเร็จ</h3>
+    <p>กำลังเข้าสู่ระบบ...</p>
+  </div>
+</div>
+
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    /* ===============================
-       Firebase Config (แก้ของคุณ)
-    ================================ */
-    const firebaseConfig = {
-  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-  authDomain: "sale-support-system.firebaseapp.com",
-  projectId: "sale-support-system",
-  storageBucket: "sale-support-system.appspot.com",
-  messagingSenderId: "640337786680",
-  appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system",
+    storageBucket: "sale-support-system.firebasestorage.app",
+    messagingSenderId: "640337786680",
+    appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+  };
 
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  /* Department -> Team */
+  const departmentEl = document.getElementById("department");
+  const teamEl = document.getElementById("team");
 
-    /* ===============================
-       Department → Team Filter
-    ================================ */
-    const departmentSelect = document.getElementById("department");
-    const teamSection = document.getElementById("teamSection");
-    const teamSelect = document.getElementById("team");
+  departmentEl.addEventListener("change", () => {
+    teamEl.innerHTML = "";
+    teamEl.disabled = false;
 
-    departmentSelect.addEventListener("change", () => {
-        const department = departmentSelect.value;
-        teamSelect.innerHTML = `<option value="">-- เลือกทีม --</option>`;
+    let teams = [];
 
-        if (department === "FBB Dealer Sale") {
-            teamSection.style.display = "block";
-            for (let i = 1; i <= 10; i++) {
-                teamSelect.innerHTML += `<option value="Team ${i}">Team ${i}</option>`;
-            }
-            teamSelect.required = true;
+    if (departmentEl.value === "FBB Dealer Sale") {
+      teams = Array.from({ length: 10 }, (_, i) => `Team ${i + 1}`);
+    }
+    if (departmentEl.value === "FBB Direct Sale") {
+      teams = Array.from({ length: 6 }, (_, i) => `Team ${i + 1}`);
+    }
+    if (departmentEl.value === "FBB Telesale") {
+      teamEl.innerHTML = `<option value="Telesale">Telesale</option>`;
+      return;
+    }
 
-        } else if (department === "FBB Direct Sale") {
-            teamSection.style.display = "block";
-            for (let i = 1; i <= 6; i++) {
-                teamSelect.innerHTML += `<option value="Team ${i}">Team ${i}</option>`;
-            }
-            teamSelect.required = true;
-
-        } else {
-            teamSection.style.display = "none";
-            teamSelect.required = false;
-            teamSelect.value = "";
-        }
+    teams.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      teamEl.appendChild(opt);
     });
+  });
 
-    /* ===============================
-       Register Submit
-    ================================ */
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
+  /* Register */
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const fullName = document.getElementById("fullName").value.trim();
-        const department = departmentSelect.value;
-        const team = teamSelect.value;
-        const phone = document.getElementById("phone").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
+    const password = password.value;
+    const confirm = confirmPassword.value;
+    if (password !== confirm) {
+      alert("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
 
-        if (password !== confirmPassword) {
-            alert("รหัสผ่านไม่ตรงกัน");
-            return;
-        }
+    loadingOverlay.classList.remove("hidden");
 
-        if (
-            (department === "FBB Dealer Sale" || department === "FBB Direct Sale") 
-            && !team
-        ) {
-            alert("กรุณาเลือกทีม");
-            return;
-        }
+    try {
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        email.value,
+        password
+      );
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        fullName: fullName.value,
+        department: department.value,
+        team: team.value,
+        phone: phone.value,
+        email: email.value,
+        role: "user",
+        createdAt: new Date()
+      });
 
-            await setDoc(doc(db, "users", user.uid), {
-                fullName: fullName,
-                email: email,
-                department: department,
-                team: department === "FBB Telesale" ? null : team,
-                phone: phone,
-                role: "user",
-                status: "active",
-                createdAt: serverTimestamp(),
-                lastLogin: null
-            });
+      loadingOverlay.classList.add("hidden");
+      successOverlay.classList.remove("hidden");
 
-            alert("สมัครใช้งานสำเร็จ");
-            window.location.href = "login.html";
+      setTimeout(() => {
+        window.location.href = "./user/main.html";
+      }, 2000);
 
-        } catch (error) {
-            alert(error.message);
-        }
-    });
+    } catch (err) {
+      loadingOverlay.classList.add("hidden");
+      alert(err.message);
+    }
+  });
 </script>
 
 </body>
