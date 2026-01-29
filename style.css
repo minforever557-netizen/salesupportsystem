@@ -1,144 +1,132 @@
-/* =========================
-   GLOBAL RESET & THEME
-========================= */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* ===============================
+   GLOBAL
+================================ */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
 
 :root {
-    --green-main: #22c55e;
+    --green-main: #34d399;
     --green-soft: #ecfdf5;
-    --green-bg: #f0fdf4;
-    --green-border: #bbf7d0;
-    --text-main: #064e3b;
+    --green-dark: #10b981;
+    --text-main: #111827;
     --text-muted: #6b7280;
     --white: #ffffff;
+    --border: #e5e7eb;
+    --shadow: 0 10px 25px rgba(0,0,0,.08);
 }
 
-html, body {
-    height: 100%;
-    font-family: "Segoe UI", "Noto Sans Thai", sans-serif;
-    background: linear-gradient(135deg, #e6fff5, #f0fdf4);
+* {
+    box-sizing: border-box;
+    font-family: 'Sarabun', sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--green-soft);
     color: var(--text-main);
 }
 
-/* =========================
+/* ===============================
    LAYOUT
-========================= */
+================================ */
 .center-layout {
-    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
 }
 
-/* =========================
+/* ===============================
    CARD
-========================= */
+================================ */
 .card {
-    background: var(--white);
     width: 100%;
-    max-width: 420px;
-    padding: 40px 36px;
+    background: var(--white);
     border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    padding: 35px 30px;
+    box-shadow: var(--shadow);
 }
 
-/* =========================
+/* ===============================
    TITLE
-========================= */
+================================ */
 .card-title {
     text-align: center;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--green-main);
-    margin-bottom: 6px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--green-dark);
 }
 
 .card-subtitle {
     text-align: center;
-    font-size: 14px;
     color: var(--text-muted);
-    margin-bottom: 32px;
+    margin-bottom: 30px;
 }
 
-/* =========================
+/* ===============================
    FORM
-========================= */
+================================ */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-label {
+.form-group label {
     display: block;
-    font-size: 14px;
     margin-bottom: 6px;
+    font-weight: 500;
 }
 
 .input {
     width: 100%;
     padding: 12px 14px;
-    font-size: 15px;
     border-radius: 10px;
-    border: 1px solid var(--green-border);
-    background: #fafff7;
-    transition: border 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border);
+    font-size: 1rem;
 }
 
 .input:focus {
     outline: none;
     border-color: var(--green-main);
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+    box-shadow: 0 0 0 3px rgba(52,211,153,.25);
 }
 
-/* =========================
+/* ===============================
    BUTTON
-========================= */
+================================ */
 .btn {
     width: 100%;
     padding: 14px;
-    font-size: 16px;
-    font-weight: 600;
     border-radius: 12px;
     border: none;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: white;
     cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    background: var(--green-main);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: .25s;
 }
 
 .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-}
-
-.btn:active {
-    transform: translateY(0);
-    box-shadow: none;
+    background: var(--green-dark);
+    transform: translateY(-2px);
 }
 
 .btn:disabled {
-    opacity: 0.6;
+    opacity: .6;
     cursor: not-allowed;
+    transform: none;
 }
 
-/* =========================
-   LINK & TEXT
-========================= */
+/* ===============================
+   TEXT / LINK
+================================ */
 .text-center {
     text-align: center;
 }
 
 .link {
-    font-size: 14px;
-    color: var(--green-main);
+    color: var(--green-dark);
     text-decoration: none;
-    cursor: pointer;
+    font-weight: 500;
 }
 
 .link:hover {
@@ -146,17 +134,6 @@ label {
 }
 
 .divider {
-    margin: 0 8px;
-    color: #9ca3af;
-}
-
-/* =========================
-   CLICK SAFETY (สำคัญมาก)
-========================= */
-a,
-button,
-input {
-    pointer-events: auto;
-    position: relative;
-    z-index: 1;
+    margin: 0 10px;
+    color: var(--text-muted);
 }
