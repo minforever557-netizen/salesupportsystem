@@ -1,286 +1,150 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>Register | Sale Support System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>สมัครเข้าใช้งาน | Sale Portal</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
 
-<!-- Firebase -->
+<body class="auth-body">
+
+<div class="auth-card">
+    <h2 class="auth-title">สมัครเข้าใช้งาน</h2>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label>ชื่อ - นามสกุล</label>
+            <input type="text" id="fullName" class="input" required>
+        </div>
+
+        <div class="form-group">
+            <label>หน่วยงาน</label>
+            <select id="department" required>
+                <option value="">-- เลือก --</option>
+                <option value="FBB Telesale">FBB Telesale</option>
+                <option value="Support">Support</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="teamGroup">
+            <label>ทีม</label>
+            <select id="team">
+                <option value="">-- เลือกทีม --</option>
+                <option value="Team A">Team A</option>
+                <option value="Team B">Team B</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>เบอร์โทรศัพท์</label>
+            <input type="tel" id="phone" class="input" required>
+        </div>
+
+        <div class="form-group">
+            <label>อีเมลพนักงาน</label>
+            <input type="email" id="email" class="input" required>
+        </div>
+
+        <div class="form-group">
+            <label>รหัสผ่าน</label>
+            <input type="password" id="password" class="input" required>
+        </div>
+
+        <button type="submit" class="btn-auth">ลงทะเบียนเข้าใช้งาน</button>
+
+        <div class="text-center" style="margin-top:15px">
+            มีบัญชีแล้ว? <a href="../index.html" class="link">เข้าสู่ระบบ</a>
+        </div>
+    </form>
+</div>
+
+<!-- POPUP EMAIL EXISTS -->
+<div id="emailExistPopup" class="overlay hidden">
+    <div class="success-card">
+        <h3 style="color:#f97316">อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว</h3>
+
+        <button class="btn-auth" onclick="goLogin()">เข้าสู่ระบบ</button>
+        <button class="btn-auth" style="margin-top:10px" onclick="resetPassword()">รีเซ็ตรหัสผ่าน</button>
+    </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="overlay hidden">
+    <div class="spinner"></div>
+    <p>กำลังดำเนินการ...</p>
+</div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc,
-  serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    getFirestore,
+    doc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-  authDomain: "sale-support-system.firebaseapp.com",
-  projectId: "sale-support-system",
-  storageBucket: "sale-support-system.firebasestorage.app",
-  messagingSenderId: "640337786680",
-  appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.registerUser = async function () {
-  const fullname = fullnameEl.value.trim();
-  const department = departmentEl.value;
-  const team = teamEl.value || "-";
-  const phone = phoneEl.value.trim();
-  const email = emailEl.value.trim();
-  const password = passwordEl.value;
+// ซ่อนทีมถ้าเลือก FBB
+department.onchange = () => {
+    teamGroup.style.display =
+        department.value === 'FBB Telesale' ? 'none' : 'block';
+};
 
-  if (!fullname || !department || !phone || !email || !password) {
-    showError("กรุณากรอกข้อมูลให้ครบถ้วน");
-    return;
-  }
+registerForm.onsubmit = async (e) => {
+    e.preventDefault();
+    loading.classList.remove('hidden');
 
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const email = email.value;
+    const password = password.value;
 
-    await setDoc(doc(db, "users", cred.user.uid), {
-      fullname,
-      department,
-      team,
-      phone,
-      email,
-      role: "user",
-      createdAt: serverTimestamp(),
-      lastLogin: serverTimestamp()
-    });
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    showSuccess();
+        await setDoc(doc(db, "users", cred.user.uid), {
+            name: fullName.value,
+            department: department.value,
+            team: team.value || '',
+            phone: phone.value,
+            email: email,
+            role: 'sale',
+            createdAt: new Date()
+        });
 
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 1800);
+        // สมัครสำเร็จ → กลับหน้า Login
+        window.location.href = "../index.html";
 
-  } catch (err) {
-    if (err.code === "auth/email-already-in-use") {
-      showDuplicateEmail();
-    } else {
-      showError(err.message);
+    } catch (err) {
+        loading.classList.add('hidden');
+
+        if (err.code === 'auth/email-already-in-use') {
+            emailExistPopup.classList.remove('hidden');
+        } else {
+            alert(err.message);
+        }
     }
-  }
-}
-</script>
+};
 
-<style>
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg,#e8fff5,#f6fffb);
-  margin: 0;
-}
+window.goLogin = () => {
+    window.location.href = "../index.html";
+};
 
-.container {
-  max-width: 420px;
-  margin: 50px auto;
-  background: #fff;
-  padding: 28px;
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0,0,0,.08);
-}
-
-h1 {
-  text-align: center;
-  color: #1abc9c;
-  margin-bottom: 24px;
-}
-
-label {
-  font-weight: 600;
-  margin-top: 14px;
-  display: block;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #dcdcdc;
-  background: #f9fff9;
-  font-size: 15px;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 24px;
-  border: none;
-  border-radius: 12px;
-  background: #1abc9c;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #17a589;
-}
-
-/* TEAM WRAPPER */
-#teamWrapper {
-  transition: all .3s ease;
-}
-#teamWrapper.hide {
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
-  margin: 0;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-box {
-  background: #fff;
-  padding: 24px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  animation: pop .35s ease;
-}
-
-.modal-box h3 {
-  margin-top: 0;
-  color: #e67e22;
-}
-
-.modal-box button {
-  margin-top: 14px;
-}
-
-@keyframes pop {
-  from { transform: scale(.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* SUCCESS */
-.success {
-  text-align: center;
-  animation: fadeInUp .6s ease;
-}
-
-.success h2 {
-  color: #1abc9c;
-}
-
-@keyframes fadeInUp {
-  from { opacity:0; transform: translateY(30px);}
-  to { opacity:1; transform: translateY(0);}
-}
-</style>
-</head>
-
-<body>
-
-<div class="container" id="formBox">
-  <h1>สมัครเข้าใช้งาน</h1>
-
-  <label>ชื่อ - นามสกุล</label>
-  <input id="fullnameEl">
-
-  <label>หน่วยงาน</label>
-  <select id="departmentEl">
-    <option value="">-- กรุณาเลือก --</option>
-    <option>FBB Telesale</option>
-    <option>FBB Dealer Sale</option>
-    <option>FBB Direct Sale</option>
-  </select>
-
-  <div id="teamWrapper">
-    <label>ทีม</label>
-    <select id="teamEl">
-      <option value="">-- กรุณาเลือกทีม --</option>
-    </select>
-  </div>
-
-  <label>เบอร์โทรศัพท์</label>
-  <input id="phoneEl">
-
-  <label>อีเมลพนักงาน</label>
-  <input id="emailEl">
-
-  <label>รหัสผ่าน</label>
-  <input type="password" id="passwordEl">
-
-  <button onclick="registerUser()">ลงทะเบียนเข้าใช้งาน</button>
-</div>
-
-<!-- ERROR MODAL -->
-<div class="modal" id="errorModal">
-  <div class="modal-box">
-    <h3 id="errorText"></h3>
-    <button onclick="closeModal()">ตกลง</button>
-  </div>
-</div>
-
-<!-- DUPLICATE EMAIL -->
-<div class="modal" id="dupModal">
-  <div class="modal-box">
-    <h3>อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว</h3>
-    <button onclick="location.href='login.html'">เข้าสู่ระบบ</button>
-    <button onclick="location.href='forgot.html'">รีเซ็ตรหัสผ่าน</button>
-  </div>
-</div>
-
-<script>
-const departmentEl = document.getElementById("departmentEl");
-const teamEl = document.getElementById("teamEl");
-const teamWrapper = document.getElementById("teamWrapper");
-
-departmentEl.addEventListener("change", () => {
-  teamEl.innerHTML = `<option value="">-- กรุณาเลือกทีม --</option>`;
-  teamWrapper.classList.remove("hide");
-
-  if (departmentEl.value === "FBB Telesale") {
-    teamWrapper.classList.add("hide");
-    teamEl.value = "";
-    return;
-  }
-
-  let max = departmentEl.value === "FBB Dealer Sale" ? 10 : 6;
-  for (let i = 1; i <= max; i++) {
-    teamEl.innerHTML += `<option>Team ${i}</option>`;
-  }
-});
-
-function showError(msg) {
-  errorText.innerText = msg;
-  errorModal.style.display = "flex";
-}
-function showDuplicateEmail() {
-  dupModal.style.display = "flex";
-}
-function closeModal() {
-  errorModal.style.display = "none";
-}
-function showSuccess() {
-  formBox.innerHTML = `
-    <div class="success">
-      <h2>สมัครสำเร็จ 🎉</h2>
-      <p>กำลังเข้าสู่ระบบ...</p>
-    </div>`;
-}
+window.resetPassword = async () => {
+    await sendPasswordResetEmail(auth, email.value);
+    alert('ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว');
+};
 </script>
 
 </body>
