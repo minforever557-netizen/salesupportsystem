@@ -4,124 +4,106 @@
     <meta charset="UTF-8">
     <title>Register - Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- CSS กลาง -->
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body class="center-layout">
 
-    <div class="card" style="max-width:480px">
+<div class="card" style="max-width:480px">
 
-        <!-- Header -->
-        <div class="card-title">SALE PORTAL</div>
-        <div class="card-subtitle">Support Management System</div>
+    <div class="card-title">CREATE ACCOUNT</div>
+    <div class="card-subtitle">Sale Support System</div>
 
-        <!-- Corporate Info -->
-        <div class="info-box">
-            เมื่อทำการลงทะเบียนเรียบร้อยแล้ว ระบบจะกำหนดสิทธิ์ผู้ใช้งานเป็น
-            <strong>User (Sale)</strong> โดยอัตโนมัติ
-            <br>
-            กรุณากรอกข้อมูลให้ครบถ้วนเพื่อใช้ในการติดต่อและให้บริการภายในระบบ
+    <form id="registerForm">
+
+        <!-- Full Name -->
+        <div class="form-group">
+            <label>ชื่อ – นามสกุล</label>
+            <input 
+                type="text" 
+                class="input" 
+                id="fullName" 
+                placeholder="เช่น นายสมชาย ใจดี"
+                required
+            >
         </div>
 
-        <!-- Register Form -->
-        <form id="registerForm">
-
-            <!-- Full Name -->
-            <div class="form-group">
-                <label>ชื่อ - นามสกุล</label>
-                <input
-                    type="text"
-                    id="fullName"
-                    class="input"
-                    placeholder="เช่น นายสมชาย ใจดี"
-                    required
-                >
-            </div>
-
-            <!-- Department -->
-            <div class="form-group">
-                <label>หน่วยงาน</label>
-                <select id="department" class="input" required>
-                    <option value="">-- กรุณาเลือกหน่วยงาน --</option>
-                    <option value="Sales">ฝ่ายขาย (Sales)</option>
-                    <option value="Marketing">การตลาด (Marketing)</option>
-                    <option value="Support">ฝ่ายสนับสนุน (Support)</option>
-                    <option value="Operation">ฝ่ายปฏิบัติการ (Operation)</option>
-                    <option value="IT">ฝ่ายเทคโนโลยีสารสนเทศ (IT)</option>
-                    <option value="Admin">ธุรการ / สำนักงาน</option>
-                </select>
-            </div>
-
-            <!-- Phone -->
-            <div class="form-group">
-                <label>เบอร์โทรศัพท์ที่ติดต่อได้</label>
-                <input
-                    type="tel"
-                    id="phone"
-                    class="input"
-                    placeholder="เช่น 0812345678"
-                    pattern="[0-9]{9,10}"
-                    required
-                >
-            </div>
-
-            <!-- Email -->
-            <div class="form-group">
-                <label>อีเมลพนักงาน</label>
-                <input
-                    type="email"
-                    id="regEmail"
-                    class="input"
-                    placeholder="example@company.com"
-                    required
-                >
-            </div>
-
-            <!-- Password -->
-            <div class="form-group">
-                <label>รหัสผ่าน</label>
-                <input
-                    type="password"
-                    id="regPassword"
-                    class="input"
-                    placeholder="อย่างน้อย 6 ตัวอักษร"
-                    minlength="6"
-                    required
-                >
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="form-group">
-                <label>ยืนยันรหัสผ่าน</label>
-                <input
-                    type="password"
-                    id="confirmPassword"
-                    class="input"
-                    placeholder="กรอกรหัสผ่านให้ตรงกัน"
-                    required
-                >
-            </div>
-
-            <!-- Submit -->
-            <button type="submit" class="btn">
-                ลงทะเบียนเข้าใช้งานระบบ
-            </button>
-
-        </form>
-
-        <!-- Footer -->
-        <div class="text-center" style="margin-top:20px">
-            มีบัญชีผู้ใช้งานอยู่แล้ว?
-            <a href="index.html" class="link">กลับไปหน้าเข้าสู่ระบบ</a>
+        <!-- Department -->
+        <div class="form-group">
+            <label>หน่วยงาน</label>
+            <select class="input" id="department" required>
+                <option value="">-- กรุณาเลือกหน่วยงาน --</option>
+                <option value="Sales">Sales</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Customer Support">Customer Support</option>
+                <option value="IT">IT</option>
+                <option value="Admin">Admin</option>
+            </select>
         </div>
 
+        <!-- Phone -->
+        <div class="form-group">
+            <label>เบอร์โทรศัพท์ที่ติดต่อได้</label>
+            <input 
+                type="tel" 
+                class="input" 
+                id="phone" 
+                placeholder="เช่น 0812345678"
+                required
+            >
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+            <label>อีเมลพนักงาน</label>
+            <input 
+                type="email" 
+                class="input" 
+                id="email" 
+                placeholder="name@company.com"
+                required
+            >
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label>รหัสผ่าน</label>
+            <input 
+                type="password" 
+                class="input" 
+                id="password" 
+                placeholder="อย่างน้อย 6 ตัวอักษร"
+                minlength="6"
+                required
+            >
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+            <label>ยืนยันรหัสผ่าน</label>
+            <input 
+                type="password" 
+                class="input" 
+                id="confirmPassword" 
+                placeholder="กรอกรหัสผ่านให้ตรงกัน"
+                required
+            >
+        </div>
+
+        <button type="submit" class="btn" id="registerBtn">
+            ลงทะเบียนเข้าใช้งาน
+        </button>
+
+    </form>
+
+    <div class="text-center" style="margin-top:20px">
+        <a href="index.html" class="link">
+            ← กลับไปหน้าเข้าสู่ระบบ
+        </a>
     </div>
 
-    <!-- Firebase Script -->
-    <!-- ใส่ script Firebase register ของคุณต่อจากตรงนี้ได้ทันที -->
-    <!-- <script type="module" src="register.js"></script> -->
+</div>
 
+<!-- Firebase Register Script ใช้ของเดิมได้ -->
 </body>
 </html>
