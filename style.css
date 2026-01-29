@@ -1,17 +1,20 @@
 /* ===============================
-   GLOBAL
+   GLOBAL SETUP
 ================================ */
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
 
 :root {
-    --green-main: #34d399;
-    --green-soft: #ecfdf5;
-    --green-dark: #10b981;
+    --green-main: #4ade80;
+    --green-dark: #22c55e;
+    --green-bg: #ecfdf5;
+
     --text-main: #111827;
     --text-muted: #6b7280;
+
     --white: #ffffff;
     --border: #e5e7eb;
-    --shadow: 0 10px 25px rgba(0,0,0,.08);
+
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -19,10 +22,14 @@
     font-family: 'Sarabun', sans-serif;
 }
 
-body {
+html, body {
     margin: 0;
-    min-height: 100vh;
-    background: var(--green-soft);
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background: var(--green-bg);
     color: var(--text-main);
 }
 
@@ -30,6 +37,7 @@ body {
    LAYOUT
 ================================ */
 .center-layout {
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,11 +47,11 @@ body {
    CARD
 ================================ */
 .card {
-    width: 100%;
     background: var(--white);
     border-radius: 20px;
-    padding: 35px 30px;
+    padding: 32px 28px;
     box-shadow: var(--shadow);
+    width: 100%;
 }
 
 /* ===============================
@@ -54,12 +62,14 @@ body {
     font-size: 1.8rem;
     font-weight: 600;
     color: var(--green-dark);
+    margin-bottom: 6px;
 }
 
 .card-subtitle {
     text-align: center;
+    font-size: 0.95rem;
     color: var(--text-muted);
-    margin-bottom: 30px;
+    margin-bottom: 28px;
 }
 
 /* ===============================
@@ -71,8 +81,8 @@ body {
 
 .form-group label {
     display: block;
+    font-size: 0.95rem;
     margin-bottom: 6px;
-    font-weight: 500;
 }
 
 .input {
@@ -81,12 +91,13 @@ body {
     border-radius: 10px;
     border: 1px solid var(--border);
     font-size: 1rem;
+    background: #fff;
 }
 
 .input:focus {
     outline: none;
     border-color: var(--green-main);
-    box-shadow: 0 0 0 3px rgba(52,211,153,.25);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
 }
 
 /* ===============================
@@ -97,12 +108,12 @@ body {
     padding: 14px;
     border-radius: 12px;
     border: none;
-    cursor: pointer;
     background: var(--green-main);
     color: white;
     font-size: 1rem;
     font-weight: 600;
-    transition: .25s;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .btn:hover {
@@ -111,7 +122,7 @@ body {
 }
 
 .btn:disabled {
-    opacity: .6;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
@@ -126,7 +137,8 @@ body {
 .link {
     color: var(--green-dark);
     text-decoration: none;
-    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
 }
 
 .link:hover {
