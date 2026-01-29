@@ -2,145 +2,36 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบ - Sale Support System</title>
+    <title>Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="center-layout">
 
-<div class="card" style="max-width:420px; width:100%;">
+<div class="card" style="max-width:420px">
 
     <div class="card-title">SALE PORTAL</div>
     <div class="card-subtitle">Support Management System</div>
 
-    <form id="loginForm">
+    <div class="form-group">
+        <label>อีเมลผู้ใช้งาน</label>
+        <input class="input" placeholder="example@email.com">
+    </div>
 
-        <div class="form-group">
-            <label for="email">อีเมลผู้ใช้งาน</label>
-            <input
-                type="email"
-                id="email"
-                class="input"
-                placeholder="example@email.com"
-                required
-            >
-        </div>
+    <div class="form-group">
+        <label>รหัสผ่าน</label>
+        <input class="input" type="password">
+    </div>
 
-        <div class="form-group">
-            <label for="password">รหัสผ่าน</label>
-            <input
-                type="password"
-                id="password"
-                class="input"
-                placeholder="••••••••"
-                required
-            >
-        </div>
+    <button class="btn">เข้าสู่ระบบ</button>
 
-        <button type="submit" id="submitBtn" class="btn">
-            เข้าสู่ระบบ
-        </button>
-
-        <div class="text-center" style="margin-top:20px;">
-            <a href="#" class="link" onclick="forgotPassword()">ลืมรหัสผ่าน?</a>
-            <span class="divider">|</span>
-            <a href="register.html" class="link">สมัครสมาชิก</a>
-        </div>
-
-    </form>
+    <div class="text-center" style="margin-top:20px">
+        <a class="link" href="#">ลืมรหัสผ่าน?</a>
+        <span class="divider">|</span>
+        <a class="link" href="#">สมัครสมาชิก</a>
+    </div>
 
 </div>
-
-<!-- ================= FIREBASE SCRIPT ================= -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import {
-        getAuth,
-        signInWithEmailAndPassword,
-        sendPasswordResetEmail,
-        signOut
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import {
-        getFirestore,
-        doc,
-        getDoc,
-        setDoc
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.firebasestorage.app",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Forgot password
-    window.forgotPassword = async () => {
-        const email = document.getElementById("email").value;
-        if (!email) {
-            alert("กรุณากรอกอีเมลก่อน");
-            return;
-        }
-        try {
-            await sendPasswordResetEmail(auth, email);
-            alert("ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลของคุณแล้ว");
-        } catch (error) {
-            alert("เกิดข้อผิดพลาด: " + error.message);
-        }
-    };
-
-    // Login submit
-    document.getElementById("loginForm").onsubmit = async (e) => {
-        e.preventDefault();
-
-        const email = emailInput.value = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const btn = document.getElementById("submitBtn");
-
-        btn.disabled = true;
-        btn.innerText = "กำลังตรวจสอบ...";
-
-        try {
-            await signOut(auth);
-
-            const userCredential = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
-            const user = userCredential.user;
-            const userRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userRef);
-
-            let role = "user";
-            if (userDoc.exists()) {
-                role = userDoc.data().role || "user";
-                await setDoc(
-                    userRef,
-                    { lastLogin: new Date() },
-                    { merge: true }
-                );
-            }
-
-            if (role === "admin") location.href = "admin/main.html";
-            else if (role === "supervisor") location.href = "supervisor/main.html";
-            else location.href = "user/main.html";
-
-        } catch (error) {
-            alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-            btn.disabled = false;
-            btn.innerText = "เข้าสู่ระบบ";
-        }
-    };
-</script>
 
 </body>
 </html>
