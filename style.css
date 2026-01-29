@@ -1,5 +1,5 @@
 /* =========================
-   GLOBAL
+   RESET & GLOBAL
 ========================= */
 * {
   box-sizing: border-box;
@@ -13,10 +13,10 @@ body {
 }
 
 /* =========================
-   AUTH LAYOUT
+   LAYOUT
 ========================= */
-.auth-body,
-.center-layout {
+.center-layout,
+.auth-body {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,60 +26,57 @@ body {
 /* =========================
    CARD
 ========================= */
-.auth-card,
-.card {
+.card,
+.auth-card {
   background: #ffffff;
   width: 100%;
   max-width: 420px;
-  padding: 40px 36px;
-  border-radius: 18px;
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+  padding: 42px 38px;
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  animation: fadeUp 0.35s ease;
 }
 
 .card-title,
 .auth-title {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
   color: #1e7f5c;
   margin-bottom: 6px;
 }
 
 .card-subtitle {
-  text-align: center;
   font-size: 14px;
   color: #6b7280;
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
 
 /* =========================
    FORM
 ========================= */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 label {
   display: block;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 6px;
 }
 
 .input,
-.input-field,
-select {
+.input-field {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
   border: 1px solid #d1d5db;
   font-size: 15px;
-  background: #f9fafb;
+  background: #fffecb;
 }
 
 .input:focus,
-.input-field:focus,
-select:focus {
+.input-field:focus {
   outline: none;
   border-color: #1e7f5c;
   background: #ffffff;
@@ -88,43 +85,52 @@ select:focus {
 /* =========================
    BUTTON
 ========================= */
+button {
+  font-family: inherit;
+}
+
 .btn,
 .btn-auth {
   width: 100%;
-  padding: 14px;
-  margin-top: 6px;
-  border-radius: 14px;
+  padding: 15px;
+  border-radius: 16px;
   border: none;
   background: #1e7f5c;
   color: #ffffff;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .btn:hover,
 .btn-auth:hover {
   background: #166d4f;
+  transform: translateY(-1px);
 }
 
-.btn:disabled,
-.btn-auth:disabled {
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
   background: #9ca3af;
   cursor: not-allowed;
 }
 
 /* =========================
-   TEXT / LINK
+   LINKS
 ========================= */
 .text-center {
   text-align: center;
+  margin-top: 18px;
 }
 
 .link {
   color: #1e7f5c;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .link:hover {
@@ -137,278 +143,30 @@ select:focus {
 }
 
 /* =========================
-   OVERLAY (LOADING / SUCCESS)
-========================= */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.hidden {
-  display: none;
-}
-
-/* =========================
-   LOADING
-========================= */
-.spinner {
-  width: 54px;
-  height: 54px;
-  border: 5px solid #e5e7eb;
-  border-top: 5px solid #1e7f5c;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.overlay p {
-  margin-top: 16px;
-  color: #ffffff;
-  font-size: 16px;
-}
-
-/* =========================
-   SUCCESS
-========================= */
-.success-card {
-  background: #ffffff;
-  padding: 32px;
-  border-radius: 18px;
-  text-align: center;
-  width: 90%;
-  max-width: 360px;
-}
-
-.checkmark {
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 12px;
-  background: #1e7f5c;
-  color: #ffffff;
-  font-size: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* =========================
    ANIMATION
 ========================= */
-@keyframes spin {
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
-/* =========================
-   GLOBAL
-========================= */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-  background: linear-gradient(135deg, #e8f5ef, #f4fbf8);
-  color: #1f2937;
-}
 
 /* =========================
-   AUTH LAYOUT
+   RESPONSIVE
 ========================= */
-.auth-body,
-.center-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
+@media (max-width: 480px) {
+  .card,
+  .auth-card {
+    padding: 34px 24px;
+  }
 
-/* =========================
-   CARD
-========================= */
-.auth-card,
-.card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  padding: 40px 36px;
-  border-radius: 18px;
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
-}
-
-.card-title,
-.auth-title {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 700;
-  color: #1e7f5c;
-  margin-bottom: 6px;
-}
-
-.card-subtitle {
-  text-align: center;
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 24px;
-}
-
-/* =========================
-   FORM
-========================= */
-.form-group {
-  margin-bottom: 16px;
-}
-
-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 6px;
-}
-
-.input,
-.input-field,
-select {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  font-size: 15px;
-  background: #f9fafb;
-}
-
-.input:focus,
-.input-field:focus,
-select:focus {
-  outline: none;
-  border-color: #1e7f5c;
-  background: #ffffff;
-}
-
-/* =========================
-   BUTTON
-========================= */
-.btn,
-.btn-auth {
-  width: 100%;
-  padding: 14px;
-  margin-top: 6px;
-  border-radius: 14px;
-  border: none;
-  background: #1e7f5c;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn:hover,
-.btn-auth:hover {
-  background: #166d4f;
-}
-
-.btn:disabled,
-.btn-auth:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-/* =========================
-   TEXT / LINK
-========================= */
-.text-center {
-  text-align: center;
-}
-
-.link {
-  color: #1e7f5c;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-.divider {
-  margin: 0 8px;
-  color: #9ca3af;
-}
-
-/* =========================
-   OVERLAY (LOADING / SUCCESS)
-========================= */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.hidden {
-  display: none;
-}
-
-/* =========================
-   LOADING
-========================= */
-.spinner {
-  width: 54px;
-  height: 54px;
-  border: 5px solid #e5e7eb;
-  border-top: 5px solid #1e7f5c;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.overlay p {
-  margin-top: 16px;
-  color: #ffffff;
-  font-size: 16px;
-}
-
-/* =========================
-   SUCCESS
-========================= */
-.success-card {
-  background: #ffffff;
-  padding: 32px;
-  border-radius: 18px;
-  text-align: center;
-  width: 90%;
-  max-width: 360px;
-}
-
-.checkmark {
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 12px;
-  background: #1e7f5c;
-  color: #ffffff;
-  font-size: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* =========================
-   ANIMATION
-========================= */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  .card-title,
+  .auth-title {
+    font-size: 24px;
   }
 }
