@@ -6,80 +6,97 @@
     <title>Sale Dashboard - Sale Support</title>
     <link rel="stylesheet" href="../style.css?v=1.1">
 </head>
-<body>
-    <div class="sidebar">
+
+<body class="dashboard-body">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
         <div class="sidebar-header">SALE PORTAL</div>
-        <div class="sidebar-menu">
+
+        <nav class="sidebar-menu">
             <a href="main.html" class="active">🏠 <span>หน้าหลัก</span></a>
             <a href="ticket.html">📝 <span>ส่ง Ticket ใหม่</span></a>
-            <a href="history.html">🔍 <span>ค้นหา/ติดตามงาน</span></a>
-            <div style="margin-top: auto; padding: 10px;">
-                <hr style="border:0; border-top:1px solid #374151; margin-bottom:15px;">
-                <a href="#" id="logoutBtn" style="color: #ef4444; padding: 10px;">🚪 <span>ออกจากระบบ</span></a>
-            </div>
-        </div>
-    </div>
+            <a href="history.html">🔍 <span>ค้นหา / ติดตามงาน</span></a>
 
-    <div class="main-content">
-        <div class="top-bar">
-            <h3 style="margin:0;">Dashboard</h3>
-            <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="sidebar-footer">
+                <hr class="sidebar-divider">
+                <a href="#" id="logoutBtn" class="logout-link">🚪 <span>ออกจากระบบ</span></a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <h3 class="page-title">Dashboard</h3>
+
+            <div class="top-right">
+                <!-- Notification -->
                 <div class="notif-wrapper" id="notifBell">
-                    <span style="font-size:20px; cursor: pointer;">🔔</span>
+                    <span class="notif-icon">🔔</span>
                     <span class="notif-badge-icon" id="notifCount">0</span>
+
                     <div class="notif-dropdown" id="notifDropdown">
-                        <div style="padding:12px; font-weight:bold; border-bottom:1px solid #f1f5f9; color: #1e293b;">
-                            การแจ้งเตือน
-                        </div>
-                        <div id="notifList" style="max-height: 300px; overflow-y: auto;">
-                            </div>
+                        <div class="notif-header">การแจ้งเตือน</div>
+                        <div id="notifList" class="notif-list"></div>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <div id="userEmail" style="font-weight: 600; color: #111827;">Loading...</div>
-                    <small style="color: #6B7280;">Sale Representative</small>
+
+                <!-- User -->
+                <div class="user-info">
+                    <div id="userEmail" class="user-email">Loading...</div>
+                    <small class="user-role">Sale Representative</small>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <div class="stat-grid">
-            <div class="stat-box" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+        <!-- ================= STATS ================= -->
+        <section class="stat-grid">
+            <div class="stat-box stat-blue">
                 <small>งานทั้งหมด</small>
                 <div id="countAll" class="stat-number">0</div>
             </div>
-            <div class="stat-box" style="background: linear-gradient(135deg, #F87171, #EF4444);">
+
+            <div class="stat-box stat-red">
                 <small>รอดำเนินการ</small>
                 <div id="countOpen" class="stat-number">0</div>
             </div>
-            <div class="stat-box" style="background: linear-gradient(135deg, #34D399, #10B981);">
+
+            <div class="stat-box stat-green">
                 <small>งานที่เสร็จสิ้น</small>
                 <div id="countClosed" class="stat-number">0</div>
             </div>
-        </div>
+        </section>
 
-        <div class="menu-grid">
+        <!-- ================= QUICK MENU ================= -->
+        <section class="menu-grid">
             <a href="ticket.html" class="menu-card">
-                <div style="font-size: 40px; margin-bottom: 10px;">📝</div>
+                <div class="menu-icon">📝</div>
                 <b>ส่ง Ticket ใหม่</b>
-                <p style="font-size: 12px; color: #6B7280; margin-top: 5px;">แจ้งเคสงานใหม่เข้าสู่ระบบ</p>
+                <p>แจ้งเคสงานใหม่เข้าสู่ระบบ</p>
             </a>
-            <a href="history.html" class="menu-card">
-                <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
-                <b>ติดตามสถานะงาน</b>
-                <p style="font-size: 12px; color: #6B7280; margin-top: 5px;">ตรวจสอบประวัติและอัปเดต</p>
-            </a>
-        </div>
-    </div>
 
+            <a href="history.html" class="menu-card">
+                <div class="menu-icon">🔍</div>
+                <b>ติดตามสถานะงาน</b>
+                <p>ตรวจสอบประวัติและอัปเดต</p>
+            </a>
+        </section>
+    </main>
+
+    <!-- ================= MODAL ================= -->
     <div id="viewModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="color: var(--primary-green); margin-top: 0;">รายละเอียดงาน</h3>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-            <div id="modalBody" style="line-height: 1.6;"></div>
-            <button onclick="closeModal()" class="btn-auth" style="margin-top:25px;">ตกลง / ปิดหน้าต่าง</button>
+            <h3 id="modalTitle" class="modal-title">รายละเอียดงาน</h3>
+            <hr class="modal-divider">
+            <div id="modalBody" class="modal-body"></div>
+            <button onclick="closeModal()" class="btn-auth modal-btn">ตกลง / ปิดหน้าต่าง</button>
         </div>
     </div>
 
+    <!-- ================= SCRIPT ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -98,7 +115,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 1. ตรวจสอบสถานะการ Login
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('userEmail').innerText = user.email;
@@ -109,74 +125,66 @@
             }
         });
 
-        // 2. โหลดสถิติแบบ Real-time
         function loadStats(email) {
             const q = query(collection(db, "tickets"), where("email", "==", email));
-            onSnapshot(q, (snap) => {
+            onSnapshot(q, snap => {
                 let all = snap.size, open = 0, closed = 0;
-                snap.forEach(doc => {
-                    if (doc.data().status === 'Closed') closed++; else open++;
-                });
-                document.getElementById('countAll').innerText = all;
-                document.getElementById('countOpen').innerText = open;
-                document.getElementById('countClosed').innerText = closed;
+                snap.forEach(d => d.data().status === 'Closed' ? closed++ : open++);
+                countAll.innerText = all;
+                countOpen.innerText = open;
+                countClosed.innerText = closed;
             });
         }
 
-        // 3. ระบบแจ้งเตือน (Notification)
         function watchNotifications(email) {
-            const q = query(collection(db, "tickets"), where("email", "==", email), where("isReadSale", "==", false));
-            onSnapshot(q, (snap) => {
-                const badge = document.getElementById('notifCount');
-                badge.innerText = snap.size;
-                badge.style.display = snap.size > 0 ? 'block' : 'none';
-                
-                let html = '';
-                snap.forEach(d => {
-                    const data = d.data();
-                    html += `
-                        <div class="notif-item" onclick="readNotif('${d.id}')">
-                            <b>🔔 อัปเดตสถานะงาน</b><br>
-                            <small>Internet No: ${data.internetNo}</small><br>
-                            <span style="color: var(--primary-green)">สถานะ: ${data.status}</span>
-                        </div>`;
-                });
-                document.getElementById('notifList').innerHTML = html || '<div style="padding:20px; color:#999; text-align:center;">ไม่มีการแจ้งเตือนใหม่</div>';
+            const q = query(
+                collection(db, "tickets"),
+                where("email", "==", email),
+                where("isReadSale", "==", false)
+            );
+
+            onSnapshot(q, snap => {
+                notifCount.innerText = snap.size;
+                notifCount.style.display = snap.size ? 'block' : 'none';
+
+                notifList.innerHTML = snap.size
+                    ? [...snap.docs].map(d => {
+                        const data = d.data();
+                        return `
+                            <div class="notif-item" onclick="readNotif('${d.id}')">
+                                <b>🔔 อัปเดตสถานะงาน</b>
+                                <small>Internet No: ${data.internetNo}</small>
+                                <span class="notif-status">${data.status}</span>
+                            </div>`;
+                    }).join('')
+                    : '<div class="notif-empty">ไม่มีการแจ้งเตือนใหม่</div>';
             });
         }
 
-        // 4. ฟังก์ชันอ่านแจ้งเตือนและเปิด Modal
         window.readNotif = async (id) => {
-            const docRef = doc(db, "tickets", id);
-            await updateDoc(docRef, { isReadSale: true });
-            const d = await getDoc(docRef);
-            const data = d.data();
-            
-            document.getElementById('modalTitle').innerText = "📌 งานหมายเลข " + data.internetNo;
-            document.getElementById('modalBody').innerHTML = `
-                <b>สถานะปัจจุบัน:</b> <span style="color:blue">${data.status}</span><br>
-                <b>รายละเอียดจากทีม Support:</b><br>
-                <div style="background:#f9fafb; padding:10px; border-radius:8px; margin-top:5px;">
-                    ${data.supNote || 'ไม่มีหมายเหตุเพิ่มเติม'}
-                </div>
+            const ref = doc(db, "tickets", id);
+            await updateDoc(ref, { isReadSale: true });
+            const data = (await getDoc(ref)).data();
+
+            modalTitle.innerText = "📌 งานหมายเลข " + data.internetNo;
+            modalBody.innerHTML = `
+                <b>สถานะปัจจุบัน:</b> ${data.status}<br><br>
+                <b>รายละเอียดจากทีม Support:</b>
+                <div class="note-box">${data.supNote || 'ไม่มีหมายเหตุเพิ่มเติม'}</div>
             `;
-            document.getElementById('viewModal').style.display = 'block';
-            document.getElementById('notifDropdown').style.display = 'none';
+            viewModal.style.display = 'block';
+            notifDropdown.style.display = 'none';
         };
 
-        // 5. UI Event Listeners
-        const bell = document.getElementById('notifBell');
-        const dropdown = document.getElementById('notifDropdown');
-        
-        bell.onclick = (e) => { 
-            e.stopPropagation(); 
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; 
+        notifBell.onclick = e => {
+            e.stopPropagation();
+            notifDropdown.classList.toggle('show');
         };
-        
-        window.onclick = () => dropdown.style.display = 'none';
-        window.closeModal = () => document.getElementById('viewModal').style.display = 'none';
-        document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
+        window.onclick = () => notifDropdown.classList.remove('show');
+        window.closeModal = () => viewModal.style.display = 'none';
+        logoutBtn.onclick = () => signOut(auth);
     </script>
+
 </body>
 </html>
