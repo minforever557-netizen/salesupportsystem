@@ -69,7 +69,6 @@ body {
     margin-bottom: 28px;
 }
 
-/* Form */
 .form-group {
     margin-bottom: 18px;
 }
@@ -94,7 +93,6 @@ body {
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
 }
 
-/* Button */
 .btn-primary {
     width: 100%;
     padding: 14px;
@@ -111,19 +109,8 @@ body {
     background: var(--green-dark);
 }
 
-/* Link */
-.auth-link {
-    color: var(--green-dark);
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.auth-link:hover {
-    text-decoration: underline;
-}
-
 /* ===============================
-   LOADING OVERLAY (GLOBAL SAFE)
+   LOADING OVERLAY (GLOBAL)
 ================================ */
 .loading-overlay {
     position: fixed;
@@ -153,7 +140,7 @@ body {
 }
 
 /* ===============================
-   DASHBOARD LAYOUT (ISOLATED)
+   DASHBOARD LAYOUT (SAFE)
 ================================ */
 .dashboard-layout {
     display: flex;
@@ -243,7 +230,27 @@ body {
 }
 
 /* ===============================
-   RESPONSIVE (GLOBAL)
+   HAMBURGER + MOBILE SLIDE (FIXED)
+================================ */
+.hamburger {
+    display: none;
+    font-size: 1.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 40;
+}
+
+/* ===============================
+   RESPONSIVE
 ================================ */
 @media (max-width: 768px) {
 
@@ -253,13 +260,32 @@ body {
         border-radius: 16px;
     }
 
-    /* Dashboard */
+    /* Dashboard layout */
     .dashboard-layout {
         flex-direction: column;
     }
 
+    .hamburger {
+        display: block;
+    }
+
+    /* Slide Sidebar */
     .dashboard-sidebar {
-        width: 100%;
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100%;
+        width: 260px;
+        z-index: 50;
+        transition: left 0.3s ease;
+    }
+
+    .dashboard-sidebar.show {
+        left: 0;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
     }
 
     .dashboard-top {
@@ -278,52 +304,9 @@ body {
     }
 }
 
+/* ===============================
+   ANIMATION
+================================ */
 @keyframes spin {
     to { transform: rotate(360deg); }
-}
-/* ===============================
-   MOBILE SLIDE SIDEBAR
-================================ */
-
-/* Hamburger */
-.hamburger {
-    display: none;
-    font-size: 1.6rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-/* Overlay */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 40;
-}
-
-/* ================= MOBILE ================= */
-@media (max-width: 768px) {
-
-    .hamburger {
-        display: block;
-    }
-
-    .sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        height: 100%;
-        z-index: 50;
-        transition: left 0.3s ease;
-    }
-
-    .sidebar.show {
-        left: 0;
-    }
-
-    .sidebar-overlay.show {
-        display: block;
-    }
 }
