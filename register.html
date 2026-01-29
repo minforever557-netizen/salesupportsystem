@@ -7,21 +7,23 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 
-<body class="auth-body">
+<body class="center-layout">
 
-<div class="auth-card">
-  <h2 class="auth-title">สร้างบัญชีผู้ใช้งาน</h2>
+<div class="card" style="max-width:460px">
+
+  <div class="card-title">SALE PORTAL</div>
+  <div class="card-subtitle">Support Management System</div>
 
   <form id="registerForm">
 
     <div class="form-group">
       <label>ชื่อ - นามสกุล</label>
-      <input type="text" id="fullName" class="input-field" required>
+      <input class="input" id="fullName" required>
     </div>
 
     <div class="form-group">
       <label>หน่วยงาน</label>
-      <select id="department" class="input-field" required>
+      <select class="input" id="department" required>
         <option value="">-- กรุณาเลือก --</option>
         <option value="FBB Telesale">FBB Telesale</option>
         <option value="FBB Dealer Sale">FBB Dealer Sale</option>
@@ -31,56 +33,57 @@
 
     <div class="form-group">
       <label>ทีม</label>
-      <select id="team" class="input-field" required disabled>
-        <option value="">-- กรุณาเลือกหน่วยงานก่อน --</option>
+      <select class="input" id="team" required>
+        <option value="">-- กรุณาเลือกทีม --</option>
       </select>
     </div>
 
     <div class="form-group">
       <label>เบอร์โทรศัพท์</label>
-      <input type="tel" id="phone" class="input-field" required>
+      <input class="input" id="phone" required>
     </div>
 
     <div class="form-group">
       <label>อีเมลพนักงาน</label>
-      <input type="email" id="email" class="input-field" required>
+      <input type="email" class="input" id="email" required>
     </div>
 
     <div class="form-group">
       <label>รหัสผ่าน</label>
-      <input type="password" id="password" class="input-field" required minlength="6">
+      <input type="password" class="input" id="password" required minlength="6">
     </div>
 
-    <div class="form-group">
-      <label>ยืนยันรหัสผ่าน</label>
-      <input type="password" id="confirmPassword" class="input-field" required>
-    </div>
-
-    <button type="submit" class="btn-auth" id="regBtn">
-      สมัครใช้งาน
+    <button type="submit" class="btn" id="regBtn">
+      ลงทะเบียนเข้าใช้งาน
     </button>
+
   </form>
+
+  <div class="text-center" style="margin-top:16px">
+    มีบัญชีแล้ว? <a class="link" href="index.html">เข้าสู่ระบบ</a>
+  </div>
+
 </div>
 
-<!-- Loading -->
-<div id="loadingOverlay" class="overlay hidden">
-  <div class="spinner"></div>
-  <p>กำลังสร้างบัญชี...</p>
-</div>
-
-<!-- Success -->
-<div id="successOverlay" class="overlay hidden">
+<!-- EMAIL EXISTS MODAL -->
+<div class="overlay hidden" id="emailExistsModal">
   <div class="success-card">
-    <div class="checkmark">✓</div>
-    <h3>สมัครใช้งานสำเร็จ</h3>
-    <p>กำลังเข้าสู่ระบบ...</p>
+    <div class="checkmark" style="background:#f59e0b">!</div>
+    <p>
+      อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว<br>
+      กรุณาเลือกการดำเนินการ
+    </p>
+    <div style="display:flex; gap:10px; margin-top:12px">
+      <button class="btn" onclick="goLogin()">เข้าสู่ระบบ</button>
+      <button class="btn-outline" onclick="goReset()">รีเซ็ตรหัสผ่าน</button>
+    </div>
   </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
@@ -95,77 +98,59 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  /* Department -> Team */
-  const departmentEl = document.getElementById("department");
-  const teamEl = document.getElementById("team");
+  const department = document.getElementById("department");
+  const team = document.getElementById("team");
 
-  departmentEl.addEventListener("change", () => {
-    teamEl.innerHTML = "";
-    teamEl.disabled = false;
-
-    let teams = [];
-
-    if (departmentEl.value === "FBB Dealer Sale") {
-      teams = Array.from({ length: 10 }, (_, i) => `Team ${i + 1}`);
+  department.onchange = () => {
+    team.innerHTML = '<option value="">-- กรุณาเลือกทีม --</option>';
+    if (department.value === "FBB Dealer Sale") {
+      for (let i = 1; i <= 10; i++) team.innerHTML += `<option>Team ${i}</option>`;
     }
-    if (departmentEl.value === "FBB Direct Sale") {
-      teams = Array.from({ length: 6 }, (_, i) => `Team ${i + 1}`);
+    if (department.value === "FBB Direct Sale") {
+      for (let i = 1; i <= 6; i++) team.innerHTML += `<option>Team ${i}</option>`;
     }
-    if (departmentEl.value === "FBB Telesale") {
-      teamEl.innerHTML = `<option value="Telesale">Telesale</option>`;
-      return;
+    if (department.value === "FBB Telesale") {
+      team.innerHTML += `<option>Telesale</option>`;
     }
+  };
 
-    teams.forEach(t => {
-      const opt = document.createElement("option");
-      opt.value = t;
-      opt.textContent = t;
-      teamEl.appendChild(opt);
-    });
-  });
-
-  /* Register */
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  document.getElementById("registerForm").onsubmit = async (e) => {
     e.preventDefault();
-
-    const password = password.value;
-    const confirm = confirmPassword.value;
-    if (password !== confirm) {
-      alert("รหัสผ่านไม่ตรงกัน");
-      return;
-    }
-
-    loadingOverlay.classList.remove("hidden");
+    regBtn.disabled = true;
+    regBtn.innerText = "กำลังดำเนินการ...";
 
     try {
-      const userCred = await createUserWithEmailAndPassword(
-        auth,
-        email.value,
-        password
-      );
+      const email = email.value;
+      const password = password.value;
 
-      await setDoc(doc(db, "users", userCred.user.uid), {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      await setDoc(doc(db, "users", cred.user.uid), {
         fullName: fullName.value,
+        phone: phone.value,
         department: department.value,
         team: team.value,
-        phone: phone.value,
-        email: email.value,
+        email,
         role: "user",
-        createdAt: new Date()
+        createdAt: serverTimestamp()
       });
 
-      loadingOverlay.classList.add("hidden");
-      successOverlay.classList.remove("hidden");
+      window.location.href = "user/main.html";
 
-      setTimeout(() => {
-        window.location.href = "./user/main.html";
-      }, 2000);
+    } catch (error) {
+      regBtn.disabled = false;
+      regBtn.innerText = "ลงทะเบียนเข้าใช้งาน";
 
-    } catch (err) {
-      loadingOverlay.classList.add("hidden");
-      alert(err.message);
+      if (error.code === "auth/email-already-in-use") {
+        document.getElementById("emailExistsModal").classList.remove("hidden");
+      } else {
+        alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      }
     }
-  });
+  };
+
+  window.goLogin = () => window.location.href = "index.html";
+  window.goReset = () => window.location.href = "forgot-password.html";
 </script>
 
 </body>
