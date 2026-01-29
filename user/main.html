@@ -2,77 +2,104 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Sale Support System</title>
+    <title>User Dashboard - Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
+<body class="dashboard-body">
 
-<div class="dashboard-layout">
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">SALE PORTAL</div>
 
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="dashboard-sidebar" id="sidebar">
-        <h2>SALE PORTAL</h2>
+    <nav class="sidebar-menu">
+        <a href="main.html" class="active">🏠 <span>Dashboard</span></a>
+        <a href="ticket.html">📝 <span>แจ้งปัญหา</span></a>
+        <a href="history.html">🔍 <span>ติดตามงาน</span></a>
 
-        <nav class="dashboard-nav">
-            <a href="main.html" class="active">🏠 หน้าหลัก</a>
-            <a href="ticket.html">📝 ส่ง Ticket</a>
-            <a href="history.html">🔍 ติดตามงาน</a>
-            <a href="#" id="logoutBtn" class="dashboard-logout">🚪 ออกจากระบบ</a>
-        </nav>
-    </aside>
+        <div class="sidebar-footer">
+            <hr class="sidebar-divider">
+            <a href="#" id="logoutBtn" class="logout-link">🚪 <span>ออกจากระบบ</span></a>
+        </div>
+    </nav>
+</aside>
 
-    <!-- ================= MAIN ================= -->
-    <main class="dashboard-main">
+<!-- ================= MAIN ================= -->
+<main class="main-content">
 
-        <!-- TOP BAR -->
-        <header class="dashboard-top">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <!-- Hamburger -->
-                <button id="menuBtn" class="hamburger">☰</button>
-                <h3 class="page-title">Dashboard</h3>
-            </div>
+    <!-- ================= TOP BAR ================= -->
+    <header class="top-bar">
 
-            <div class="dashboard-user">
-                <div id="userEmail">Loading...</div>
-                <small>Sale Representative</small>
-            </div>
-        </header>
+        <!-- Hamburger (Mobile) -->
+        <button id="menuToggle" class="btn" style="width:auto;padding:8px 12px;display:none">
+            ☰
+        </button>
 
-        <!-- ================= STATS ================= -->
-        <section class="dashboard-stats">
-            <div class="stat-card">
-                <small>งานทั้งหมด</small>
-                <h2 id="countAll">0</h2>
-            </div>
+        <h3 class="page-title">Dashboard</h3>
 
-            <div class="stat-card">
-                <small>รอดำเนินการ</small>
-                <h2 id="countOpen">0</h2>
-            </div>
+        <div class="user-info">
+            <div id="userEmail" class="user-email">Loading...</div>
+            <small class="user-role">Sale Representative</small>
+        </div>
+    </header>
 
-            <div class="stat-card">
-                <small>เสร็จสิ้น</small>
-                <h2 id="countClosed">0</h2>
-            </div>
-        </section>
+    <!-- ================= WELCOME ================= -->
+    <section class="card" style="margin-bottom:24px">
+        <div style="font-size:1.1rem;font-weight:600;color:var(--green-dark)">
+            👋 ยินดีต้อนรับ
+        </div>
+        <div style="color:var(--text-muted);margin-top:4px">
+            นี่คือภาพรวมงานทั้งหมดของคุณในระบบ
+        </div>
+    </section>
 
-        <!-- ================= QUICK MENU ================= -->
-        <section class="dashboard-menu">
-            <a href="ticket.html" class="menu-tile">
-                <div class="menu-icon">📝</div>
-                <b>ส่ง Ticket ใหม่</b>
-            </a>
+    <!-- ================= STATS ================= -->
+    <section class="stat-grid">
+        <div class="stat-box stat-blue">
+            <small>งานทั้งหมด</small>
+            <div id="countAll" class="stat-number">0</div>
+        </div>
 
-            <a href="history.html" class="menu-tile">
-                <div class="menu-icon">🔍</div>
-                <b>ติดตามงาน</b>
-            </a>
-        </section>
+        <div class="stat-box stat-red">
+            <small>รอดำเนินการ</small>
+            <div id="countOpen" class="stat-number">0</div>
+        </div>
 
-    </main>
-</div>
+        <div class="stat-box stat-green">
+            <small>เสร็จสิ้น</small>
+            <div id="countClosed" class="stat-number">0</div>
+        </div>
+    </section>
+
+    <!-- ================= QUICK MENU ================= -->
+    <section class="menu-grid">
+        <a href="ticket.html" class="menu-card">
+            <div class="menu-icon">📝</div>
+            <b>แจ้งปัญหาใหม่</b>
+            <p>ส่ง Ticket เพื่อขอความช่วยเหลือ</p>
+        </a>
+
+        <a href="history.html" class="menu-card">
+            <div class="menu-icon">🔍</div>
+            <b>ติดตามงาน</b>
+            <p>ตรวจสอบสถานะและประวัติ</p>
+        </a>
+    </section>
+
+    <!-- ================= RECENT ================= -->
+    <section class="card" style="margin-top:28px">
+        <h4 style="margin-top:0">🕒 งานล่าสุดของคุณ</h4>
+        <div id="recentTickets" class="text-muted">
+            กำลังโหลดข้อมูล...
+        </div>
+
+        <div style="margin-top:12px">
+            <a href="history.html" class="link">ดูทั้งหมด →</a>
+        </div>
+    </section>
+
+</main>
 
 <!-- ================= SCRIPT ================= -->
 <script type="module">
@@ -99,8 +126,8 @@
         loadStats(user.email);
     });
 
-    function loadStats(email) {
-        const q = query(collection(db, "tickets"), where("email", "==", email));
+    function loadStats(email){
+        const q = query(collection(db,"tickets"), where("email","==",email));
         onSnapshot(q, snap => {
             let open = 0, closed = 0;
             snap.forEach(d => d.data().status === "Closed" ? closed++ : open++);
@@ -112,13 +139,26 @@
 
     logoutBtn.onclick = () => signOut(auth);
 
-    /* ===== Hamburger ===== */
-    const menuBtn = document.getElementById("menuBtn");
+    // ================= HAMBURGER =================
+    const menuToggle = document.getElementById("menuToggle");
     const sidebar = document.getElementById("sidebar");
 
-    menuBtn.onclick = () => {
-        sidebar.classList.toggle("show");
+    function handleResize(){
+        if (window.innerWidth <= 768) {
+            sidebar.style.display = "none";
+            menuToggle.style.display = "block";
+        } else {
+            sidebar.style.display = "flex";
+            menuToggle.style.display = "none";
+        }
+    }
+
+    menuToggle.onclick = () => {
+        sidebar.style.display = sidebar.style.display === "none" ? "flex" : "none";
     };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
 </script>
 
 </body>
