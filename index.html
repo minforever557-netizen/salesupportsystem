@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Login - Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Global CSS -->
     <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -14,29 +16,16 @@
     <div class="card-title">SALE PORTAL</div>
     <div class="card-subtitle">Support Management System</div>
 
-    <!-- LOGIN FORM -->
     <form id="loginForm">
 
         <div class="form-group">
             <label>อีเมลผู้ใช้งาน</label>
-            <input
-                type="email"
-                class="input"
-                id="email"
-                placeholder="example@email.com"
-                required
-            >
+            <input type="email" class="input" id="email" required>
         </div>
 
         <div class="form-group">
             <label>รหัสผ่าน</label>
-            <input
-                type="password"
-                class="input"
-                id="password"
-                placeholder="••••••••"
-                required
-            >
+            <input type="password" class="input" id="password" required>
         </div>
 
         <button type="submit" class="btn" id="loginBtn">
@@ -53,59 +42,61 @@
 
 </div>
 
-<!-- ================= FIREBASE + LOGIN SCRIPT ================= -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import {
-        getAuth,
-        signInWithEmailAndPassword,
-        sendPasswordResetEmail
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import {
-        getFirestore,
-        doc,
-        getDoc
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<!-- ===== Loading Overlay ===== -->
+<div class="loading-overlay" id="loading">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <div>กำลังเข้าสู่ระบบ...</div>
+    </div>
+</div>
 
-    /* 🔧 Firebase Config */
+<!-- ===== Firebase ===== -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 🔥 Firebase Config (แก้เป็นของคุณ)
     const firebaseConfig = {
-        apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-        authDomain: "sale-support-system.firebaseapp.com",
-        projectId: "sale-support-system",
-        storageBucket: "sale-support-system.appspot.com",
-        messagingSenderId: "640337786680",
-        appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "XXXX",
+        appId: "XXXX"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    /* ================= LOGIN ================= */
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    const form = document.getElementById("loginForm");
+    const loading = document.getElementById("loading");
+    const btn = document.getElementById("loginBtn");
+
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
-        const btn = document.getElementById("loginBtn");
 
+        // UI Loading
         btn.disabled = true;
         btn.innerText = "กำลังเข้าสู่ระบบ...";
+        loading.style.display = "flex";
 
         try {
-            // Firebase Auth
             const cred = await signInWithEmailAndPassword(auth, email, password);
             const uid = cred.user.uid;
 
-            // อ่าน role จาก Firestore
             const snap = await getDoc(doc(db, "users", uid));
 
-            let role = "user"; // ค่า default
-            if (snap.exists()) {
-                role = snap.data().role || "user";
+            if (!snap.exists()) {
+                throw new Error("ไม่พบข้อมูลผู้ใช้");
             }
 
-            // Redirect ตาม role
+            const role = snap.data().role;
+
             if (role === "admin") {
                 window.location.href = "./admin/main.html";
             } else if (role === "supervisor") {
@@ -114,38 +105,16 @@
                 window.location.href = "./user/main.html";
             }
 
-        } catch (error) {
-            alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-            console.error(error);
+        } catch (err) {
+            alert("เข้าสู่ระบบไม่สำเร็จ");
+            console.error(err);
+
             btn.disabled = false;
             btn.innerText = "เข้าสู่ระบบ";
-        }
-    });
-
-    /* ================= FORGOT PASSWORD ================= */
-    document.getElementById("forgotBtn").addEventListener("click", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("email").value;
-        if (!email) {
-            alert("กรุณากรอกอีเมลก่อนกดลืมรหัสผ่าน");
-            return;
-        }
-
-        try {
-            await sendPasswordResetEmail(auth, email);
-            alert("ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว");
-        } catch (error) {
-            alert("ไม่สามารถส่งอีเมลรีเซ็ตรหัสผ่านได้");
-            console.error(error);
+            loading.style.display = "none";
         }
     });
 </script>
-<div class="loading-overlay" id="loading">
-    <div class="loading-box">
-        <div class="spinner"></div>
-        <div>กำลังเข้าสู่ระบบ...</div>
-    </div>
-</div>
+
 </body>
 </html>
