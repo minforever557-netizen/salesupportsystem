@@ -1,157 +1,268 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>Register - Sale Support System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8" />
+<title>Register</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+/* ================= FIREBASE CONFIG ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+  authDomain: "sale-support-system.firebaseapp.com",
+  projectId: "sale-support-system",
+  storageBucket: "sale-support-system.firebasestorage.app",
+  messagingSenderId: "640337786680",
+  appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ================= DOM ================= */
+const form = document.getElementById("registerForm");
+const department = document.getElementById("department");
+const team = document.getElementById("team");
+const slidePanel = document.getElementById("emailExistPanel");
+
+/* ================= TEAM FILTER ================= */
+department.addEventListener("change", () => {
+  team.innerHTML = `<option value="">-- กรุณาเลือกทีม --</option>`;
+  let max = 0;
+
+  if (department.value === "FBB Dealer Sale") max = 10;
+  if (department.value === "FBB Direct Sale") max = 6;
+
+  if (department.value === "FBB Telesale") {
+    team.disabled = true;
+    return;
+  }
+
+  team.disabled = false;
+  for (let i = 1; i <= max; i++) {
+    team.innerHTML += `<option value="Team ${i}">Team ${i}</option>`;
+  }
+});
+
+/* ================= REGISTER ================= */
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const fullname = form.fullname.value;
+  const dept = department.value;
+  const teamVal = team.value || "-";
+  const phone = form.phone.value;
+  const email = form.email.value;
+  const password = form.password.value;
+
+  try {
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+    await setDoc(doc(db, "users", userCred.user.uid), {
+      fullname,
+      department: dept,
+      team: teamVal,
+      phone,
+      role: "user",
+      email,
+      createdAt: new Date()
+    });
+
+    /* ===== SUCCESS ANIMATION ===== */
+    showSuccess(() => {
+      signInWithEmailAndPassword(auth, email, password).then(() => {
+        window.location.href = "dashboard.html";
+      });
+    });
+
+  } catch (err) {
+    if (err.code === "auth/email-already-in-use") {
+      slidePanel.classList.add("show");
+    } else {
+      alert(err.message);
+    }
+  }
+});
+
+/* ================= UI ACTION ================= */
+window.goLogin = () => location.href = "login.html";
+window.goReset = () => location.href = "forgot.html";
+
+function showSuccess(callback) {
+  const success = document.getElementById("successOverlay");
+  success.classList.add("show");
+  setTimeout(callback, 1800);
+}
+</script>
+
+<style>
+/* ================= BASE ================= */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg,#eafff5,#ffffff);
+  margin: 0;
+}
+
+.container {
+  max-width: 520px;
+  background: #fff;
+  margin: 40px auto;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #1e6f5c;
+}
+
+/* ================= FORM ================= */
+label {
+  font-weight: 600;
+  margin-top: 14px;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px 14px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #d7efe7;
+  background: #f7fffb;
+  font-size: 15px;
+}
+
+button.main {
+  margin-top: 24px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg,#20c997,#0ca678);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ================= SLIDE PANEL ================= */
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -360px;
+  width: 320px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -10px 0 30px rgba(0,0,0,.15);
+  padding: 24px;
+  transition: .4s ease;
+  z-index: 999;
+}
+
+.side-panel.show {
+  right: 0;
+}
+
+.side-panel h3 {
+  color: #e8590c;
+}
+
+.side-panel button {
+  margin-top: 14px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn { background:#20c997;color:#fff; }
+.reset-btn { background:#fff;border:1px solid #20c997;color:#20c997; }
+
+/* ================= SUCCESS OVERLAY ================= */
+#successOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  color: #20c997;
+  opacity: 0;
+  pointer-events: none;
+  transition: .4s ease;
+}
+
+#successOverlay.show {
+  opacity: 1;
+}
+</style>
 </head>
 
-<body class="center-layout">
+<body>
 
-<div class="card" style="max-width:460px">
-
-  <div class="card-title">SALE PORTAL</div>
-  <div class="card-subtitle">Support Management System</div>
+<div class="container">
+  <h2>ลงทะเบียนเข้าใช้งาน</h2>
 
   <form id="registerForm">
+    <label>ชื่อ - นามสกุล</label>
+    <input name="fullname" required>
 
-    <div class="form-group">
-      <label>ชื่อ - นามสกุล</label>
-      <input class="input" id="fullName" required>
-    </div>
+    <label>หน่วยงาน</label>
+    <select id="department" required>
+      <option value="">-- กรุณาเลือก --</option>
+      <option>FBB Telesale</option>
+      <option>FBB Dealer Sale</option>
+      <option>FBB Direct Sale</option>
+    </select>
 
-    <div class="form-group">
-      <label>หน่วยงาน</label>
-      <select class="input" id="department" required>
-        <option value="">-- กรุณาเลือก --</option>
-        <option value="FBB Telesale">FBB Telesale</option>
-        <option value="FBB Dealer Sale">FBB Dealer Sale</option>
-        <option value="FBB Direct Sale">FBB Direct Sale</option>
-      </select>
-    </div>
+    <label>ทีม</label>
+    <select id="team" disabled>
+      <option value="">-- กรุณาเลือกทีม --</option>
+    </select>
 
-    <div class="form-group">
-      <label>ทีม</label>
-      <select class="input" id="team" required>
-        <option value="">-- กรุณาเลือกทีม --</option>
-      </select>
-    </div>
+    <label>เบอร์โทรศัพท์</label>
+    <input name="phone" required>
 
-    <div class="form-group">
-      <label>เบอร์โทรศัพท์</label>
-      <input class="input" id="phone" required>
-    </div>
+    <label>อีเมลพนักงาน</label>
+    <input name="email" type="email" required>
 
-    <div class="form-group">
-      <label>อีเมลพนักงาน</label>
-      <input type="email" class="input" id="email" required>
-    </div>
+    <label>รหัสผ่าน</label>
+    <input name="password" type="password" required>
 
-    <div class="form-group">
-      <label>รหัสผ่าน</label>
-      <input type="password" class="input" id="password" required minlength="6">
-    </div>
-
-    <button type="submit" class="btn" id="regBtn">
-      ลงทะเบียนเข้าใช้งาน
-    </button>
-
+    <button class="main">ลงทะเบียนเข้าใช้งาน</button>
   </form>
-
-  <div class="text-center" style="margin-top:16px">
-    มีบัญชีแล้ว? <a class="link" href="index.html">เข้าสู่ระบบ</a>
-  </div>
-
 </div>
 
-<!-- EMAIL EXISTS MODAL -->
-<div class="overlay hidden" id="emailExistsModal">
-  <div class="success-card">
-    <div class="checkmark" style="background:#f59e0b">!</div>
-    <p>
-      อีเมลนี้มีบัญชีผู้ใช้งานอยู่แล้ว<br>
-      กรุณาเลือกการดำเนินการ
-    </p>
-    <div style="display:flex; gap:10px; margin-top:12px">
-      <button class="btn" onclick="goLogin()">เข้าสู่ระบบ</button>
-      <button class="btn-outline" onclick="goReset()">รีเซ็ตรหัสผ่าน</button>
-    </div>
-  </div>
+<!-- EMAIL EXIST PANEL -->
+<div class="side-panel" id="emailExistPanel">
+  <h3>อีเมลนี้มีบัญชีอยู่แล้ว</h3>
+  <p>กรุณาเลือกการดำเนินการ</p>
+  <button class="login-btn" onclick="goLogin()">เข้าสู่ระบบ</button>
+  <button class="reset-btn" onclick="goReset()">รีเซ็ตรหัสผ่าน</button>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-    authDomain: "sale-support-system.firebaseapp.com",
-    projectId: "sale-support-system",
-    storageBucket: "sale-support-system.firebasestorage.app",
-    messagingSenderId: "640337786680",
-    appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  const department = document.getElementById("department");
-  const team = document.getElementById("team");
-
-  department.onchange = () => {
-    team.innerHTML = '<option value="">-- กรุณาเลือกทีม --</option>';
-    if (department.value === "FBB Dealer Sale") {
-      for (let i = 1; i <= 10; i++) team.innerHTML += `<option>Team ${i}</option>`;
-    }
-    if (department.value === "FBB Direct Sale") {
-      for (let i = 1; i <= 6; i++) team.innerHTML += `<option>Team ${i}</option>`;
-    }
-    if (department.value === "FBB Telesale") {
-      team.innerHTML += `<option>Telesale</option>`;
-    }
-  };
-
-  document.getElementById("registerForm").onsubmit = async (e) => {
-    e.preventDefault();
-    regBtn.disabled = true;
-    regBtn.innerText = "กำลังดำเนินการ...";
-
-    try {
-      const email = email.value;
-      const password = password.value;
-
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-      await setDoc(doc(db, "users", cred.user.uid), {
-        fullName: fullName.value,
-        phone: phone.value,
-        department: department.value,
-        team: team.value,
-        email,
-        role: "user",
-        createdAt: serverTimestamp()
-      });
-
-      window.location.href = "user/main.html";
-
-    } catch (error) {
-      regBtn.disabled = false;
-      regBtn.innerText = "ลงทะเบียนเข้าใช้งาน";
-
-      if (error.code === "auth/email-already-in-use") {
-        document.getElementById("emailExistsModal").classList.remove("hidden");
-      } else {
-        alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
-      }
-    }
-  };
-
-  window.goLogin = () => window.location.href = "index.html";
-  window.goReset = () => window.location.href = "forgot-password.html";
-</script>
+<!-- SUCCESS -->
+<div id="successOverlay">สมัครสำเร็จ ✓</div>
 
 </body>
 </html>
