@@ -568,3 +568,147 @@ body {
         font-size: 0.75rem;
     }
 }
+/* ===============================
+   DASHBOARD LAYOUT
+================================ */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===============================
+   SIDEBAR
+================================ */
+.dashboard-sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #064e3b, #022c22);
+    color: #fff;
+    padding: 24px 20px;
+}
+
+.dashboard-sidebar h2 {
+    margin: 0 0 32px;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dashboard-nav a {
+    color: #d1fae5;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s ease;
+}
+
+.dashboard-nav a:hover,
+.dashboard-nav a.active {
+    background: rgba(255,255,255,0.15);
+}
+
+.dashboard-logout {
+    margin-top: 40px;
+    color: #fca5a5 !important;
+}
+
+/* ===============================
+   MAIN
+================================ */
+.dashboard-main {
+    flex: 1;
+    padding: 28px;
+}
+
+/* ===============================
+   TOP BAR
+================================ */
+.dashboard-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.dashboard-user {
+    text-align: right;
+}
+
+.dashboard-user small {
+    color: var(--text-muted);
+}
+
+/* ===============================
+   STATS
+================================ */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+}
+
+.stat-card small {
+    color: var(--text-muted);
+}
+
+.stat-card h2 {
+    margin: 10px 0 0;
+    font-size: 2rem;
+}
+
+/* ===============================
+   QUICK MENU
+================================ */
+.dashboard-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.menu-tile {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: transform 0.2s ease;
+}
+
+.menu-tile:hover {
+    transform: translateY(-4px);
+}
+
+.menu-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+
+    .dashboard-sidebar {
+        width: 100%;
+    }
+}
