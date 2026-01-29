@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Login - Sale Support System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body class="center-layout">
@@ -16,12 +16,12 @@
     <form id="loginForm">
       <div class="form-group">
         <label>อีเมลผู้ใช้งาน</label>
-        <input type="email" id="email" class="input" required />
+        <input type="email" id="email" class="input" required>
       </div>
 
       <div class="form-group">
         <label>รหัสผ่าน</label>
-        <input type="password" id="password" class="input" required />
+        <input type="password" id="password" class="input" required>
       </div>
 
       <button type="submit" class="btn" id="loginBtn">
@@ -48,6 +48,7 @@
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // 🔹 Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
       authDomain: "sale-support-system.firebaseapp.com",
@@ -65,6 +66,12 @@
     const overlay = document.getElementById("loadingOverlay");
     const btn = document.getElementById("loginBtn");
 
+    /* 🔒 สำคัญมาก : ปิด overlay ทันทีที่โหลดหน้า */
+    window.addEventListener("load", () => {
+      overlay.classList.add("hidden");
+      btn.disabled = false;
+    });
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -75,19 +82,14 @@
       btn.disabled = true;
 
       try {
-        const userCred = await signInWithEmailAndPassword(auth, email, password);
-        const uid = userCred.user.uid;
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
 
-        const userRef = doc(db, "users", uid);
-        const snap = await getDoc(userRef);
-
-        if (!snap.exists()) {
-          throw new Error("ไม่พบข้อมูลผู้ใช้งานในระบบ");
-        }
+        const snap = await getDoc(doc(db, "users", uid));
+        if (!snap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้งาน");
 
         const role = snap.data().role;
 
-        // Redirect ตาม Role
         if (role === "admin") {
           window.location.href = "./admin/main.html";
         } else if (role === "supervisor") {
