@@ -1,52 +1,62 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>Sale Support System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Sale Support System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS กลาง -->
-  <link rel="stylesheet" href="style.css">
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="/salesupportsystem/style.css">
 </head>
 <body>
 
 <div class="app-layout">
 
-  <!-- SIDEBAR -->
-  <aside class="dashboard-sidebar">
-    <div class="sidebar-logo">SALE SUPPORT</div>
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            SALE SUPPORT
+        </div>
 
-    <nav class="dashboard-nav">
-      <a href="/salesupportsystem/index.html">🏠 Dashboard</a>
-      <a href="/salesupportsystem/user/main.html">👤 User</a>
-      <a href="/salesupportsystem/supervisor/main.html">🧑‍💼 Supervisor</a>
-      <a href="/salesupportsystem/admin/main.html">🛠 Admin</a>
-    </nav>
-  </aside>
+        <nav class="dashboard-nav">
+            <a href="/salesupportsystem/index.html">🏠 Dashboard</a>
+            <a href="/salesupportsystem/user/main.html">👤 User</a>
+            <a href="/salesupportsystem/supervisor/main.html">🧑‍💼 Supervisor</a>
+            <a href="/salesupportsystem/admin/main.html">🛠 Admin</a>
+        </nav>
+    </aside>
 
-  <!-- MAIN -->
-  <div class="main-area">
+    <!-- ================= MAIN AREA ================= -->
+    <div class="main-area">
 
-    <header class="topbar">
-      <div id="currentDateTime"></div>
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div class="topbar-center" id="currentDateTime">--</div>
 
-      <div class="user-box">
-        🔔 <b id="userName">User</b>
-        <button id="logoutBtn">Logout</button><br>
-        <small id="userEmail">email</small>
-      </div>
-    </header>
+            <div class="topbar-right">
+                <div class="user-box">
+                    <div class="user-top">
+                        🔔
+                        <b id="userName">User</b>
+                        <button id="logoutBtn" class="btn-logout">Logout</button>
+                    </div>
+                    <div class="user-bottom">
+                        <small id="userEmail">email</small>
+                        <small id="userTime">--</small>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-    <!-- จุดที่เอา content แต่ละหน้ามาใส่ -->
-    <main class="content-area">
-      <div id="page-content"></div>
-    </main>
+        <!-- CONTENT (ฉีดเนื้อหาแต่ละหน้า) -->
+        <main class="content-area">
+            <div id="page-content"></div>
+        </main>
 
-  </div>
+    </div>
 </div>
 
-
-<!-- JS กลาง -->
-<script src="assets/js/layout.js"></script>
+<!-- Global JS -->
+<script src="/salesupportsystem/assets/js/layout.js"></script>
 </body>
 </html>
