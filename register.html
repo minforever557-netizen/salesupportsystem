@@ -25,56 +25,60 @@
         <h1>Create Account</h1>
         <p class="subtitle">สมัครผู้ใช้งานใหม่</p>
 
+        <!-- fullname -->
         <div class="input-group">
             <i class="fa-solid fa-id-card"></i>
             <input type="text" id="fullname" placeholder="ชื่อ - นามสกุล">
         </div>
 
+        <!-- phone -->
         <div class="input-group">
             <i class="fa-solid fa-phone"></i>
             <input type="tel" id="phone" placeholder="เบอร์โทร">
         </div>
 
+        <!-- email -->
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
             <input type="email" id="email" placeholder="Email">
         </div>
+
+        <!-- password -->
         <div class="input-group password-group">
-    <i class="fa-solid fa-key"></i>
-    <input type="password" id="password" placeholder="Password">
-    <span class="toggle-password" data-target="password">
-        <i class="fa-solid fa-eye"></i>
-    </span>
+            <i class="fa-solid fa-key"></i>
+            <input type="password" id="password" placeholder="Password">
+            <span class="toggle-password" data-target="password">
+                <i class="fa-solid fa-eye"></i>
+            </span>
         </div>
 
+        <!-- confirm password -->
         <div class="input-group password-group">
-    <i class="fa-solid fa-key"></i>
-    <input type="password" id="confirmPassword" placeholder="Confirm Password">
-    <span class="toggle-password" data-target="confirmPassword">
-        <i class="fa-solid fa-eye"></i>
-    </span>
+            <i class="fa-solid fa-key"></i>
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <span class="toggle-password" data-target="confirmPassword">
+                <i class="fa-solid fa-eye"></i>
+            </span>
         </div>
 
-        <!-- ทีมหลัก -->
+        <!-- team -->
         <div class="input-group">
-    <i class="fa-solid fa-users"></i>
-    <select id="team" class="styled-select">
-        <option value="">เลือกทีม</option>
-        <option value="FBB Telesale">FBB Telesale</option>
-        <option value="FBB Dealer Sales">FBB Dealer Sales</option>
-        <option value="FBB Direct Sales">FBB Direct Sales</option>
-    </select>
-</div>
+            <i class="fa-solid fa-users"></i>
+            <select id="team" class="styled-select">
+                <option value="">เลือกทีม</option>
+                <option value="FBB Telesale">FBB Telesale</option>
+                <option value="FBB Dealer Sales">FBB Dealer Sales</option>
+                <option value="FBB Direct Sales">FBB Direct Sales</option>
+            </select>
+        </div>
 
-
-        <!-- ทีมย่อย -->
-<div class="input-group" id="subTeamGroup" hidden>
-    <i class="fa-solid fa-sitemap"></i>
-    <select id="subTeam" class="styled-select">
-        <option value="">เลือกทีมย่อย</option>
-    </select>
-</div>
-
+        <!-- sub team -->
+        <div class="input-group" id="subTeamGroup" style="display:none;">
+            <i class="fa-solid fa-sitemap"></i>
+            <select id="subTeam" class="styled-select">
+                <option value="">เลือกทีมย่อย</option>
+            </select>
+        </div>
 
         <button id="registerBtn" class="btn-primary">
             <i class="fa-solid fa-user-check"></i>
@@ -92,9 +96,97 @@
     </div>
 </div>
 
-<!-- ✅ โหลด JS หลัง DOM -->
+<!-- Firebase -->
 <script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
-<script type="module" src="/salesupportsystem/assets/js/register.js"></script>
+
+<!-- Register Logic -->
+<script type="module">
+import { auth, db } from "/salesupportsystem/assets/js/firebase.js";
+import {
+    createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    doc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+/* 👁️ toggle password */
+document.querySelectorAll(".toggle-password").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const input = document.getElementById(btn.dataset.target);
+        const icon = btn.querySelector("i");
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    });
+});
+
+/* 👥 team logic */
+const team = document.getElementById("team");
+const subTeamGroup = document.getElementById("subTeamGroup");
+const subTeam = document.getElementById("subTeam");
+
+team.addEventListener("change", () => {
+    subTeam.innerHTML = `<option value="">เลือกทีมย่อย</option>`;
+    subTeamGroup.style.display = "none";
+
+    if (team.value === "FBB Dealer Sales" || team.value === "FBB Direct Sales") {
+        for (let i = 1; i <= 10; i++) {
+            const opt = document.createElement("option");
+            opt.value = `${team.value} ทีม ${i}`;
+            opt.textContent = `${team.value} ทีม ${i}`;
+            subTeam.appendChild(opt);
+        }
+        subTeamGroup.style.display = "flex";
+    }
+});
+
+/* 📝 register */
+document.getElementById("registerBtn").onclick = async () => {
+    const fullname = fullname.value.trim();
+    const phone = phone.value.trim();
+    const email = email.value.trim();
+    const password = password.value;
+    const confirm = confirmPassword.value;
+
+    const msg = document.getElementById("msg");
+
+    if (!fullname || !phone || !email || !password) {
+        msg.innerText = "⚠️ กรุณากรอกข้อมูลให้ครบ";
+        return;
+    }
+
+    if (password !== confirm) {
+        msg.innerText = "❌ รหัสผ่านไม่ตรงกัน";
+        return;
+    }
+
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+        await setDoc(doc(db, "users", cred.user.uid), {
+            fullname,
+            phone,
+            email,
+            team: team.value,
+            subTeam: subTeam.value || "",
+            role: "user",
+            createdAt: new Date()
+        });
+
+        msg.innerText = "✅ สมัครสมาชิกสำเร็จ";
+        setTimeout(() => location.href = "index.html", 1500);
+
+    } catch (err) {
+        console.error(err);
+        msg.innerText = "❌ " + err.message;
+    }
+};
+</script>
 
 </body>
 </html>
