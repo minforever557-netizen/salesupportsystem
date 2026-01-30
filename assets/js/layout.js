@@ -1,35 +1,54 @@
-// โหลด layout.html แล้วฝังเข้า body
-fetch('../layout.html')
-  .then(res => res.text())
-  .then(html => {
-    document.body.innerHTML = html;
+document.addEventListener("DOMContentLoaded", async () => {
 
-    // ดึงเนื้อหาของหน้าเดิม
-    const page = document.getElementById('page');
-    if (page) {
-      document.getElementById('pageContent').innerHTML = page.innerHTML;
+    // 🔹 1. เก็บเนื้อหาหน้าเดิม
+    const pageContentEl = document.getElementById("page-content");
+    if (!pageContentEl) {
+        console.warn("ไม่พบ #page-content → ไม่ inject layout");
+        return;
+    }
+    const pageHTML = pageContentEl.innerHTML;
+
+    // 🔹 2. โหลด layout.html
+    const res = await fetch("/salesupportsystem/layout.html");
+    const layoutHTML = await res.text();
+
+    // 🔹 3. เขียน layout ลง body
+    document.body.innerHTML = layoutHTML;
+
+    // 🔹 4. ใส่เนื้อหากลับ
+    const target = document.getElementById("page-content");
+    if (target) {
+        target.innerHTML = pageHTML;
     }
 
+    // 🔹 5. init หลัง DOM พร้อม
     initLayout();
-  });
+});
 
 function initLayout() {
-  // เวลา + วันที่
-  setInterval(() => {
-    const now = new Date();
-    document.getElementById('currentDateTime').innerText =
-      now.toLocaleString('th-TH');
 
-    document.getElementById('userTime').innerText =
-      now.toLocaleTimeString('th-TH');
-  }, 1000);
+    // ===== วันที่ / เวลา =====
+    const dateEl = document.getElementById("currentDateTime");
+    const timeEl = document.getElementById("userTime");
 
-  // Logout (ผูก Firebase ทีหลังได้)
-  document.getElementById('logoutBtn').onclick = () => {
-    alert('Logout');
-  };
+    setInterval(() => {
+        const now = new Date();
+        if (dateEl) dateEl.innerText = now.toLocaleString("th-TH");
+        if (timeEl) timeEl.innerText = now.toLocaleTimeString("th-TH");
+    }, 1000);
 
-  // mock user
-  document.getElementById('userName').innerText = 'Demo User';
-  document.getElementById('userEmail').innerText = 'demo@email.com';
+    // ===== Logout =====
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.onclick = () => {
+            alert("Logout (ผูก Firebase ภายหลัง)");
+        };
+    }
+
+    // ===== Mock User (เอาออกตอนต่อ Firebase) =====
+    const userName = document.getElementById("userName");
+    const userEmail = document.getElementById("userEmail");
+
+    if (userName) userName.innerText = "Demo User";
+    if (userEmail) userEmail.innerText = "demo@email.com";
 }
