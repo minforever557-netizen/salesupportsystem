@@ -474,3 +474,58 @@ textarea.form-control {
     font-size: 14px;
 }
 
+/* ================= LOGIN LOADING ================= */
+.login-loading {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.login-loading.hidden {
+    display: none;
+}
+
+.loading-card {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    animation: popIn .3s ease;
+}
+
+.loading-card p {
+    margin-top: 16px;
+    font-weight: 600;
+    color: #065f46;
+}
+
+/* spinner */
+.spinner {
+    width: 46px;
+    height: 46px;
+    border: 5px solid #d1fae5;
+    border-top: 5px solid #22c55e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
