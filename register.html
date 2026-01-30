@@ -39,30 +39,42 @@
             <i class="fa-solid fa-envelope"></i>
             <input type="email" id="email" placeholder="Email">
         </div>
+        <div class="input-group password-group">
+    <i class="fa-solid fa-key"></i>
+    <input type="password" id="password" placeholder="Password">
+    <span class="toggle-password" data-target="password">
+        <i class="fa-solid fa-eye"></i>
+    </span>
+        </div>
 
-        <div class="input-group">
-            <i class="fa-solid fa-key"></i>
-            <input type="password" id="password" placeholder="Password">
+        <div class="input-group password-group">
+    <i class="fa-solid fa-key"></i>
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+    <span class="toggle-password" data-target="confirmPassword">
+        <i class="fa-solid fa-eye"></i>
+    </span>
         </div>
 
         <!-- ทีมหลัก -->
         <div class="input-group">
-            <i class="fa-solid fa-users"></i>
-            <select id="team">
-                <option value="">-- เลือกทีม --</option>
-                <option value="FBB Telesale">FBB Telesale</option>
-                <option value="FBB Dealer Sales">FBB Dealer Sales</option>
-                <option value="FBB Direct Sales">FBB Direct Sales</option>
-            </select>
-        </div>
+    <i class="fa-solid fa-users"></i>
+    <select id="team" class="styled-select">
+        <option value="">เลือกทีม</option>
+        <option value="FBB Telesale">FBB Telesale</option>
+        <option value="FBB Dealer Sales">FBB Dealer Sales</option>
+        <option value="FBB Direct Sales">FBB Direct Sales</option>
+    </select>
+</div>
+
 
         <!-- ทีมย่อย -->
-        <div class="input-group" id="subTeamGroup" hidden>
-            <i class="fa-solid fa-sitemap"></i>
-            <select id="subTeam">
-                <option value="">-- เลือกทีมย่อย --</option>
-            </select>
-        </div>
+<div class="input-group" id="subTeamGroup" hidden>
+    <i class="fa-solid fa-sitemap"></i>
+    <select id="subTeam" class="styled-select">
+        <option value="">เลือกทีมย่อย</option>
+    </select>
+</div>
+
 
         <button id="registerBtn" class="btn-primary">
             <i class="fa-solid fa-user-check"></i>
