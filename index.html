@@ -5,27 +5,59 @@
     <title>Sale Support System | Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
     <!-- CSS -->
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="/salesupportsystem/style.css">
 </head>
 
 <body class="login-page">
 
 <div class="login-container">
     <div class="login-card">
-        <h1>🔐 Sale Support System</h1>
-        <p class="subtitle">เข้าสู่ระบบเพื่อใช้งาน</p>
 
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
+        <!-- ICON -->
+        <div class="login-icon">
+            <i class="fa-solid fa-lock"></i>
+        </div>
 
-        <button id="loginBtn" class="btn-primary">Login</button>
+        <!-- TITLE -->
+        <h1>Sale Support System</h1>
+        <p class="subtitle">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            เข้าสู่ระบบเพื่อใช้งาน
+        </p>
 
+        <!-- EMAIL -->
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="Email">
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="input-group">
+            <i class="fa-solid fa-key"></i>
+            <input type="password" id="password" placeholder="Password">
+        </div>
+
+        <!-- BUTTON -->
+        <button id="loginBtn" class="btn-primary">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            Login
+        </button>
+
+        <!-- MESSAGE -->
         <div id="msg" class="msg"></div>
+
     </div>
 </div>
 
-<!-- Loading -->
+<!-- 🔄 LOGIN LOADING -->
 <div id="loginLoading" class="login-loading">
     <div class="loading-card">
         <div class="spinner"></div>
@@ -34,8 +66,8 @@
 </div>
 
 <!-- JS -->
-<script type="module" src="./assets/js/firebase.js"></script>
-<script type="module" src="./assets/js/login.js"></script>
+<script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
+<script type="module" src="/salesupportsystem/assets/js/login.js"></script>
 
 </body>
 </html>
