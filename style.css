@@ -441,6 +441,21 @@ body.login-page {
     font-size: 26px;
     color: #222;
 }
+.login-links {
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.login-links a {
+    color: #1e9f61;
+    text-decoration: none;
+    margin: 0 6px;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
 
 .subtitle {
     margin: 8px 0 25px;
