@@ -2,27 +2,54 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Create Account</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Create Account | Sale Support System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link rel="stylesheet" href="/salesupportsystem/style.css">
 </head>
-<body class="auth-page">
 
-<div class="auth-box">
-    <h2>📝 Create Account</h2>
+<body class="login-page">
 
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+<div class="login-container">
+    <div class="login-card">
 
-    <select id="role">
-        <option value="user">User</option>
-        <option value="supervisor">Supervisor</option>
-        <option value="admin">Admin</option>
-    </select>
+        <div class="login-icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
 
-    <button id="registerBtn">Register</button>
-    <p id="msg"></p>
+        <h1>Create Account</h1>
+        <p class="subtitle">สร้างบัญชีผู้ใช้งานใหม่</p>
+
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="Email">
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-key"></i>
+            <input type="password" id="password" placeholder="Password">
+        </div>
+
+        <button id="registerBtn" class="btn-primary">
+            <i class="fa-solid fa-user-check"></i>
+            Register
+        </button>
+
+        <div id="msg" class="msg"></div>
+
+        <div class="login-links">
+            <a href="index.html">
+                <i class="fa-solid fa-arrow-left"></i> Back to Login
+            </a>
+        </div>
+
+    </div>
 </div>
 
-<script type="module" src="assets/js/register.js"></script>
+<script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
+<script type="module" src="/salesupportsystem/assets/js/register.js"></script>
 </body>
 </html>
