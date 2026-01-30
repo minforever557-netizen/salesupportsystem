@@ -1,17 +1,17 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
     signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+import {
+    doc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
     const btn = document.getElementById("loginBtn");
     const msg = document.getElementById("msg");
-
-    if (!btn) {
-        console.error("❌ loginBtn not found");
-        return;
-    }
+    const loading = document.getElementById("loginLoading");
 
     btn.onclick = async () => {
 
@@ -23,23 +23,40 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // 🔄 animation
+        // 🔄 show animation
+        loading.classList.add("show");
         btn.disabled = true;
-        btn.innerText = "Logging in...";
-        msg.innerText = "⏳ กำลังเข้าสู่ระบบ...";
 
         try {
-            await signInWithEmailAndPassword(auth, email, pass);
+            // 1. Login
+            const cred = await signInWithEmailAndPassword(auth, email, pass);
+            const user = cred.user;
 
-            msg.innerText = "✅ Login สำเร็จ";
-            location.href = "/salesupportsystem/user/main.html";
+            // 2. โหลด role จาก Firestore
+            const snap = await getDoc(doc(db, "users", user.uid));
+
+            if (!snap.exists()) {
+                throw new Error("ไม่พบข้อมูลผู้ใช้");
+            }
+
+            const role = snap.data().role;
+
+            // 3. Redirect ตาม role
+            if (role === "admin") {
+                location.href = "./admin/main.html";
+            } 
+            else if (role === "supervisor") {
+                location.href = "./supervisor/main.html";
+            } 
+            else {
+                location.href = "./user/main.html";
+            }
 
         } catch (err) {
             console.error(err);
+            loading.classList.remove("show");
             msg.innerText = "❌ " + err.message;
-
             btn.disabled = false;
-            btn.innerText = "Login";
         }
     };
 });
