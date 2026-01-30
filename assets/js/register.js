@@ -1,38 +1,91 @@
+import { auth, db } from "./firebase.js";
 import {
     createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import {
-    doc, setDoc
+    doc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+const teamSelect = document.getElementById("team");
+const subTeamGroup = document.getElementById("subTeamGroup");
+const subTeamSelect = document.getElementById("subTeam");
+const msg = document.getElementById("msg");
+
+/* ======================
+   TEAM CHANGE
+====================== */
+teamSelect.onchange = () => {
+
+    const team = teamSelect.value;
+    subTeamSelect.innerHTML = "";
+
+    if (team === "FBB Dealer Sales" || team === "FBB Direct Sales") {
+
+        subTeamGroup.style.display = "flex";
+
+        const prefix = team === "FBB Dealer Sales"
+            ? "FBB Dealer Sales"
+            : "FBB Direct Sales";
+
+        subTeamSelect.innerHTML = `<option value="">-- เลือกทีมย่อย --</option>`;
+
+        for (let i = 1; i <= 10; i++) {
+            const opt = document.createElement("option");
+            opt.value = `${prefix} ${i}`;
+            opt.textContent = `${prefix} ทีม ${i}`;
+            subTeamSelect.appendChild(opt);
+        }
+
+    } else {
+        subTeamGroup.style.display = "none";
+    }
+};
+
+/* ======================
+   REGISTER
+====================== */
 document.getElementById("registerBtn").onclick = async () => {
 
-    const email = document.getElementById("email").value;
-    const pass  = document.getElementById("password").value;
-    const role  = document.getElementById("role").value;
-    const msg   = document.getElementById("msg");
+    const fullname = document.getElementById("fullname").value.trim();
+    const phone    = document.getElementById("phone").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const team     = teamSelect.value;
+    const subTeam  = subTeamSelect.value || null;
+
+    if (!fullname || !phone || !email || !password || !team) {
+        msg.innerText = "⚠️ กรุณากรอกข้อมูลให้ครบ";
+        return;
+    }
+
+    if ((team === "FBB Dealer Sales" || team === "FBB Direct Sales") && !subTeam) {
+        msg.innerText = "⚠️ กรุณาเลือกทีมย่อย";
+        return;
+    }
 
     try {
-        const cred = await createUserWithEmailAndPassword(
-            window.auth,
+        msg.innerText = "⏳ กำลังสร้างบัญชี...";
+
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+        await setDoc(doc(db, "users", cred.user.uid), {
+            fullname,
+            phone,
             email,
-            pass
-        );
+            team,
+            subTeam,
+            role: "user",
+            createdAt: serverTimestamp()
+        });
 
-        await setDoc(
-            doc(window.db, "users", cred.user.uid),
-            {
-                email,
-                role,
-                createdAt: new Date()
-            }
-        );
+        msg.style.color = "green";
+        msg.innerText = "✅ สมัครสมาชิกสำเร็จ";
 
-        msg.innerText = "✅ Register สำเร็จ";
-        setTimeout(() => location.href = "index.html", 1000);
+        setTimeout(() => location.href = "index.html", 1500);
 
     } catch (err) {
-        msg.innerText = err.message;
+        console.error(err);
+        msg.innerText = "❌ " + err.message;
     }
 };
