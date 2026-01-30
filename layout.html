@@ -12,47 +12,39 @@
 
 <div class="app-layout">
 
-  <!-- ========== SIDEBAR ========== -->
+  <!-- SIDEBAR -->
   <aside class="dashboard-sidebar">
-    <div class="sidebar-logo">
-      <span>SALE SUPPORT</span>
-    </div>
+    <div class="sidebar-logo">SALE SUPPORT</div>
 
     <nav class="dashboard-nav">
-      <a href="index.html">🏠 Dashboard</a>
-      <a href="user/main.html">👤 User</a>
-      <a href="supervisor/main.html">🧑‍💼 Supervisor</a>
-      <a href="admin/main.html">🛠 Admin</a>
+      <a href="/salesupportsystem/index.html">🏠 Dashboard</a>
+      <a href="/salesupportsystem/user/main.html">👤 User</a>
+      <a href="/salesupportsystem/supervisor/main.html">🧑‍💼 Supervisor</a>
+      <a href="/salesupportsystem/admin/main.html">🛠 Admin</a>
     </nav>
   </aside>
 
-  <!-- ========== MAIN AREA ========== -->
+  <!-- MAIN -->
   <div class="main-area">
 
-    <!-- TOP BAR -->
     <header class="topbar">
-      <div class="topbar-center" id="currentDateTime">--</div>
+      <div id="currentDateTime"></div>
 
-      <div class="topbar-right">
-        <div class="user-box">
-          <div class="user-top">
-            🔔
-            <b id="userName">User</b>
-            <button id="logoutBtn" class="btn-logout">Logout</button>
-          </div>
-          <div class="user-bottom">
-            <small id="userEmail">email</small>
-            <small id="userTime">--</small>
-          </div>
-        </div>
+      <div class="user-box">
+        🔔 <b id="userName">User</b>
+        <button id="logoutBtn">Logout</button><br>
+        <small id="userEmail">email</small>
       </div>
     </header>
 
-    <!-- CONTENT -->
-    <main class="content-area" id="pageContent"></main>
+    <!-- จุดที่เอา content แต่ละหน้ามาใส่ -->
+    <main class="content-area">
+      <div id="page-content"></div>
+    </main>
 
   </div>
 </div>
+
 
 <!-- JS กลาง -->
 <script src="assets/js/layout.js"></script>
