@@ -4,40 +4,32 @@
     <meta charset="UTF-8">
     <title>Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Global CSS -->
-    <link rel="stylesheet" href="/salesupportsystem/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-layout">
 
-    <!-- ================= SIDEBAR ================= -->
     <aside class="dashboard-sidebar">
-        <div class="sidebar-logo">
-            SALE SUPPORT
-        </div>
+        <div class="sidebar-logo">SALE SUPPORT</div>
 
         <nav class="dashboard-nav">
-            <a href="/salesupportsystem/index.html">🏠 Dashboard</a>
-            <a href="/salesupportsystem/user/main.html">👤 User</a>
-            <a href="/salesupportsystem/supervisor/main.html">🧑‍💼 Supervisor</a>
-            <a href="/salesupportsystem/admin/main.html">🛠 Admin</a>
+            <a href="index.html">🏠 Dashboard</a>
+            <a href="user/main.html">👤 User</a>
+            <a href="supervisor/main.html">🧑‍💼 Supervisor</a>
+            <a href="admin/main.html">🛠 Admin</a>
         </nav>
     </aside>
 
-    <!-- ================= MAIN AREA ================= -->
     <div class="main-area">
 
-        <!-- TOP BAR -->
         <header class="topbar">
             <div class="topbar-center" id="currentDateTime">--</div>
 
             <div class="topbar-right">
                 <div class="user-box">
                     <div class="user-top">
-                        🔔
-                        <b id="userName">User</b>
+                        🔔 <b id="userName">User</b>
                         <button id="logoutBtn" class="btn-logout">Logout</button>
                     </div>
                     <div class="user-bottom">
@@ -48,15 +40,13 @@
             </div>
         </header>
 
-        <!-- CONTENT (ฉีดเนื้อหาแต่ละหน้า) -->
         <main class="content-area">
-            <div id="page-content"></div>
+            <!-- 🔴 ตรงนี้คือจุดฉีด -->
+            <div id="layout-slot"></div>
         </main>
 
     </div>
 </div>
 
-<!-- Global JS -->
-<script src="/salesupportsystem/assets/js/layout.js"></script>
 </body>
 </html>
