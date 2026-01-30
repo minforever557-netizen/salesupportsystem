@@ -6,47 +6,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-layout">
 
-    <!-- SIDEBAR -->
+    <!-- ========== SIDEBAR ========== -->
     <aside class="dashboard-sidebar" id="sidebar">
         <div class="sidebar-logo">
             <span>SALE SUPPORT</span>
         </div>
 
-        <nav class="dashboard-nav" id="sidebarMenu"></nav>
+        <nav class="dashboard-nav" id="sidebarMenu">
+            <a href="#" class="active">🏠 Dashboard</a>
+            <a href="#">🎫 Tickets</a>
+            <a href="#">📄 History</a>
+            <a href="#" class="logout">🚪 Logout</a>
+        </nav>
     </aside>
 
-    <!-- MAIN -->
+    <!-- ========== MAIN AREA ========== -->
     <div class="main-area">
 
         <!-- TOP BAR -->
         <header class="topbar">
-            <div class="topbar-center" id="currentDateTime"></div>
+
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+
+            <div class="topbar-center" id="currentDateTime">
+                --
+            </div>
 
             <div class="topbar-right">
-                <div class="user-info">
-                    <span class="bell">🔔</span>
-                    <div>
-                        <b id="userName">User</b><br>
-                        <small id="userEmail">email</small><br>
-                        <small id="userTime">--</small>
+                <div class="user-box">
+
+                    <div class="user-top">
+                        <span class="icon-bell">🔔</span>
+                        <strong id="userName">User</strong>
+                        <button id="logoutBtn" class="btn-logout">Logout</button>
                     </div>
-                    <button id="logoutBtn" class="btn-logout">Logout</button>
+
+                    <div class="user-bottom">
+                        <span id="userEmail">email</span>
+                        <span id="userTime">--</span>
+                    </div>
+
                 </div>
             </div>
+
         </header>
 
         <!-- CONTENT -->
-        <main class="content-area" id="pageContent"></main>
+        <main class="content-area" id="pageContent">
+            <div class="card">
+                <h2>Welcome</h2>
+                <p>ระบบ Sale Support พร้อมใช้งาน</p>
+            </div>
+        </main>
+
     </div>
 </div>
 
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<script src="assets/js/layout.js"></script>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+</script>
 
 </body>
 </html>
