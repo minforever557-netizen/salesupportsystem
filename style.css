@@ -620,28 +620,4 @@ body.login-page {
 .toggle-password:hover {
     color: #27ae60;
 }
-/* ===== PASSWORD GROUP FIX ===== */
-.password-group {
-    position: relative;
-}
-
-.password-group input {
-    padding-right: 46px; /* เผื่อที่ให้ปุ่มตา */
-}
-
-.toggle-password {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
-    z-index: 5; /* 🔑 สำคัญมาก */
-}
-
-.toggle-password:hover {
-    color: #22c55e;
-}
-
-
 
