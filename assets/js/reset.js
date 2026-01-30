@@ -1,18 +1,16 @@
-import { auth } from "./firebase.js";
-import { sendPasswordResetEmail }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.getElementById("resetBtn").onclick = async () => {
 
+    const email = document.getElementById("email").value;
+    const msg   = document.getElementById("msg");
+
     try {
-        await sendPasswordResetEmail(auth,
-            document.getElementById("email").value
-        );
-
-        document.getElementById("msg").innerText =
-            "📩 ส่ง Email Reset แล้ว";
-
+        await sendPasswordResetEmail(window.auth, email);
+        msg.innerText = "📩 ส่งลิงก์ Reset Password แล้ว";
     } catch (err) {
-        document.getElementById("msg").innerText = err.message;
+        msg.innerText = err.message;
     }
 };
