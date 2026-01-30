@@ -1,33 +1,36 @@
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc }
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
 
-    // 🔹 1. เก็บเนื้อหาหน้าเดิม
-    const pageContentEl = document.getElementById("page-content");
-    if (!pageContentEl) {
-        console.warn("ไม่พบ #page-content → ไม่ inject layout");
-        return;
-    }
-    const pageHTML = pageContentEl.innerHTML;
+    /* ================= 1. เก็บ content หน้าเดิม ================= */
+    const pageEl = document.getElementById("page-content");
+    if (!pageEl) return;
 
-    // 🔹 2. โหลด layout.html
+    const pageHTML = pageEl.innerHTML;
+
+    /* ================= 2. โหลด layout ================= */
     const res = await fetch("/salesupportsystem/layout.html");
     const layoutHTML = await res.text();
 
-    // 🔹 3. เขียน layout ลง body
     document.body.innerHTML = layoutHTML;
 
-    // 🔹 4. ใส่เนื้อหากลับ
-    const target = document.getElementById("page-content");
-    if (target) {
-        target.innerHTML = pageHTML;
-    }
+    /* ================= 3. ใส่ content กลับ ================= */
+    const slot = document.getElementById("page-content");
+    slot.innerHTML = pageHTML;
 
-    // 🔹 5. init หลัง DOM พร้อม
+    /* ================= 4. init ================= */
     initLayout();
+    initAuth();
 });
 
+/* ================= UI Layout ================= */
 function initLayout() {
 
-    // ===== วันที่ / เวลา =====
+    // เวลา
     const dateEl = document.getElementById("currentDateTime");
     const timeEl = document.getElementById("userTime");
 
@@ -37,18 +40,54 @@ function initLayout() {
         if (timeEl) timeEl.innerText = now.toLocaleTimeString("th-TH");
     }, 1000);
 
-    // ===== Logout =====
+    // Logout
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
-        logoutBtn.onclick = () => {
-            alert("Logout (ผูก Firebase ภายหลัง)");
-        };
+        logoutBtn.onclick = () => signOut(auth);
+    }
+}
+
+/* ================= Firebase Auth + Role ================= */
+function initAuth() {
+
+    onAuthStateChanged(auth, async (user) => {
+
+        if (!user) {
+            window.location.href = "/salesupportsystem/index.html";
+            return;
+        }
+
+        document.getElementById("userEmail").innerText = user.email;
+
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (!snap.exists()) return;
+
+        const role = snap.data().role;
+        renderMenu(role);
+    });
+}
+
+/* ================= Role Menu ================= */
+function renderMenu(role) {
+
+    const nav = document.querySelector(".dashboard-nav");
+    nav.innerHTML = "";
+
+    nav.innerHTML += `<a href="/salesupportsystem/index.html">🏠 Dashboard</a>`;
+
+    if (role === "user") {
+        nav.innerHTML += `<a href="/salesupportsystem/user/main.html">👤 User</a>`;
     }
 
-    // ===== Mock User (เอาออกตอนต่อ Firebase) =====
-    const userName = document.getElementById("userName");
-    const userEmail = document.getElementById("userEmail");
+    if (role === "supervisor") {
+        nav.innerHTML += `<a href="/salesupportsystem/supervisor/main.html">🧑‍💼 Supervisor</a>`;
+    }
 
-    if (userName) userName.innerText = "Demo User";
-    if (userEmail) userEmail.innerText = "demo@email.com";
+    if (role === "admin") {
+        nav.innerHTML += `
+            <a href="/salesupportsystem/admin/main.html">🛠 Admin</a>
+            <a href="/salesupportsystem/supervisor/main.html">🧑‍💼 Supervisor</a>
+            <a href="/salesupportsystem/user/main.html">👤 User</a>
+        `;
+    }
 }
