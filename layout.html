@@ -5,128 +5,55 @@
     <title>Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS กลาง -->
+    <!-- Global CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- ========== APP LAYOUT ========== -->
 <div class="app-layout">
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="dashboard-sidebar" id="sidebar">
-
         <div class="sidebar-logo">
-            <!-- เปลี่ยน logo ได้ -->
-            <img src="assets/img/logo.svg" alt="Logo">
             <span>SALE SUPPORT</span>
         </div>
 
-        <nav class="dashboard-nav">
-            <a href="dashboard.html" class="active">📊 Dashboard</a>
-            <a href="manage-job.html">🛠 จัดการงาน</a>
-            <a href="history.html">📄 ประวัติงาน</a>
-            <a href="#" class="logout">🚪 ออกจากระบบ</a>
+        <nav class="dashboard-nav" id="sidebarMenu">
+            <!-- menu inject by role -->
         </nav>
-
     </aside>
 
-    <!-- ================= MAIN AREA ================= -->
+    <!-- ===== MAIN ===== -->
     <div class="main-area">
 
-        <!-- ========== TOP BAR ========== -->
+        <!-- TOP BAR -->
         <header class="topbar">
+            <div class="topbar-center" id="currentDateTime"></div>
 
-            <!-- LEFT (Hamburger) -->
-            <button class="hamburger" id="btnHamburger">☰</button>
-
-            <!-- CENTER (DateTime) -->
-            <div class="topbar-center">
-                <span id="currentDateTime">--</span>
-            </div>
-
-            <!-- RIGHT (User Info) -->
             <div class="topbar-right">
-                <div class="user-box">
-
-                    <div class="user-top">
-                        <span class="icon-bell">🔔</span>
-                        <strong id="userName">User Name</strong>
-                        <button class="btn-logout" id="logoutBtn">Logout</button>
+                <div class="user-info">
+                    <span class="bell">🔔</span>
+                    <div>
+                        <b id="userName">User</b><br>
+                        <small id="userEmail">email</small><br>
+                        <small id="userTime">--</small>
                     </div>
-
-                    <div class="user-bottom">
-                        <small id="userEmail">user@email.com</small>
-                        <small id="loginDateTime">--</small>
-                    </div>
-
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
                 </div>
             </div>
-
         </header>
 
-        <!-- ================= CONTENT ================= -->
-        <main class="content-area" id="pageContent">
-
-            <!-- 👇 เนื้อหาแต่ละหน้าใส่ตรงนี้ -->
-            <div class="card">
-                <h2>Welcome 🎉</h2>
-                <p>นี่คือ Layout กลางของระบบ Sale Support</p>
-            </div>
-
-        </main>
+        <!-- CONTENT (เปลี่ยนเฉพาะตรงนี้) -->
+        <main class="content-area" id="pageContent"></main>
 
     </div>
 </div>
 
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-<!-- ================= JS (Layout Logic) ================= -->
-<script>
-/* ===== SIDEBAR MOBILE ===== */
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('sidebarOverlay');
-const btnHamburger = document.getElementById('btnHamburger');
-
-btnHamburger.onclick = () => {
-    sidebar.classList.add('show');
-    overlay.classList.add('show');
-};
-
-overlay.onclick = () => {
-    sidebar.classList.remove('show');
-    overlay.classList.remove('show');
-};
-
-/* ===== DATE TIME ===== */
-function updateDateTime() {
-    const now = new Date();
-    const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    };
-
-    const text = now.toLocaleDateString('th-TH', options);
-    document.getElementById('currentDateTime').innerText = text;
-    document.getElementById('loginDateTime').innerText = text;
-}
-
-setInterval(updateDateTime, 1000);
-updateDateTime();
-
-/* ===== MOCK USER (เปลี่ยนเป็นของจริงภายหลัง) ===== */
-document.getElementById('userName').innerText = 'Supervisor Name';
-document.getElementById('userEmail').innerText = 'supervisor@email.com';
-
-/* ===== LOGOUT ===== */
-document.getElementById('logoutBtn').onclick = () => {
-    alert('Logout');
-    // window.location.href = 'index.html';
-};
-</script>
+<!-- Global JS -->
+<script src="assets/js/layout.js"></script>
 
 </body>
 </html>
