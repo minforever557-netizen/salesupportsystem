@@ -10,10 +10,12 @@ import { getFirestore } from
 const firebaseConfig = {
     apiKey: "AIzaSy...",
     authDomain: "sale-support-system.firebaseapp.com",
-    projectId: "sale-support-system"
+    projectId: "sale-support-system",
 };
 
 const app = initializeApp(firebaseConfig);
 
 window.auth = getAuth(app);
 window.db   = getFirestore(app);
+
+console.log("🔥 Firebase initialized");
