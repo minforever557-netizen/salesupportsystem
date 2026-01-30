@@ -43,13 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // 3. Redirect ตาม role
             if (role === "admin") {
-                location.href = "./admin/main.html";
+                location.href = "admin/main.html";
             } 
             else if (role === "supervisor") {
-                location.href = "./supervisor/main.html";
+                location.href = "supervisor/main.html";
             } 
             else {
-                location.href = "./user/main.html";
+                location.href = "user/main.html";
             }
 
         } catch (err) {
