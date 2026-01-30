@@ -5,77 +5,37 @@
     <title>Sale Support System | Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Style -->
+    <!-- CSS -->
     <link rel="stylesheet" href="/salesupportsystem/style.css">
-
-    <style>
-        /* กันหน้าโล่งกรณี CSS ไม่โหลด */
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: linear-gradient(135deg, #1abc9c, #16a085);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
 </head>
 
 <body class="login-page">
 
 <div class="login-container">
-
     <div class="login-card">
         <h1>🔐 Sale Support System</h1>
         <p class="subtitle">เข้าสู่ระบบเพื่อใช้งาน</p>
 
-        <div class="form-group">
-            <input
-                type="email"
-                id="email"
-                placeholder="Email"
-                autocomplete="username"
-            >
-        </div>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
 
-        <div class="form-group">
-            <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                autocomplete="current-password"
-            >
-        </div>
-
-        <button id="loginBtn" class="btn-primary">
-            Login
-        </button>
-
-        <div class="login-links">
-            <a href="/salesupportsystem/register.html">Create Account</a>
-            |
-            <a href="/salesupportsystem/forgot-password.html">Forgot Password</a>
-        </div>
+        <button id="loginBtn" class="btn-primary">Login</button>
 
         <div id="msg" class="msg"></div>
     </div>
-
 </div>
 
-<!-- 🔥 Firebase ต้องโหลดก่อน -->
-<script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
-
-<!-- 🔥 Login Logic -->
-<script type="module" src="/salesupportsystem/assets/js/login.js"></script>
-<!-- LOGIN LOADING OVERLAY -->
-<div id="loginLoading" class="login-loading hidden">
+<!-- ✅ LOGIN LOADING (ต้องอยู่นอก container) -->
+<div id="loginLoading" class="login-loading">
     <div class="loading-card">
         <div class="spinner"></div>
         <p>กำลังเข้าสู่ระบบ...</p>
     </div>
 </div>
 
+<!-- JS -->
+<script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
+<script type="module" src="/salesupportsystem/assets/js/login.js"></script>
 
 </body>
 </html>
