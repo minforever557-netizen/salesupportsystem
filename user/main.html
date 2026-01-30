@@ -3,82 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<div class="app-layout">
-
-    <!-- SIDEBAR -->
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-logo">
-            <span>SALE SUPPORT</span>
-        </div>
-
-        <nav class="dashboard-nav">
-            <a href="main.html" class="active">🏠 Dashboard</a>
-            <a href="create-ticket.html">📝 แจ้งปัญหา</a>
-            <a href="history.html">📂 ประวัติ</a>
-            <a href="#" id="logoutBtn" class="logout">🚪 ออกจากระบบ</a>
-        </nav>
-    </aside>
-
-    <!-- MAIN -->
-    <div class="main-area">
-
-        <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="topbar-center">
-                <span id="currentDateTime">--</span>
-            </div>
-
-            <div class="topbar-right">
-                <div class="user-box">
-                    <div class="user-top">
-                        🔔 <b id="userEmail">Loading...</b>
-                    </div>
-                    <div class="user-bottom">
-                        <small>User</small>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- CONTENT -->
-        <main class="content-area">
-
-            <!-- ===== STATS ===== -->
-            <section class="dashboard-stats">
-                <div class="stat-card">
-                    <small>Ticket ทั้งหมด</small>
-                    <h2 id="countAll">0</h2>
-                </div>
-
-                <div class="stat-card">
-                    <small>กำลังดำเนินการ</small>
-                    <h2 id="countOpen">0</h2>
-                </div>
-
-                <div class="stat-card">
-                    <small>เสร็จสิ้น</small>
-                    <h2 id="countClosed">0</h2>
-                </div>
-            </section>
-
-            <!-- ===== MENU ===== -->
-            <section class="dashboard-menu">
-                <a href="create-ticket.html" class="menu-tile">📝 แจ้งปัญหา</a>
-                <a href="history.html" class="menu-tile">📂 ประวัติ</a>
-            </section>
-
-        </main>
-
-    </div>
+<div id="page">
+    <h1>Dashboard ผู้ใช้งาน</h1>
+    <p>เนื้อหาตรงนี้เปลี่ยนตามเมนู</p>
 </div>
 
-<!-- JS เดิมใช้ต่อได้ -->
-<script type="module" src="main.js"></script>
-
+<script src="../assets/js/layout.js"></script>
 </body>
 </html>
