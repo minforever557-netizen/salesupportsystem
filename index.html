@@ -76,6 +76,22 @@
         <p>กำลังเข้าสู่ระบบ...</p>
     </div>
 </div>
+    <!-- ❌ LOGIN ERROR POPUP -->
+<div id="errorPopup" class="popup-overlay" style="display:none;">
+    <div class="popup-box">
+        <div class="popup-icon error">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+
+        <h3>เข้าสู่ระบบไม่สำเร็จ</h3>
+        <p id="errorText">Email หรือรหัสผ่านไม่ถูกต้อง</p>
+
+        <button id="closePopup" class="btn-popup">
+            ปิด
+        </button>
+    </div>
+</div>
+
 
 <!-- JS -->
 <script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
