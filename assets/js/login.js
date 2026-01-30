@@ -53,10 +53,33 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         } catch (err) {
-            console.error(err);
-            loading.classList.remove("show");
-            msg.innerText = "❌ " + err.message;
-            btn.disabled = false;
-        }
+    console.error(err);
+
+    let text = "❌ เกิดข้อผิดพลาด";
+
+    switch (err.code) {
+        case "auth/user-not-found":
+            text = "❌ ไม่พบผู้ใช้นี้ในระบบ";
+            break;
+
+        case "auth/wrong-password":
+            text = "❌ รหัสผ่านไม่ถูกต้อง";
+            break;
+
+        case "auth/invalid-email":
+            text = "❌ รูปแบบ Email ไม่ถูกต้อง";
+            break;
+
+        case "auth/too-many-requests":
+            text = "⚠️ ลองผิดหลายครั้ง กรุณารอสักครู่";
+            break;
+    }
+
+    msg.innerText = text;
+
+    btn.disabled = false;
+    btn.innerText = "Login";
+}
+
     };
 });
