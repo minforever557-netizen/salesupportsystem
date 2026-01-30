@@ -5,9 +5,11 @@
     <title>Create Account | Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Font & Icon -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
     <link rel="stylesheet" href="/salesupportsystem/style.css">
 </head>
 
@@ -55,9 +57,11 @@
         </div>
 
         <!-- ทีมย่อย -->
-        <div class="input-group" id="subTeamGroup" style="display:none;">
+        <div class="input-group" id="subTeamGroup" hidden>
             <i class="fa-solid fa-sitemap"></i>
-            <select id="subTeam"></select>
+            <select id="subTeam">
+                <option value="">-- เลือกทีมย่อย --</option>
+            </select>
         </div>
 
         <button id="registerBtn" class="btn-primary">
@@ -76,7 +80,9 @@
     </div>
 </div>
 
+<!-- ✅ โหลด JS หลัง DOM -->
 <script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
 <script type="module" src="/salesupportsystem/assets/js/register.js"></script>
+
 </body>
 </html>
