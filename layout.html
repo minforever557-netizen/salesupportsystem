@@ -30,19 +30,27 @@
     <div class="main-area">
 
         <!-- TOP BAR -->
-        <header class="topbar">
+<header class="topbar">
+    <div class="topbar-center">
+        <span id="currentDateTime">--</span>
+    </div>
 
-            <button id="hamburger" class="hamburger">☰</button>
-
-            <div class="topbar-center" id="datetime"></div>
-
-            <div class="topbar-right">
-                <span class="notif-icon">🔔</span>
-                <span id="userInfo">User Name</span>
-                <button id="logoutBtn">Logout</button>
+    <div class="topbar-right">
+        <div class="user-box">
+            <div class="user-top">
+                <span class="icon-bell">🔔</span>
+                <span id="userName">User Name</span>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
             </div>
 
-        </header>
+            <div class="user-bottom">
+                <small id="userEmail">user@email.com</small>
+                <small id="userDateTime">--</small>
+            </div>
+        </div>
+    </div>
+</header>
+
 
         <!-- CONTENT -->
         <main class="content-area" id="pageContent">
