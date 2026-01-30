@@ -93,7 +93,7 @@ document.getElementById("registerBtn").onclick = async () => {
 document.querySelectorAll(".toggle-password").forEach(btn => {
     btn.addEventListener("click", () => {
         const input = document.getElementById(btn.dataset.target);
-        const icon  = btn.querySelector("i");
+        const icon = btn.querySelector("i");
 
         if (input.type === "password") {
             input.type = "text";
