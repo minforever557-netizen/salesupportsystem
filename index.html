@@ -2,28 +2,44 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Sale Support System</title>
+    <title>Sale Support System | Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="auth-page">
+<body class="login-page">
 
-<div class="auth-box">
-    <h2>🔐 Sale Support System</h2>
+<div class="login-container">
 
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
+    <div class="login-card">
+        <h1>🔐 Sale Support System</h1>
+        <p class="subtitle">เข้าสู่ระบบเพื่อใช้งาน</p>
 
-    <button id="loginBtn">Login</button>
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Email">
+        </div>
 
-    <div class="auth-links">
-        <a href="register.html">Create Account</a> |
-        <a href="forgot-password.html">Forgot Password</a>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Password">
+        </div>
+
+        <button id="loginBtn" class="btn-primary">Login</button>
+
+        <div class="login-links">
+            <a href="register.html">Create Account</a>
+            |
+            <a href="forgot-password.html">Forgot Password</a>
+        </div>
+
+        <div id="msg" class="msg"></div>
     </div>
 
-    <p id="msg"></p>
 </div>
 
+<!-- Firebase -->
+<script type="module" src="assets/js/firebase.js"></script>
 <script type="module" src="assets/js/login.js"></script>
+
 </body>
 </html>
