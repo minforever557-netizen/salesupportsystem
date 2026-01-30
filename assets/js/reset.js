@@ -1,5 +1,4 @@
-<script type="module">
-import { auth } from "/salesupportsystem/assets/js/firebase.js";
+import { auth } from "./firebase.js";
 import {
     sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -8,11 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const btn = document.getElementById("sendResetBtn");
     const msg = document.getElementById("msg");
+    const emailInput = document.getElementById("email");
 
     btn.addEventListener("click", async (e) => {
-        e.preventDefault(); // 🔑 สำคัญมาก (กันปุ่มเงียบ)
+        e.preventDefault(); // 🔑 กันปุ่มเงียบ
 
-        const email = document.getElementById("email").value.trim();
+        const email = emailInput.value.trim();
 
         if (!email) {
             msg.innerText = "⚠️ กรุณากรอก Email";
@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         btn.disabled = true;
+        msg.style.color = "#555";
         msg.innerText = "⏳ กำลังส่งลิงก์รีเซ็ตรหัสผ่าน...";
 
         try {
@@ -28,9 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             msg.style.color = "#16a34a";
             msg.innerHTML = `
-                ✅ ส่งลิงก์เรียบร้อยแล้ว<br>
-                📩 กรุณาตรวจสอบ <b>Inbox</b><br>
-                ⚠️ หากไม่พบ ให้ตรวจสอบใน <b>Junk / Spam</b>
+                ✅ ส่งลิงก์รีเซ็ตรหัสผ่านเรียบร้อยแล้ว<br>
+                📩 กรุณาตรวจสอบ Email ของคุณ<br>
+                ⚠️ หากไม่พบ ให้ดูที่ <b>Junk / Spam</b>
             `;
 
         } catch (err) {
@@ -42,11 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 case "auth/user-not-found":
                     text = "❌ ไม่พบ Email นี้ในระบบ";
                     break;
+
                 case "auth/invalid-email":
                     text = "❌ รูปแบบ Email ไม่ถูกต้อง";
                     break;
+
                 case "auth/too-many-requests":
-                    text = "⚠️ ลองหลายครั้งเกินไป กรุณารอสักครู่";
+                    text = "⚠️ ขออภัย ลองใหม่อีกครั้งภายหลัง";
                     break;
             }
 
@@ -57,4 +60,3 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.disabled = false;
     });
 });
-</script>
