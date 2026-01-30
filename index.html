@@ -1,100 +1,29 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>Login - Sale Support</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
-
-<!-- Remix Icon -->
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
-
-<!-- Main CSS -->
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <title>Sale Support System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body class="auth-page">
-<div class="auth-wrapper">
-    <div class="auth-card">
 
-        <h1 class="auth-title">เข้าสู่ระบบ</h1>
-        <p class="auth-subtitle">Sale Support System</p>
+<div class="auth-box">
+    <h2>🔐 Sale Support System</h2>
 
-        <!-- Email -->
-        <div class="input-group">
-            <i class="ri-mail-line"></i>
-            <input type="email" id="email" placeholder="Email">
-        </div>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
 
-        <!-- Password -->
-        <div class="input-group">
-            <i class="ri-lock-line"></i>
-            <input type="password" id="password" placeholder="Password">
-        </div>
+    <button id="loginBtn">Login</button>
 
-        <button id="loginBtn" class="btn-primary">
-            <i class="ri-login-box-line"></i> Login
-        </button>
-
-        <p id="errorMsg" class="error-text"></p>
+    <div class="auth-links">
+        <a href="register.html">Create Account</a> |
+        <a href="forgot-password.html">Forgot Password</a>
     </div>
+
+    <p id="msg"></p>
 </div>
 
-<!-- ================= SCRIPT ================= -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-  authDomain: "sale-support-system.firebaseapp.com",
-  projectId: "sale-support-system"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-loginBtn.onclick = async () => {
-    errorMsg.innerText = "";
-    loginBtn.disabled = true;
-
-    try {
-        const cred = await signInWithEmailAndPassword(
-            auth,
-            email.value,
-            password.value
-        );
-
-        const uid = cred.user.uid;
-
-        // 🔐 ดึง Role จาก Firestore
-        const snap = await getDoc(doc(db, "users", uid));
-        if (!snap.exists()) throw "ไม่พบข้อมูลผู้ใช้";
-
-        const role = snap.data().role;
-
-        // 🔁 Redirect ตาม Role
-        if (role === "admin") {
-            location.href = "admin/dashboard.html";
-        } else if (role === "supervisor") {
-            location.href = "supervisor/main.html";
-        } else {
-            location.href = "user/main.html";
-        }
-
-    } catch (err) {
-        errorMsg.innerText = "❌ Email หรือ Password ไม่ถูกต้อง";
-        loginBtn.disabled = false;
-    }
-};
-
-</script>
-
+<script type="module" src="assets/js/login.js"></script>
 </body>
 </html>
