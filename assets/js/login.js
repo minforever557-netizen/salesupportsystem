@@ -1,16 +1,29 @@
-import { auth } from "./firebase.js";
-import { signInWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const msg = document.getElementById("msg");
+document.addEventListener("DOMContentLoaded", () => {
 
-document.getElementById("loginBtn").onclick = async () => {
-    try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-        location.href = "user/main.html"; // redirect แรก (role จะจัดการต่อ)
-    } catch (err) {
-        msg.innerText = err.message;
+    const btn = document.getElementById("loginBtn");
+    const msg = document.getElementById("msg");
+
+    if (!btn) {
+        console.error("❌ loginBtn not found");
+        return;
     }
-};
+
+    btn.onclick = async () => {
+
+        const email = document.getElementById("email").value;
+        const pass  = document.getElementById("password").value;
+
+        msg.innerText = "⏳ Logging in...";
+
+        try {
+            await signInWithEmailAndPassword(window.auth, email, pass);
+            location.href = "/salesupportsystem/dashboard.html";
+        } catch (err) {
+            msg.innerText = err.message;
+        }
+    };
+});
