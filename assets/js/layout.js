@@ -1,29 +1,58 @@
-// โหลด layout.html
+// ===============================
+// STEP 1: เก็บ content หน้าเดิม
+// ===============================
+const pageContent = document.getElementById('page')?.innerHTML || '';
+
+// ===============================
+// STEP 2: โหลด layout.html
+// ===============================
 fetch('../layout.html')
     .then(res => res.text())
     .then(html => {
+        // เขียน layout ลง body
         document.body.innerHTML = html;
 
-        // ดึง content ของหน้า
-        const page = document.getElementById('page');
-        if (page) {
-            document.getElementById('pageContent').innerHTML = page.innerHTML;
+        // ===============================
+        // STEP 3: inject content
+        // ===============================
+        const contentArea = document.getElementById('pageContent');
+        if (contentArea) {
+            contentArea.innerHTML = pageContent;
         }
 
         initLayout();
-    });
+    })
+    .catch(err => console.error('Load layout failed', err));
 
+
+// ===============================
+// INIT LAYOUT
+// ===============================
 function initLayout() {
-    // เวลา
+
+    // เวลา (กลางบน + ใต้ email)
     setInterval(() => {
         const now = new Date();
-        document.getElementById('currentDateTime').innerText =
-            now.toLocaleString('th-TH');
-        document.getElementById('userTime').innerText =
-            now.toLocaleTimeString('th-TH');
+
+        const dateTime = now.toLocaleString('th-TH', {
+            dateStyle: 'medium',
+            timeStyle: 'short'
+        });
+
+        const time = now.toLocaleTimeString('th-TH');
+
+        const current = document.getElementById('currentDateTime');
+        const userTime = document.getElementById('userTime');
+
+        if (current) current.innerText = dateTime;
+        if (userTime) userTime.innerText = time;
     }, 1000);
 
-    // Logout (ผูก Firebase ภายหลัง)
+    // Logout (ไว้ผูก Firebase ทีหลัง)
     const logout = document.getElementById('logoutBtn');
-    if (logout) logout.onclick = () => alert('logout');
+    if (logout) {
+        logout.onclick = () => {
+            alert('logout');
+        };
+    }
 }
