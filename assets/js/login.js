@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             await signInWithEmailAndPassword(auth, email, pass);
 
             msg.innerText = "✅ Login สำเร็จ";
-            location.href = "/salesupportsystem/dashboard.html";
+            location.href = "/salesupportsystem/user/main.html";
 
         } catch (err) {
             console.error(err);
