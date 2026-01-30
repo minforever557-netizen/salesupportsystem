@@ -597,27 +597,29 @@ body.login-page {
     pointer-events: none;
 }
 
-/* ========== PASSWORD EYE FIX ========== */
+/* ===== PASSWORD GROUP (FINAL FIX) ===== */
 
 .password-group {
     position: relative;
 }
 
 .password-group input {
-    padding-right: 46px;
+    width: 100%;
+    padding-right: 52px; /* เผื่อพื้นที่ให้ปุ่มตา */
 }
 
 .toggle-password {
     position: absolute;
-    right: 14px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: #888;
-    z-index: 2;
+    color: #999;
+
+    z-index: 10;          /* ⭐ สำคัญ */
+    pointer-events: auto; /* ⭐ สำคัญ */
 }
 
 .toggle-password:hover {
-    color: #27ae60;
+    color: #22c55e;
 }
-
