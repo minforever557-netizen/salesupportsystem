@@ -2,17 +2,17 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Support System</title>
+    <title>Sale Support System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS กลาง -->
+    <!-- Global CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app-layout">
+<div class="dashboard-layout">
 
-    <!-- ========== SIDEBAR ========== -->
+    <!-- ================= SIDEBAR ================= -->
     <aside class="dashboard-sidebar" id="sidebar">
 
         <div class="sidebar-logo">
@@ -21,49 +21,55 @@
         </div>
 
         <nav class="dashboard-nav" id="sidebarMenu">
-            <!-- menu inject -->
+            <!-- JS inject menu here -->
         </nav>
 
     </aside>
 
-    <!-- ========== MAIN AREA ========== -->
-    <div class="main-area">
+    <!-- ================= MAIN ================= -->
+    <div class="dashboard-main">
 
-        <!-- TOP BAR -->
-<header class="topbar">
-    <div class="topbar-center">
-        <span id="currentDateTime">--</span>
-    </div>
+        <!-- ========== TOP BAR ========== -->
+        <header class="topbar">
 
-    <div class="topbar-right">
-        <div class="user-box">
-            <div class="user-top">
-                <span class="icon-bell">🔔</span>
-                <span id="userName">User Name</span>
-                <button id="logoutBtn" class="btn-logout">Logout</button>
+            <button class="hamburger" id="hamburger">☰</button>
+
+            <div class="topbar-center">
+                <span id="currentDateTime">--</span>
             </div>
 
-            <div class="user-bottom">
-                <small id="userEmail">user@email.com</small>
-                <small id="userDateTime">--</small>
+            <div class="topbar-right">
+                <div class="user-box">
+
+                    <div class="user-top">
+                        <span class="icon-bell">🔔</span>
+                        <span id="userName">User Name</span>
+                        <button id="logoutBtn" class="btn-logout">Logout</button>
+                    </div>
+
+                    <div class="user-bottom">
+                        <small id="userEmail">user@email.com</small>
+                        <small id="userDateTime">--</small>
+                    </div>
+
+                </div>
             </div>
-        </div>
-    </div>
-</header>
 
+        </header>
 
-        <!-- CONTENT -->
+        <!-- ========== CONTENT AREA ========== -->
         <main class="content-area" id="pageContent">
-            <!-- page content -->
+            <!-- 🔽 เนื้อหาของแต่ละหน้า inject ตรงนี้ -->
         </main>
 
     </div>
 
 </div>
 
+<!-- Overlay (Mobile Sidebar) -->
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-<!-- JS กลาง -->
+<!-- Global Layout JS -->
 <script src="assets/js/layout.js"></script>
 
 </body>
