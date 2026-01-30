@@ -21,7 +21,17 @@
         </div>
 
         <h1>Create Account</h1>
-        <p class="subtitle">สร้างบัญชีผู้ใช้งานใหม่</p>
+        <p class="subtitle">สมัครผู้ใช้งานใหม่</p>
+
+        <div class="input-group">
+            <i class="fa-solid fa-id-card"></i>
+            <input type="text" id="fullname" placeholder="ชื่อ - นามสกุล">
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-phone"></i>
+            <input type="tel" id="phone" placeholder="เบอร์โทร">
+        </div>
 
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
@@ -31,6 +41,23 @@
         <div class="input-group">
             <i class="fa-solid fa-key"></i>
             <input type="password" id="password" placeholder="Password">
+        </div>
+
+        <!-- ทีมหลัก -->
+        <div class="input-group">
+            <i class="fa-solid fa-users"></i>
+            <select id="team">
+                <option value="">-- เลือกทีม --</option>
+                <option value="FBB Telesale">FBB Telesale</option>
+                <option value="FBB Dealer Sales">FBB Dealer Sales</option>
+                <option value="FBB Direct Sales">FBB Direct Sales</option>
+            </select>
+        </div>
+
+        <!-- ทีมย่อย -->
+        <div class="input-group" id="subTeamGroup" style="display:none;">
+            <i class="fa-solid fa-sitemap"></i>
+            <select id="subTeam"></select>
         </div>
 
         <button id="registerBtn" class="btn-primary">
