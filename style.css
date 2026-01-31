@@ -1,88 +1,61 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
+
 :root {
-    --primary-green: #e8f5e9; /* เขียวอ่อน */
-    --accent-orange: #fff3e0; /* ส้มอ่อน */
+    --soft-green: #e8f5e9;
+    --soft-orange: #fff3e0;
     --deep-green: #4caf50;
     --deep-orange: #ff9800;
     --white: #ffffff;
-    --text-dark: #333;
-    --radius: 20px; /* ความมน */
+    --radius-full: 50px;
+    --radius-soft: 20px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Kanit', sans-serif;
 }
 
 body {
-    font-family: 'Kanit', sans-serif;
     margin: 0;
-    background-color: #f9f9f9;
-    color: var(--text-dark);
+    background-color: #fcfcfc;
 }
 
-/* Layout Structure */
-#app-container {
-    display: flex;
-    height: 100vh;
-}
-
-/* Sidebar */
-#sidebar {
-    width: 260px;
-    background: var(--white);
-    border-right: 1px solid #eee;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    transition: all 0.3s;
-}
-
-.nav-item {
-    padding: 12px 20px;
-    margin-bottom: 8px;
-    border-radius: var(--radius);
+/* ปุ่มและ Input ที่มีความมนตามโจทย์ */
+button, .btn {
+    border-radius: var(--radius-full) !important;
+    padding: 10px 25px;
+    border: none;
     cursor: pointer;
     transition: 0.3s;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-dark);
 }
 
-.nav-item:hover, .nav-item.active {
-    background-color: var(--primary-green);
+input, select, textarea {
+    border-radius: var(--radius-soft) !important;
+    border: 1px solid #eee;
+    padding: 12px 15px;
+    background: var(--white);
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Sidebar & Layout */
+.sidebar-item {
+    border-radius: var(--radius-full);
+    margin: 5px 0;
+    transition: all 0.2s;
+}
+
+.sidebar-item:hover {
+    background-color: var(--soft-green);
     color: var(--deep-green);
 }
 
-/* Top Bar */
-#topbar {
-    height: 60px;
+/* Dashboard Cards */
+.card {
+    border-radius: var(--radius-soft);
     background: var(--white);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-/* Buttons & Inputs */
-button, input, select, textarea {
-    border-radius: var(--radius) !important;
-    border: 1px solid #ddd;
-    padding: 10px 15px;
-}
-
-.btn-primary {
-    background-color: var(--deep-green);
-    color: white;
-    border: none;
-}
-
-.btn-orange {
-    background-color: var(--deep-orange);
-    color: white;
-    border: none;
-}
-
-/* Content Area */
-#main-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 25px;
-    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid var(--soft-orange);
 }
