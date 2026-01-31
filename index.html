@@ -9,19 +9,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-
-    <div id="app-shell">
-        <div id="topbar">
+    <div id="app-wrapper">
+        <header class="topbar">
+            <div class="logo"><b>SALE</b> Support</div>
+            <div class="user-info">
+                <i class="fas fa-bell"></i>
+                <span id="display-name" style="margin: 0 10px;">Guest</span>
+                <div class="avatar"></div>
             </div>
+        </header>
+
         <div class="main-container">
-            <nav id="sidebar">
-                <div id="dynamic-menu">
-                    <p>กำลังโหลดเมนู...</p>
+            <aside class="sidebar">
+                <div id="dynamic-menu"></div>
+                <div style="margin-top: auto;">
+                    <hr>
+                    <div class="nav-item" onclick="navigate('home')"><i class="fas fa-home"></i> Home</div>
+                    <div class="nav-item" onclick="logout()" style="color: #ff5252;"><i class="fas fa-sign-out-alt"></i> Logout</div>
                 </div>
-            </nav>
+            </aside>
+
             <main id="main-content">
-                <h1>ยินดีต้อนรับ</h1>
-                <p>หากข้อความนี้ไม่เปลี่ยนไป โปรดเช็ค Console (F12)</p>
+                <h2>กำลังโหลดข้อมูล...</h2>
             </main>
         </div>
     </div>
