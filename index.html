@@ -2,107 +2,42 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Sale Support System | Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="/salesupportsystem/style.css">
+    <title>Sale Support System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-code.js"></script>
 </head>
+<body>
 
-<body class="login-page">
-
-<div class="login-container">
-    <div class="login-card">
-
-        <!-- ICON -->
-        <div class="login-icon">
-            <i class="fa-solid fa-lock"></i>
+    <div id="login-section" class="auth-container">
         </div>
 
-        <!-- TITLE -->
-        <h1>Sale Support System</h1>
-        <p class="subtitle">
-            <i class="fa-solid fa-right-to-bracket"></i>
-            เข้าสู่ระบบเพื่อใช้งาน
-        </p>
-
-        <!-- EMAIL -->
-        <div class="input-group">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="email" placeholder="Email">
-        </div>
-<!-- password -->
-<div class="input-group password-group">
-    <i class="fa-solid fa-key"></i>
-    <input
-        type="password"
-        id="password"
-        placeholder="Password"
-    >
-    <span class="toggle-password" data-target="password">
-        <i class="fa-solid fa-eye"></i>
-    </span>
-</div>
-
-
-
-
-
-        <!-- BUTTON -->
-        <button id="loginBtn" class="btn-primary">
-            <i class="fa-solid fa-arrow-right-to-bracket"></i>
-            Login
-        </button>
-        <div class="login-links">
-    <a href="register.html">
-        <i class="fa-solid fa-user-plus"></i> Create Account
-    </a>
-    |
-    <a href="forgot-password.html">
-        <i class="fa-solid fa-unlock-keyhole"></i> Forgot Password
-    </a>
-</div>
-
-        <!-- MESSAGE -->
-        <div id="msg" class="msg"></div>
-
-    </div>
-</div>
-
-<!-- 🔄 LOGIN LOADING -->
-<div id="loginLoading" class="login-loading">
-    <div class="loading-card">
-        <div class="spinner"></div>
-        <p>กำลังเข้าสู่ระบบ...</p>
-    </div>
-</div>
-    <!-- ❌ LOGIN ERROR POPUP -->
-<div id="errorPopup" class="popup-overlay" style="display:none;">
-    <div class="popup-box">
-        <div class="popup-icon error">
-            <i class="fa-solid fa-circle-xmark"></i>
+    <div id="app-wrapper" style="display: none;">
+        <div id="topbar">
+            <div class="logo"><b>SALE</b> Support</div>
+            <div class="user-info">
+                <span id="user-display-name">Loading...</span>
+                <i class="fas fa-bell" style="margin: 0 15px;"></i>
+                <img src="avatar.png" width="35" style="border-radius: 50%;">
+            </div>
         </div>
 
-        <h3>เข้าสู่ระบบไม่สำเร็จ</h3>
-        <p id="errorText">Email หรือรหัสผ่านไม่ถูกต้อง</p>
+        <div id="app-container">
+            <nav id="sidebar">
+                <div id="dynamic-menu">
+                    </div>
+                <div style="margin-top: auto;">
+                    <hr>
+                    <a href="#" class="nav-item" onclick="navigate('home')"><i class="fas fa-home"></i> Home</a>
+                    <a href="#" class="nav-item" id="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </nav>
 
-        <button id="closePopup" class="btn-popup">
-            ปิด
-        </button>
+            <main id="main-content">
+                </main>
+        </div>
     </div>
-</div>
 
-
-<!-- JS -->
-<script type="module" src="/salesupportsystem/assets/js/firebase.js"></script>
-<script type="module" src="/salesupportsystem/assets/js/login.js"></script>
-
+    <script type="module" src="app.js"></script>
 </body>
 </html>
