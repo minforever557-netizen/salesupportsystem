@@ -73,55 +73,69 @@
         const db = getFirestore(fApp);
 
         window.app = {
-            async login() {
-                const e = document.getElementById('login-email').value;
-                const p = document.getElementById('login-pass').value;
-                try { await signInWithEmailAndPassword(auth, e, p); } 
-                catch (err) { alert("อีเมลหรือรหัสผ่านผิดพลาด: " + err.message); }
-            },
-            logout() { signOut(auth).then(() => window.location.reload()); },
+    async login() {
+        const e = document.getElementById('login-email')?.value;
+        const p = document.getElementById('login-pass')?.value;
+        if (!e || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
+        try { 
+            await signInWithEmailAndPassword(auth, e, p); 
+        } catch (err) { 
+            alert("อีเมลหรือรหัสผ่านผิดพลาด"); 
+        }
+    },
 
-            navigate(pageId) {
-                const content = document.getElementById('main-content');
-                const view = this.views[pageId] || this.views['home'];
-                content.innerHTML = typeof view === 'function' ? view() : view;
-            },
+    logout() { 
+        signOut(auth).then(() => window.location.reload()); 
+    },
 
-            async loadMenu(role) {
-                const menuBox = document.getElementById('dynamic-menu');
-                // ปรับให้ดึงตามชื่อ Document ใน Firebase (admin หรือ users)
-                const permDoc = await getDoc(doc(db, "permission", role.toLowerCase())); 
-                
-                if (permDoc.exists()) {
-                    const allowedIds = permDoc.data().menus; 
-                    const menuData = {
-                        'report': { name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
-                        'track': { name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' },
-                        'close': { name: '3. ปิด Ticket', icon: 'fa-circle-check' },
-                        'admin_all': { name: '4. รวมงาน Admin', icon: 'fa-list-check' },
-                        'dashboard_main': { name: '5. Dashboard', icon: 'fa-chart-pie' },
-                        'ticket_mgmt': { name: '6. จัดการหัวข้อ', icon: 'fa-tags' },
-                        'user_mgmt': { name: '7. จัดการ User', icon: 'fa-users-gear' },
-                        'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
-                        'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
-                    };
+    navigate(pageId) {
+        const content = document.getElementById('main-content');
+        if (!content) return;
+        const view = this.views[pageId] || this.views['home'];
+        content.innerHTML = typeof view === 'function' ? view() : view;
+    },
 
-                    menuBox.innerHTML = allowedIds.map(id => {
-                        const item = menuData[id];
-                        return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
-                    }).join('');
-                } else {
-                    menuBox.innerHTML = '<p style="padding:10px; color:red;">ไม่พบสิทธิ์ (Role: '+role+')</p>';
-                }
-            },
+    async loadMenu(role) {
+        const menuBox = document.getElementById('dynamic-menu');
+        if (!menuBox) return;
 
-            views: {
-                'home': `<h2>หน้าแรก</h2><div class="card">ยินดีต้อนรับสู่ระบบ Sale Support</div>`,
-                'report': `<h2>1. แจ้งปัญหา</h2><div class="card"><input type="text" placeholder="Internet No."><button class="btn btn-green">ส่ง</button></div>`,
-                'track': `<h2>2. ติดตาม Ticket</h2><div class="card">แสดงรายการ...</div>`,
-                'close': `<h2>3. ปิด Ticket</h2><div class="card">เฉพาะ Admin...</div>`
+        try {
+            // ปรับให้เป็นตัวพิมพ์เล็ก (toLowerCase) เพื่อให้ตรงกับชื่อ Document "admin" ในรูปของคุณ
+            const roleDocName = role.toLowerCase(); 
+            const permDoc = await getDoc(doc(db, "permission", roleDocName));
+            
+            if (permDoc.exists()) {
+                const allowedIds = permDoc.data().menus; 
+                const menuData = {
+                    'report': { name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
+                    'track': { name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' },
+                    'close': { name: '3. ปิด Ticket', icon: 'fa-circle-check' },
+                    'admin_all': { name: '4. รวมงาน Admin', icon: 'fa-list-check' },
+                    'dashboard_main': { name: '5. Dashboard', icon: 'fa-chart-pie' },
+                    'ticket_mgmt': { name: '6. จัดการหัวข้อ', icon: 'fa-tags' },
+                    'user_mgmt': { name: '7. จัดการ User', icon: 'fa-users-gear' },
+                    'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
+                    'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
+                };
+
+                menuBox.innerHTML = allowedIds.map(id => {
+                    const item = menuData[id];
+                    return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
+                }).join('');
+            } else {
+                menuBox.innerHTML = `<p style="color:red; font-size:12px;">ไม่พบเอกสารสิทธิ์: ${roleDocName}</p>`;
             }
-        };
+        } catch (error) {
+            console.error("Error loading menu:", error);
+        }
+    },
+
+    views: {
+        'home': `<h2>หน้าแรก</h2><div class="card">ยินดีต้อนรับสู่ระบบ Sale Support</div>`,
+        'report': `<h2>1. แจ้งปัญหา</h2><div class="card">ฟอร์มแจ้งปัญหา...</div>`,
+        // เพิ่มหน้าอื่นๆ ตามต้องการ...
+    }
+}; // ปิดปีกกาของ window.app ให้ครบถ้วนเพื่อแก้ SyntaxError
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
