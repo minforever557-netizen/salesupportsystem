@@ -10,16 +10,24 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userDoc.data() || { role: 'User', name: 'Unknown' };
         
         // แสดงชื่อบน Topbar
-        document.getElementById('display-name').innerText = userData.name || user.email;
+        // app.js (ช่วงบรรทัดที่ 13)
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.exists() ? userDoc.data() : { role: 'User', name: user.email };
         
-        // โหลดเมนูตามสิทธิ์ (Role)
+        // ✅ แก้ไข: ตรวจสอบก่อนว่ามี Element นี้ในหน้าจอไหมก่อนใส่ค่า
+        const nameElement = document.getElementById('display-name');
+        if (nameElement) {
+            nameElement.innerText = userData.name || user.email;
+        }
+
+        // โหลดเมนู
         loadMenu(userData.role);
-        
-        // พาไปหน้า Home เป็นหน้าแรก
         navigate('home');
     } else {
-        // ถ้าไม่ได้ Login ให้เด้งไปหน้า Login (ถ้าทำหน้าแยก)
-        // window.location.href = 'login.html'; 
+        // ถ้าไม่มี user ให้เด้งไปหน้า login (ถ้าคุณทำหน้าแยกไว้)
+        // window.location.href = 'login.html';
     }
 });
 
