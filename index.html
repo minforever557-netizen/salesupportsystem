@@ -2,42 +2,19 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sale Support System</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/your-code.js"></script>
+    <style>
+        /* เอาโค้ด CSS ด้านบนมาวางที่นี่ */
+    </style>
 </head>
 <body>
-
-    <div id="login-section" class="auth-container">
+    <div id="app">
         </div>
 
-    <div id="app-wrapper" style="display: none;">
-        <div id="topbar">
-            <div class="logo"><b>SALE</b> Support</div>
-            <div class="user-info">
-                <span id="user-display-name">Loading...</span>
-                <i class="fas fa-bell" style="margin: 0 15px;"></i>
-                <img src="avatar.png" width="35" style="border-radius: 50%;">
-            </div>
-        </div>
-
-        <div id="app-container">
-            <nav id="sidebar">
-                <div id="dynamic-menu">
-                    </div>
-                <div style="margin-top: auto;">
-                    <hr>
-                    <a href="#" class="nav-item" onclick="navigate('home')"><i class="fas fa-home"></i> Home</a>
-                    <a href="#" class="nav-item" id="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-            </nav>
-
-            <main id="main-content">
-                </main>
-        </div>
-    </div>
-
-    <script type="module" src="app.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+        // ... โค้ด Firebase ของคุณ ...
+    </script>
 </body>
 </html>
