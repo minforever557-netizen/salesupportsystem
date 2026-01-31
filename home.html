@@ -1,1 +1,206 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Sale Support | Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+:root{
+  --green:#c8e6c9;
+  --orange:#ffe0b2;
+  --white:#ffffff;
+  --dark:#2e2e2e;
+}
+
+*{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{margin:0;background:#f4f6f5}
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar{
+  width:240px;
+  background:var(--green);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar h3{
+  text-align:center;
+  margin:10px 0 20px;
+}
+
+.sidebar a{
+  text-decoration:none;
+  padding:12px;
+  margin-bottom:8px;
+  border-radius:14px;
+  color:#000;
+  display:block;
+}
+
+.sidebar a:hover{
+  background:var(--orange);
+}
+
+.sidebar .bottom{
+  margin-top:auto;
+}
+
+/* ===== Topbar ===== */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.topbar{
+  height:60px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+
+.topbar .user{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+/* ===== Content ===== */
+.content{
+  padding:20px;
+  overflow:auto;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:20px;
+  margin-bottom:20px;
+}
+
+.stat{
+  display:flex;
+  gap:20px;
+}
+
+.stat .card{
+  flex:1;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <h3>📞 Sale Support</h3>
+
+    <a href="home.html">🏠 Home</a>
+    <a href="ticket-create.html">➕ แจ้งปัญหา</a>
+    <a href="ticket-my.html">🎫 Ticket ของฉัน</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+
+    <!-- Admin Only -->
+    <a href="admin-all.html" data-role="Admin">🛠 งานทั้งหมด</a>
+    <a href="ticket-master.html" data-role="Admin">⚙️ Ticket Management</a>
+    <a href="user-management.html" data-role="Admin">👥 User Management</a>
+    <a href="permission.html" data-role="Admin">🔐 Permission</a>
+
+    <div class="bottom">
+      <a href="#" onclick="logout()">🚪 Logout</a>
+    </div>
+  </div>
+
+  <!-- ===== Main ===== -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>🏢 Sale Support System</div>
+      <div class="user">
+        <span id="userInfo">Loading...</span>
+        🔔
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="card">
+        <h2>👋 ยินดีต้อนรับ</h2>
+        <p>ระบบแจ้งปัญหาและติดตามงานของ Sale Support</p>
+      </div>
+
+      <div class="stat">
+        <div class="card">Open<br><b>0</b></div>
+        <div class="card">Pending<br><b>0</b></div>
+        <div class="card">Closed<br><b>0</b></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== Firebase ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+  authDomain: "sale-support-system.firebaseapp.com",
+  projectId: "sale-support-system",
+  storageBucket: "sale-support-system.appspot.com",
+  messagingSenderId: "640337786680",
+  appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ===== Auth Check + Role =====
+onAuthStateChanged(auth, async user=>{
+  if(!user){
+    window.location.href = "index.html";
+    return;
+  }
+
+  document.getElementById("userInfo").innerText =
+    user.email;
+
+  // 🔐 ดึง Role จาก Firestore (users/{uid})
+  const snap = await getDoc(doc(db,"users",user.uid));
+  const role = snap.exists() ? snap.data().role : "User";
+
+  // ซ่อนเมนูตาม Role
+  document.querySelectorAll("[data-role]").forEach(el=>{
+    if(el.dataset.role !== role){
+      el.style.display="none";
+    }
+  });
+});
+
+// ===== Logout =====
+window.logout = function(){
+  signOut(auth).then(()=>{
+    window.location.href="index.html";
+  });
+}
+</script>
+
+</body>
+</html>
