@@ -13,51 +13,60 @@
         .topbar { height: 60px; background: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .main-container { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 280px; background: var(--white); padding: 20px; border-right: 1px solid #eee; display: flex; flex-direction: column; overflow-y: auto; }
-        .content-area { flex: 1; padding: 25px; overflow-y: auto; background: var(--white); margin: 15px; border-radius: 20px; }
+        .content-area { flex: 1; padding: 25px; overflow-y: auto; background: var(--white); margin: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .nav-item { padding: 12px 15px; border-radius: var(--round); cursor: pointer; margin-bottom: 5px; transition: 0.3s; color: #555; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
         .nav-item:hover, .nav-item.active { background: var(--light-green); color: var(--green); }
         .nav-item.logout { color: #ff5252; margin-top: auto; }
         .btn { border-radius: var(--round); padding: 10px 25px; border: none; cursor: pointer; font-weight: 500; transition: 0.2s; }
-        .btn-green { background: var(--green); color: white; }
+        .btn-green { background: var(--green); color: white; width: 100%; }
         .card { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--light-orange); margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 12px; border-radius: 20px; border: 1px solid #ddd; margin: 10px 0 15px; outline: none; font-size: 1rem; }
-        #auth-page { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:1000; }
+        #auth-page { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--light-green); display:flex; justify-content:center; align-items:center; z-index:1000; }
     </style>
 </head>
 <body>
 
     <div id="auth-page">
-        <div class="card" style="width: 350px; text-align: center;">
-            <h2 style="color: var(--green);">SALE SUPPORT</h2>
-            <input type="email" id="login-email" placeholder="Email">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button class="btn btn-green" style="width: 100%;" onclick="app.login()">เข้าสู่ระบบ</button>
+        <div class="card" style="width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h2 style="color: var(--green); margin-bottom: 20px;">SALE SUPPORT</h2>
+            <div id="auth-form-content">
+                <input type="email" id="login-email" placeholder="Email">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button class="btn btn-green" onclick="app.login()">เข้าสู่ระบบ</button>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.85rem;">
+                    <span style="color: #666; cursor: pointer;" onclick="app.resetPassword()">ลืมรหัสผ่าน?</span>
+                    <span style="color: var(--green); cursor: pointer; font-weight: bold;" onclick="app.showRegister()">สมัครสมาชิก</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--green);"><i class="fas fa-headset"></i> SALE Support</div>
+        <div style="font-weight: bold; color: var(--green); font-size: 1.2rem;"><i class="fas fa-headset"></i> SALE Support</div>
         <div style="display: flex; align-items: center; gap: 15px;">
             <i class="fas fa-bell" style="color: var(--orange);"></i>
             <span id="display-user">Loading...</span>
-            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--light-green);"></div>
+            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--light-green); border: 1px solid var(--green);"></div>
         </div>
     </header>
 
     <div class="main-container">
         <aside class="sidebar">
-            <div id="dynamic-menu"></div>
+            <div id="dynamic-menu">
+                </div>
             <hr style="width: 100%; border: 0.5px solid #eee; margin: 20px 0;">
-            <div class="nav-item" onclick="app.navigate('home')"><i class="fas fa-house"></i> Home</div>
-            <div class="nav-item logout" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            <div class="nav-item" onclick="app.navigate('home')"><i class="fas fa-house"></i> หน้าแรก</div>
+            <div class="nav-item logout" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</div>
         </aside>
-        <main class="content-area" id="main-content"></main>
+
+        <main class="content-area" id="main-content">
+            </main>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
@@ -73,81 +82,116 @@
         const db = getFirestore(fApp);
 
         window.app = {
-    async login() {
-        const e = document.getElementById('login-email')?.value;
-        const p = document.getElementById('login-pass')?.value;
-        if (!e || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
-        try { 
-            await signInWithEmailAndPassword(auth, e, p); 
-        } catch (err) { 
-            alert("อีเมลหรือรหัสผ่านผิดพลาด"); 
-        }
-    },
+            // --- ระบบ Authentication ---
+            async login() {
+                const e = document.getElementById('login-email')?.value;
+                const p = document.getElementById('login-pass')?.value;
+                if (!e || !p) return alert("กรุณากรอก Email และ Password");
+                try { await signInWithEmailAndPassword(auth, e, p); } 
+                catch (err) { alert("เข้าสู่ระบบไม่สำเร็จ: " + err.message); }
+            },
 
-    logout() { 
-        signOut(auth).then(() => window.location.reload()); 
-    },
+            async register() {
+                const name = document.getElementById('reg-name').value;
+                const e = document.getElementById('reg-email').value;
+                const p = document.getElementById('reg-pass').value;
+                if (!name || !e || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
+                try {
+                    const res = await createUserWithEmailAndPassword(auth, e, p);
+                    await setDoc(doc(db, "users", res.user.uid), {
+                        name: name, email: e, role: "users", status: "active", createdAt: new Date().toISOString()
+                    });
+                    alert("สมัครสมาชิกสำเร็จ!");
+                    window.location.reload();
+                } catch (err) { alert("สมัครไม่สำเร็จ: " + err.message); }
+            },
 
-    navigate(pageId) {
-        const content = document.getElementById('main-content');
-        if (!content) return;
-        const view = this.views[pageId] || this.views['home'];
-        content.innerHTML = typeof view === 'function' ? view() : view;
-    },
+            async resetPassword() {
+                const email = prompt("ระบุ Email เพื่อรับลิงก์รีเซ็ตรหัสผ่าน:");
+                if (!email) return;
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert("ส่งลิงก์ไปที่ Email เรียบร้อยแล้ว");
+                } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
+            },
 
-    async loadMenu(role) {
-        const menuBox = document.getElementById('dynamic-menu');
-        if (!menuBox) return;
+            showRegister() {
+                document.getElementById('auth-form-content').innerHTML = `
+                    <input type="text" id="reg-name" placeholder="ชื่อ-นามสกุล">
+                    <input type="email" id="reg-email" placeholder="Email">
+                    <input type="password" id="reg-pass" placeholder="Password (6 ตัวขึ้นไป)">
+                    <button class="btn btn-green" onclick="app.register()">ยืนยันสมัครสมาชิก</button>
+                    <p style="margin-top:15px; font-size:0.85rem; color:#666; cursor:pointer;" onclick="window.location.reload()">กลับหน้า Login</p>
+                `;
+            },
 
-        try {
-            // ปรับให้เป็นตัวพิมพ์เล็ก (toLowerCase) เพื่อให้ตรงกับชื่อ Document "admin" ในรูปของคุณ
-            const roleDocName = role.toLowerCase(); 
-            const permDoc = await getDoc(doc(db, "permission", roleDocName));
-            
-            if (permDoc.exists()) {
-                const allowedIds = permDoc.data().menus; 
-                const menuData = {
-                    'report': { name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
-                    'track': { name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' },
-                    'close': { name: '3. ปิด Ticket', icon: 'fa-circle-check' },
-                    'admin_all': { name: '4. รวมงาน Admin', icon: 'fa-list-check' },
-                    'dashboard_main': { name: '5. Dashboard', icon: 'fa-chart-pie' },
-                    'ticket_mgmt': { name: '6. จัดการหัวข้อ', icon: 'fa-tags' },
-                    'user_mgmt': { name: '7. จัดการ User', icon: 'fa-users-gear' },
-                    'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
-                    'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
-                };
+            logout() { signOut(auth).then(() => window.location.reload()); },
 
-                menuBox.innerHTML = allowedIds.map(id => {
-                    const item = menuData[id];
-                    return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
-                }).join('');
-            } else {
-                menuBox.innerHTML = `<p style="color:red; font-size:12px;">ไม่พบเอกสารสิทธิ์: ${roleDocName}</p>`;
-            }
-        } catch (error) {
-            console.error("Error loading menu:", error);
-        }
-    },
+            // --- ระบบเมนูและเนื้อหา ---
+            async loadMenu(role) {
+                const menuBox = document.getElementById('dynamic-menu');
+                if (!menuBox) return;
+                try {
+                    const roleKey = role ? role.toLowerCase() : 'users';
+                    const permDoc = await getDoc(doc(db, "permission", roleKey));
+                    
+                    if (permDoc.exists()) {
+                        const allowedIds = permDoc.data().menus;
+                        const menuData = {
+                            'report': { name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
+                            'track': { name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' },
+                            'close': { name: '3. ปิด Ticket', icon: 'fa-circle-check' },
+                            'admin_all': { name: '4. รวมงาน Admin', icon: 'fa-list-check' },
+                            'dashboard_main': { name: '5. Dashboard', icon: 'fa-chart-pie' },
+                            'ticket_mgmt': { name: '6. จัดการหัวข้อ', icon: 'fa-tags' },
+                            'user_mgmt': { name: '7. จัดการ User', icon: 'fa-users-gear' },
+                            'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
+                            'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
+                        };
 
-    views: {
-        'home': `<h2>หน้าแรก</h2><div class="card">ยินดีต้อนรับสู่ระบบ Sale Support</div>`,
-        'report': `<h2>1. แจ้งปัญหา</h2><div class="card">ฟอร์มแจ้งปัญหา...</div>`,
-        // เพิ่มหน้าอื่นๆ ตามต้องการ...
-    }
-}; // ปิดปีกกาของ window.app ให้ครบถ้วนเพื่อแก้ SyntaxError
+                        menuBox.innerHTML = allowedIds.map(id => {
+                            const item = menuData[id];
+                            return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
+                        }).join('');
+                    }
+                } catch (err) { console.error("Menu Error:", err); }
+            },
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('auth-page').style.display = 'none';
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const data = userDoc.exists() ? userDoc.data() : { role: 'users', name: user.email };
+            navigate(pageId) {
+                const content = document.getElementById('main-content');
+                const view = this.views[pageId] || this.views['home'];
+                content.innerHTML = typeof view === 'function' ? view() : view;
                 
-                document.getElementById('display-user').innerText = data.name || user.email;
-                app.loadMenu(data.role || 'users');
-                app.navigate('home');
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.toggle('active', el.innerText.includes(pageId));
+                });
+            },
+
+            views: {
+                'home': `<h2>ยินดีต้อนรับ</h2><div class="card">เข้าสู่ระบบ Sale Support System<br>เลือกเมนูที่ต้องการทางด้านซ้ายเพื่อเริ่มงาน</div>`,
+                'report': `<h2>แจ้งปัญหาการใช้งาน</h2><div class="card"><label>ระบุ Internet No.</label><input type="text" id="ticket-inet" placeholder="10 หลัก"><button class="btn btn-green">ส่งข้อมูล</button></div>`,
+                'track': `<h2>ติดตามสถานะ</h2><div class="card">กำลังดึงข้อมูล...</div>`,
+                'close': `<h2>ปิดงาน (Admin)</h2><div class="card">รายการ Ticket ที่ค้างอยู่...</div>`
+            }
+        };
+
+        // ตรวจสอบสถานะ User เมื่อเปิดหน้าเว็บ
+        onAuthStateChanged(auth, async (user) => {
+            const authPage = document.getElementById('auth-page');
+            const userDisplay = document.getElementById('display-user');
+
+            if (user) {
+                authPage.style.display = 'none';
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    const userData = userDoc.exists() ? userDoc.data() : { role: 'users', name: user.email };
+                    
+                    userDisplay.innerText = userData.name || user.email;
+                    app.loadMenu(userData.role);
+                    app.navigate('home');
+                } catch (err) { console.error("User Status Error:", err); }
             } else {
-                document.getElementById('auth-page').style.display = 'flex';
+                authPage.style.display = 'flex';
             }
         });
     </script>
