@@ -16,23 +16,25 @@
         * { box-sizing: border-box; font-family: 'Kanit', sans-serif; }
         body { margin: 0; background: var(--gray); display: flex; flex-direction: column; height: 100vh; }
 
-        /* --- Layout ส่วนกลาง --- */
         .topbar { height: 60px; background: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .main-container { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 260px; background: var(--white); padding: 20px; border-right: 1px solid #eee; display: flex; flex-direction: column; }
+        .sidebar { width: 280px; background: var(--white); padding: 20px; border-right: 1px solid #eee; display: flex; flex-direction: column; overflow-y: auto; }
         .content-area { flex: 1; padding: 25px; overflow-y: auto; background: var(--white); margin: 15px; border-radius: 20px; }
 
-        /* --- UI Elements --- */
-        .nav-item { padding: 12px 15px; border-radius: var(--round); cursor: pointer; margin-bottom: 5px; transition: 0.3s; color: #555; display: flex; align-items: center; gap: 10px; }
+        .nav-item { padding: 12px 15px; border-radius: var(--round); cursor: pointer; margin-bottom: 5px; transition: 0.3s; color: #555; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
         .nav-item:hover, .nav-item.active { background: var(--light-green); color: var(--green); }
         .nav-item.logout { color: #ff5252; margin-top: auto; }
         
-        .btn { border-radius: var(--round); padding: 10px 25px; border: none; cursor: pointer; font-weight: 500; }
+        .btn { border-radius: var(--round); padding: 10px 25px; border: none; cursor: pointer; font-weight: 500; transition: 0.2s; }
         .btn-green { background: var(--green); color: white; }
+        .btn-green:hover { background: #43a047; }
         .card { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--light-orange); margin-bottom: 20px; }
         
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 20px; border: 1px solid #ddd; margin: 10px 0 15px; outline: none; }
-        
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 20px; border: 1px solid #ddd; margin: 10px 0 15px; outline: none; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--light-green); color: #666; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+
         #auth-page { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:1000; }
     </style>
 </head>
@@ -59,14 +61,12 @@
     <div class="main-container">
         <aside class="sidebar">
             <div id="dynamic-menu"></div>
-            
             <hr style="width: 100%; border: 0.5px solid #eee; margin: 20px 0;">
             <div class="nav-item" onclick="app.navigate('home')"><i class="fas fa-house"></i> Home</div>
             <div class="nav-item logout" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
         </aside>
 
-        <main class="content-area" id="main-content">
-            </main>
+        <main class="content-area" id="main-content"></main>
     </div>
 
     <script type="module">
@@ -87,7 +87,6 @@
         const auth = getAuth(fApp);
         const db = getFirestore(fApp);
 
-        // --- ระบบจัดการ Application ---
         window.app = {
             async login() {
                 const e = document.getElementById('login-email').value;
@@ -95,23 +94,20 @@
                 try { await signInWithEmailAndPassword(auth, e, p); } 
                 catch (err) { alert("อีเมลหรือรหัสผ่านผิดพลาด"); }
             },
-            logout() { signOut(auth); window.location.reload(); },
+            logout() { signOut(auth).then(() => window.location.reload()); },
 
-            // ฟังก์ชันเปลี่ยนหน้า (Update เนื้อหาเฉพาะส่วน)
             navigate(pageId) {
                 const content = document.getElementById('main-content');
-                
-                // ค้นหาหน้าจากคลังข้อมูล
                 const view = this.views[pageId] || this.views['home'];
                 content.innerHTML = typeof view === 'function' ? view() : view;
                 
-                // จัดการ Active Class ที่ Sidebar
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.toggle('active', el.innerText.includes(pageId));
+                });
             },
 
-            // คลังข้อมูลของแต่ละหน้า (เพิ่มหน้าใหม่ได้ที่นี่)
             views: {
-                'home': `<h2>หน้าแรก</h2><div class="card">ยินดีต้อนรับสู่ระบบ Sale Support</div>`,
+                'home': `<h2>หน้าแรก</h2><div class="card"><h3>Dashboard สรุปงานของคุณ</h3><p>ยินดีต้อนรับสู่ระบบ Sale Support</p></div>`,
                 'report': () => `
                     <h2>1. แจ้งปัญหาการใช้งาน</h2>
                     <div class="card">
@@ -119,24 +115,38 @@
                         <select id="issue-topic">${Array.from({length:10},(_,i)=>`<option>เรื่องที่ ${i+1}</option>`).join('')}</select>
                         <label>Internet No.</label>
                         <input type="text" placeholder="ระบุเลข Internet 10 หลัก">
-                        <label>รายละเอียด</label>
-                        <textarea rows="4" placeholder="ระบุรายละเอียดปัญหา..."></textarea>
-                        <button class="btn btn-green">ส่งข้อมูล</button>
+                        <label>รายละเอียดปัญหา</label>
+                        <textarea rows="4" placeholder="ระบุรายละเอียด..."></textarea>
+                        <button class="btn btn-green">ส่ง Ticket</button>
                     </div>`,
-                'track': `<h2>2. ติดตาม Ticket</h2><div class="card"><input type="text" placeholder="ค้นหาด้วย Internet No."><table>...</table></div>`,
-                'close': `<h2>3. ปิด Ticket</h2><div class="card">รายการงานรอปิด (Open/Pending)</div>`
+                'track': `<h2>2. ติดตาม Ticket ของ User</h2><div class="card"><input type="text" placeholder="ค้นหาด้วย Internet No."><table><tr><th>วันที่</th><th>ID</th><th>หัวข้อ</th><th>สถานะ</th></tr></table></div>`,
+                'close': `<h2>3. ปิด Ticket (Open/Pending)</h2><div class="card"><table><tr><th>ID</th><th>รายละเอียด</th><th>สถานะ</th><th>จัดการ</th></tr></table></div>`,
+                'admin_all': `<h2>4. หน้ารวมงานของ Admin</h2><div class="card"><div style="display:flex; gap:10px;"><input type="date"><select><option>พนักงานทุกคน</option></select><button class="btn btn-green">ค้นหา</button></div></div>`,
+                'dashboard_main': `<h2>5. Dashboard สรุปผล</h2><div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;"><div class="card">Open: 0</div><div class="card">Pending: 0</div><div class="card">Closed: 0</div></div>`,
+                'ticket_mgmt': `<h2>6. Ticket Management</h2><div class="card"><button class="btn btn-green">+ เพิ่มหัวข้อปัญหา</button></div>`,
+                'user_mgmt': `<h2>7. User Management</h2><div class="card"><table><tr><th>ชื่อ</th><th>ทีม</th><th>สิทธิ์</th><th>จัดการ</th></tr></table></div>`,
+                'permission_mgmt': `<h2>8. Permission Management</h2><div class="card"><p>ตั้งค่าการมองเห็นเมนูตามสิทธิ์การใช้งาน</p></div>`,
+                'logs': `<h2>9. Activity Logs</h2><div class="card"><p>ประวัติการเข้าใช้งานและการแก้ไขข้อมูล</p></div>`
             },
 
-            // โหลดเมนูตาม Role
             async loadMenu(role) {
                 const menuBox = document.getElementById('dynamic-menu');
                 let items = [
-                    { id: 'report', name: 'แจ้งปัญหา', icon: 'fa-paper-plane' },
-                    { id: 'track', name: 'ติดตามงาน', icon: 'fa-list-check' }
+                    { id: 'report', name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
+                    { id: 'track', name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' }
                 ];
                 
+                if(role === 'Admin' || role === 'Supervisor') {
+                    items.push({ id: 'close', name: '3. ปิด Ticket', icon: 'fa-circle-check' });
+                    items.push({ id: 'admin_all', name: '4. รวมงาน Admin', icon: 'fa-list-check' });
+                    items.push({ id: 'dashboard_main', name: '5. Dashboard', icon: 'fa-chart-pie' });
+                }
+
                 if(role === 'Admin') {
-                    items.push({ id: 'close', name: 'ปิด Ticket', icon: 'fa-circle-check' });
+                    items.push({ id: 'ticket_mgmt', name: '6. จัดการหัวข้อ', icon: 'fa-tags' });
+                    items.push({ id: 'user_mgmt', name: '7. จัดการ User', icon: 'fa-users-gear' });
+                    items.push({ id: 'permission_mgmt', name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' });
+                    items.push({ id: 'logs', name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' });
                 }
 
                 menuBox.innerHTML = items.map(i => `
@@ -147,7 +157,6 @@
             }
         };
 
-        // ตรวจสอบการ Login
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('auth-page').style.display = 'none';
