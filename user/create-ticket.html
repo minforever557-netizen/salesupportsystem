@@ -1,211 +1,41 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<title>Create Ticket</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="center-layout">
 
-<style>
-:root {
-    --green-main: #064635;
-    --green-soft: #ecfdf5;
-    --green-btn: #16a34a;
-    --text-main: #064635;
-    --border-soft: #d1fae5;
-}
+    <div class="ticket-card">
+        <h2>📝 Create Ticket</h2>
+        <p class="ticket-desc">กรุณากรอกข้อมูลปัญหาให้ครบถ้วน</p>
 
-/* ================= GLOBAL ================= */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: "Segoe UI", Tahoma, sans-serif;
-    background: var(--green-soft);
-    color: var(--text-main);
-}
+        <form id="createTicketForm">
 
-body {
-    display: flex;
-    flex-direction: column;
-}
+            <div class="form-group">
+                <label>หัวข้อปัญหา</label>
+                <select required>
+                    <option value="">-- เลือกหัวข้อปัญหา --</option>
+                    <option>ปัญหาที่ 1</option>
+                    <option>ปัญหาที่ 2</option>
+                    <option>ปัญหาที่ 3</option>
+                    <option>ปัญหาที่ 4</option>
+                    <option>ปัญหาที่ 5</option>
+                    <option>ปัญหาที่ 6</option>
+                    <option>ปัญหาที่ 7</option>
+                    <option>ปัญหาที่ 8</option>
+                    <option>ปัญหาที่ 9</option>
+                    <option>ปัญหาที่ 10</option>
+                </select>
+            </div>
 
-/* ================= TOPBAR ================= */
-.topbar {
-    height: 60px;
-    background: var(--green-main);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    font-size: 20px;
-    font-weight: 600;
-}
+            <div class="form-group">
+                <label>รายละเอียดปัญหา</label>
+                <textarea
+                    placeholder="อธิบายรายละเอียดปัญหา..."
+                    required></textarea>
+            </div>
 
-/* ================= LAYOUT ================= */
-.app-layout {
-    flex: 1;
-    display: flex;
-}
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">ส่ง Ticket</button>
+                <button type="reset" class="btn-secondary">ล้างข้อมูล</button>
+            </div>
 
-/* ================= SIDEBAR ================= */
-.dashboard-sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #064635, #043f30);
-    color: #fff;
-    padding: 20px;
-}
-
-.dashboard-sidebar h2 {
-    margin: 0 0 30px;
-    font-size: 20px;
-}
-
-.dashboard-nav a {
-    display: block;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    color: #d1fae5;
-    text-decoration: none;
-    border-radius: 12px;
-}
-
-.dashboard-nav a.active,
-.dashboard-nav a:hover {
-    background: rgba(255,255,255,.15);
-}
-
-/* ================= MAIN ================= */
-.main-area {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ================= CARD ================= */
-.ticket-card {
-    background: #fff;
-    width: 100%;
-    max-width: 520px;
-    padding: 32px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
-}
-
-.ticket-card h1 {
-    margin: 0 0 8px;
-    font-size: 26px;
-}
-
-.ticket-card p {
-    margin: 0 0 24px;
-    color: #555;
-}
-
-/* ================= FORM ================= */
-.form-group {
-    margin-bottom: 18px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border-soft);
-    font-size: 15px;
-}
-
-.form-group textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-/* ================= BUTTON ================= */
-.btn-submit {
-    width: 100%;
-    padding: 14px;
-    background: var(--green-btn);
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-submit:hover {
-    opacity: .9;
-}
-</style>
-</head>
-
-<body>
-
-<!-- TOPBAR -->
-<div class="topbar">SALE PORTAL</div>
-
-<div class="app-layout">
-
-    <!-- SIDEBAR -->
-    <aside class="dashboard-sidebar">
-        <h2>📋 เมนู</h2>
-        <nav class="dashboard-nav">
-            <a href="#">🏠 Dashboard</a>
-            <a href="#" class="active">📝 แจ้งปัญหา</a>
-            <a href="#">📂 ประวัติ</a>
-            <a href="#" style="color:#fca5a5">🚪 ออกจากระบบ</a>
-        </nav>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main-area">
-        <div class="ticket-card">
-            <h1>📝 Create Ticket</h1>
-            <p>กรุณากรอกข้อมูลปัญหาให้ครบถ้วน</p>
-
-            <form id="ticketForm">
-                <div class="form-group">
-                    <label>หัวข้อปัญหา</label>
-                    <select required>
-                        <option value="">-- เลือกหัวข้อปัญหา --</option>
-                        <option>ปัญหาที่ 1</option>
-                        <option>ปัญหาที่ 2</option>
-                        <option>ปัญหาที่ 3</option>
-                        <option>ปัญหาที่ 4</option>
-                        <option>ปัญหาที่ 5</option>
-                        <option>ปัญหาที่ 6</option>
-                        <option>ปัญหาที่ 7</option>
-                        <option>ปัญหาที่ 8</option>
-                        <option>ปัญหาที่ 9</option>
-                        <option>ปัญหาที่ 10</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>รายละเอียดปัญหา</label>
-                    <textarea placeholder="อธิบายรายละเอียดปัญหา..." required></textarea>
-                </div>
-
-                <button class="btn-submit" type="submit">ส่ง Ticket</button>
-            </form>
-        </div>
-    </main>
+        </form>
+    </div>
 
 </div>
-
-<script>
-document.getElementById("ticketForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    alert("ส่ง Ticket เรียบร้อย (ตัวอย่าง)");
-});
-</script>
-
-</body>
-</html>
