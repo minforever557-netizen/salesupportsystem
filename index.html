@@ -4,25 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sale Support System</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --green: #4caf50; --light-green: #e8f5e9; --orange: #ff9800; --light-orange: #fff3e0; --white: #ffffff; --gray: #f8f9fa; --round: 30px; }
-        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; }
-        body { margin: 0; background: var(--gray); display: flex; flex-direction: column; height: 100vh; }
-        .topbar { height: 60px; background: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
-        .main-container { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 280px; background: var(--white); padding: 20px; border-right: 1px solid #eee; display: flex; flex-direction: column; overflow-y: auto; }
-        .content-area { flex: 1; padding: 25px; overflow-y: auto; background: var(--white); margin: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .nav-item { padding: 12px 15px; border-radius: var(--round); cursor: pointer; margin-bottom: 5px; transition: 0.3s; color: #555; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
-        .nav-item:hover, .nav-item.active { background: var(--light-green); color: var(--green); }
-        .nav-item.logout { color: #ff5252; margin-top: auto; }
-        .btn { border-radius: var(--round); padding: 10px 25px; border: none; cursor: pointer; font-weight: 500; transition: 0.2s; }
-        .btn-green { background: var(--green); color: white; width: 100%; }
-        .card { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--light-orange); margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 20px; border: 1px solid #ddd; margin: 10px 0 15px; outline: none; font-size: 1rem; }
-        #auth-page { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--light-green); display:flex; justify-content:center; align-items:center; z-index:1000; }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -52,15 +38,13 @@
 
     <div class="main-container">
         <aside class="sidebar">
-            <div id="dynamic-menu">
-                </div>
+            <div id="dynamic-menu"></div>
             <hr style="width: 100%; border: 0.5px solid #eee; margin: 20px 0;">
             <div class="nav-item" onclick="app.navigate('home')"><i class="fas fa-house"></i> หน้าแรก</div>
             <div class="nav-item logout" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</div>
         </aside>
 
-        <main class="content-area" id="main-content">
-            </main>
+        <main class="content-area" id="main-content"></main>
     </div>
 
     <script type="module">
@@ -82,44 +66,43 @@
         const db = getFirestore(fApp);
 
         window.app = {
-            // --- ระบบ Authentication ---
             async login() {
                 const e = document.getElementById('login-email')?.value;
                 const p = document.getElementById('login-pass')?.value;
-                if (!e || !p) return alert("กรุณากรอก Email และ Password");
+                if (!e || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
                 try { await signInWithEmailAndPassword(auth, e, p); } 
-                catch (err) { alert("เข้าสู่ระบบไม่สำเร็จ: " + err.message); }
+                catch (err) { alert("Error: " + err.message); }
             },
 
             async register() {
                 const name = document.getElementById('reg-name').value;
                 const e = document.getElementById('reg-email').value;
                 const p = document.getElementById('reg-pass').value;
-                if (!name || !e || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
                 try {
                     const res = await createUserWithEmailAndPassword(auth, e, p);
                     await setDoc(doc(db, "users", res.user.uid), {
-                        name: name, email: e, role: "users", status: "active", createdAt: new Date().toISOString()
+                        name: name, email: e, role: "users", status: "active"
                     });
                     alert("สมัครสมาชิกสำเร็จ!");
                     window.location.reload();
-                } catch (err) { alert("สมัครไม่สำเร็จ: " + err.message); }
+                } catch (err) { alert("Error: " + err.message); }
             },
 
             async resetPassword() {
-                const email = prompt("ระบุ Email เพื่อรับลิงก์รีเซ็ตรหัสผ่าน:");
-                if (!email) return;
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert("ส่งลิงก์ไปที่ Email เรียบร้อยแล้ว");
-                } catch (err) { alert("เกิดข้อผิดพลาด: " + err.message); }
+                const email = prompt("ระบุ Email ของคุณ:");
+                if (email) {
+                    try {
+                        await sendPasswordResetEmail(auth, email);
+                        alert("ส่งลิงก์รีเซ็ตไปที่ Email แล้ว");
+                    } catch (err) { alert("Error: " + err.message); }
+                }
             },
 
             showRegister() {
                 document.getElementById('auth-form-content').innerHTML = `
                     <input type="text" id="reg-name" placeholder="ชื่อ-นามสกุล">
                     <input type="email" id="reg-email" placeholder="Email">
-                    <input type="password" id="reg-pass" placeholder="Password (6 ตัวขึ้นไป)">
+                    <input type="password" id="reg-pass" placeholder="Password (6+ ตัว)">
                     <button class="btn btn-green" onclick="app.register()">ยืนยันสมัครสมาชิก</button>
                     <p style="margin-top:15px; font-size:0.85rem; color:#666; cursor:pointer;" onclick="window.location.reload()">กลับหน้า Login</p>
                 `;
@@ -127,14 +110,10 @@
 
             logout() { signOut(auth).then(() => window.location.reload()); },
 
-            // --- ระบบเมนูและเนื้อหา ---
             async loadMenu(role) {
                 const menuBox = document.getElementById('dynamic-menu');
-                if (!menuBox) return;
                 try {
-                    const roleKey = role ? role.toLowerCase() : 'users';
-                    const permDoc = await getDoc(doc(db, "permission", roleKey));
-                    
+                    const permDoc = await getDoc(doc(db, "permission", role.toLowerCase()));
                     if (permDoc.exists()) {
                         const allowedIds = permDoc.data().menus;
                         const menuData = {
@@ -148,50 +127,40 @@
                             'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
                             'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
                         };
-
                         menuBox.innerHTML = allowedIds.map(id => {
                             const item = menuData[id];
                             return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
                         }).join('');
                     }
-                } catch (err) { console.error("Menu Error:", err); }
+                } catch (err) { console.error(err); }
             },
 
             navigate(pageId) {
                 const content = document.getElementById('main-content');
                 const view = this.views[pageId] || this.views['home'];
                 content.innerHTML = typeof view === 'function' ? view() : view;
-                
                 document.querySelectorAll('.nav-item').forEach(el => {
                     el.classList.toggle('active', el.innerText.includes(pageId));
                 });
             },
 
             views: {
-                'home': `<h2>ยินดีต้อนรับ</h2><div class="card">เข้าสู่ระบบ Sale Support System<br>เลือกเมนูที่ต้องการทางด้านซ้ายเพื่อเริ่มงาน</div>`,
-                'report': `<h2>แจ้งปัญหาการใช้งาน</h2><div class="card"><label>ระบุ Internet No.</label><input type="text" id="ticket-inet" placeholder="10 หลัก"><button class="btn btn-green">ส่งข้อมูล</button></div>`,
-                'track': `<h2>ติดตามสถานะ</h2><div class="card">กำลังดึงข้อมูล...</div>`,
-                'close': `<h2>ปิดงาน (Admin)</h2><div class="card">รายการ Ticket ที่ค้างอยู่...</div>`
+                'home': `<h2>หน้าแรก</h2><div class="card">ยินดีต้อนรับสู่ระบบ Sale Support</div>`,
+                'report': `<h2>แจ้งปัญหา</h2><div class="card"><input type="text" placeholder="Internet No."><button class="btn btn-green">ส่ง Ticket</button></div>`,
+                // เพิ่มหน้าอื่นๆ ที่นี่...
             }
         };
 
-        // ตรวจสอบสถานะ User เมื่อเปิดหน้าเว็บ
         onAuthStateChanged(auth, async (user) => {
-            const authPage = document.getElementById('auth-page');
-            const userDisplay = document.getElementById('display-user');
-
             if (user) {
-                authPage.style.display = 'none';
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    const userData = userDoc.exists() ? userDoc.data() : { role: 'users', name: user.email };
-                    
-                    userDisplay.innerText = userData.name || user.email;
-                    app.loadMenu(userData.role);
-                    app.navigate('home');
-                } catch (err) { console.error("User Status Error:", err); }
+                document.getElementById('auth-page').style.display = 'none';
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userData = userDoc.exists() ? userDoc.data() : { role: 'users', name: user.email };
+                document.getElementById('display-user').innerText = userData.name || user.email;
+                app.loadMenu(userData.role);
+                app.navigate('home');
             } else {
-                authPage.style.display = 'flex';
+                document.getElementById('auth-page').style.display = 'flex';
             }
         });
     </script>
