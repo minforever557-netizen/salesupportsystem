@@ -1,80 +1,121 @@
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ตรวจสอบสถานะการ Login
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
+const firebaseConfig = {
+    apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
+    authDomain: "sale-support-system.firebaseapp.com",
+    projectId: "sale-support-system",
+    storageBucket: "sale-support-system.firebasestorage.app",
+    messagingSenderId: "640337786680",
+    appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
+};
+
+const fApp = initializeApp(firebaseConfig);
+const auth = getAuth(fApp);
+const db = getFirestore(fApp);
+
+window.app = {
+    async login() {
+        const e = document.getElementById('login-email')?.value;
+        const p = document.getElementById('login-pass')?.value;
+        if (!e || !p) return alert("กรุณากรอกข้อมูล");
+        try { await signInWithEmailAndPassword(auth, e, p); } 
+        catch (err) { alert("Login Fail: " + err.message); }
+    },
+
+    async register() {
+        const name = document.getElementById('reg-name').value;
+        const e = document.getElementById('reg-email').value;
+        const p = document.getElementById('reg-pass').value;
         try {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            const userData = userDoc.exists() ? userDoc.data() : { role: 'User', name: user.email };
-            
-            // แก้ไข TypeError: เช็คว่ามี Element ก่อนใส่ชื่อ
-            const nameDisplay = document.getElementById('display-name');
-            if (nameDisplay) {
-                nameDisplay.innerText = userData.name || user.email;
-            }
+            const res = await createUserWithEmailAndPassword(auth, e, p);
+            await setDoc(doc(db, "users", res.user.uid), { 
+                name, email: e, role: "users", status: "active" 
+            });
+            alert("สมัครสำเร็จ!"); window.location.reload();
+        } catch (err) { alert(err.message); }
+    },
 
-            loadMenu(userData.role);
-            navigate('home');
-        } catch (error) {
-            console.error("Error fetching user data:", error);
+    showRegister() {
+        const form = document.getElementById('auth-form-content');
+        if (form) {
+            form.innerHTML = `
+                <input type="text" id="reg-name" placeholder="ชื่อ-นามสกุล">
+                <input type="email" id="reg-email" placeholder="Email">
+                <input type="password" id="reg-pass" placeholder="Password (6 ตัวขึ้นไป)">
+                <button class="btn btn-green" onclick="app.register()">ยืนยันสมัครสมาชิก</button>
+                <p onclick="window.location.reload()" style="cursor:pointer; font-size:0.8rem; margin-top:10px;">กลับไปหน้า Login</p>
+            `;
         }
-    } else {
-        // ถ้าต้องการให้เด้งไปหน้า login
-        // window.location.href = 'login.html';
-        console.log("No user logged in");
-    }
-});
+    },
 
-// ระบบเปลี่ยนหน้า (SPA)
-window.navigate = async (page) => {
-    const content = document.getElementById('main-content');
-    if (!content) return;
+    async resetPassword() {
+        const email = prompt("กรอก Email ที่ใช้สมัคร:");
+        if (email) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("ส่งลิงก์รีเซ็ตไปที่ Email แล้วครับ");
+            } catch (err) { alert(err.message); }
+        }
+    },
 
-    switch(page) {
-        case 'home':
-            content.innerHTML = `<h2>หน้าแรก</h2><p>ยินดีต้อนรับสู่ระบบ Sale Support</p>`;
-            break;
-        case 'report':
-            content.innerHTML = `
-                <h2>แจ้งปัญหาการใช้งาน</h2>
-                <div class="card">
-                    <label>หัวข้อปัญหา</label>
-                    <select id="issue-topic">
-                        ${Array.from({length: 10}, (_, i) => `<option>เรื่องที่ ${i+1}</option>`).join('')}
-                    </select>
-                    <br><label>Internet No.</label>
-                    <input type="text" id="internet-no" placeholder="960xxxxxxx">
-                    <button class="btn btn-green">ส่งข้อมูล</button>
-                </div>`;
-            break;
-        default:
-            content.innerHTML = `<h2>Coming Soon</h2><p>หน้านี้กำลังอยู่ระหว่างการพัฒนา</p>`;
+    logout() { signOut(auth).then(() => window.location.reload()); },
+
+    async loadMenu(role) {
+        const menuBox = document.getElementById('dynamic-menu');
+        if (!menuBox) return;
+        try {
+            const roleKey = role ? role.toLowerCase() : 'users';
+            const permDoc = await getDoc(doc(db, "permission", roleKey));
+            
+            if (permDoc.exists()) {
+                const menuData = {
+                    'report': { name: 'แจ้งปัญหา', icon: 'fa-paper-plane' },
+                    'track': { name: 'ติดตาม Ticket', icon: 'fa-magnifying-glass' },
+                    'close': { name: 'ปิด Ticket', icon: 'fa-circle-check' },
+                    'admin_all': { name: 'รวมงาน Admin', icon: 'fa-list-check' },
+                    'dashboard_main': { name: 'Dashboard', icon: 'fa-chart-pie' },
+                    'user_mgmt': { name: 'จัดการ User', icon: 'fa-users-gear' }
+                };
+                menuBox.innerHTML = permDoc.data().menus.map(id => {
+                    const item = menuData[id];
+                    return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
+                }).join('');
+            }
+        } catch (err) { console.error("Menu Error:", err); }
+    },
+
+    navigate(pageId) {
+        const content = document.getElementById('main-content');
+        if (!content) return;
+        content.innerHTML = this.views[pageId] || this.views['home'];
+        
+        // Active class toggle
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.toggle('active', el.innerText.includes(pageId));
+        });
+    },
+
+    views: {
+        'home': `<h2>ยินดีต้อนรับ</h2><div class="card">เลือกเมนูทางซ้ายเพื่อเริ่มงาน</div>`,
+        'report': `<h2>แจ้งปัญหา</h2><div class="card"><input placeholder="ระบุเลข Internet"><textarea placeholder="อาการเสีย" style="width:100%; padding:10px; border-radius:10px;"></textarea><button class="btn btn-green">ส่ง Ticket</button></div>`
     }
 };
 
-// โหลดเมนูตาม Role
-async function loadMenu(userRole) {
-    const menuDiv = document.getElementById('dynamic-menu');
-    if (!menuDiv) return;
-
-    try {
-        const permDoc = await getDoc(doc(db, "permissions", userRole));
-        if (permDoc.exists()) {
-            const allowedMenus = permDoc.data().menus;
-            menuDiv.innerHTML = allowedMenus.map(m => `
-                <div class="nav-item" onclick="navigate('${m.id}')">
-                    <i class="fas ${m.icon || 'fa-circle'}"></i> ${m.name}
-                </div>
-            `).join('');
-        } else {
-            // Default Menu ถ้าไม่มีข้อมูลใน Firestore
-            menuDiv.innerHTML = `<div class="nav-item" onclick="navigate('report')"><i class="fas fa-paper-plane"></i> แจ้งปัญหา</div>`;
-        }
-    } catch (e) {
-        console.error("Menu load error:", e);
+onAuthStateChanged(auth, async (user) => {
+    const authPage = document.getElementById('auth-page');
+    const userDisplay = document.getElementById('display-user');
+    
+    if (user) {
+        if (authPage) authPage.style.display = 'none';
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const data = userDoc.exists() ? userDoc.data() : { role: 'users', name: user.email };
+        
+        if (userDisplay) userDisplay.innerText = data.name || user.email;
+        app.loadMenu(data.role);
+        app.navigate('home');
+    } else {
+        if (authPage) authPage.style.display = 'flex';
     }
-}
-
-window.logout = () => signOut(auth);
+});
