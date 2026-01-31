@@ -4,17 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sale Support System</title>
-    <style>
-        /* เอาโค้ด CSS ด้านบนมาวางที่นี่ */
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div id="app">
-        </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
-        // ... โค้ด Firebase ของคุณ ...
-    </script>
+    <div id="app-shell">
+        <div id="topbar">
+            </div>
+        <div class="main-container">
+            <nav id="sidebar">
+                <div id="dynamic-menu">
+                    <p>กำลังโหลดเมนู...</p>
+                </div>
+            </nav>
+            <main id="main-content">
+                <h1>ยินดีต้อนรับ</h1>
+                <p>หากข้อความนี้ไม่เปลี่ยนไป โปรดเช็ค Console (F12)</p>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>
