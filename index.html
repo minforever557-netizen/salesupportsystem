@@ -129,33 +129,43 @@
                 'logs': `<h2>9. Activity Logs</h2><div class="card"><p>ประวัติการเข้าใช้งานและการแก้ไขข้อมูล</p></div>`
             },
 
-            async loadMenu(role) {
-                const menuBox = document.getElementById('dynamic-menu');
-                let items = [
-                    { id: 'report', name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
-                    { id: 'track', name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' }
-                ];
-                
-                if(role === 'Admin' || role === 'Supervisor') {
-                    items.push({ id: 'close', name: '3. ปิด Ticket', icon: 'fa-circle-check' });
-                    items.push({ id: 'admin_all', name: '4. รวมงาน Admin', icon: 'fa-list-check' });
-                    items.push({ id: 'dashboard_main', name: '5. Dashboard', icon: 'fa-chart-pie' });
-                }
-
-                if(role === 'Admin') {
-                    items.push({ id: 'ticket_mgmt', name: '6. จัดการหัวข้อ', icon: 'fa-tags' });
-                    items.push({ id: 'user_mgmt', name: '7. จัดการ User', icon: 'fa-users-gear' });
-                    items.push({ id: 'permission_mgmt', name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' });
-                    items.push({ id: 'logs', name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' });
-                }
-
-                menuBox.innerHTML = items.map(i => `
-                    <div class="nav-item" onclick="app.navigate('${i.id}')">
-                        <i class="fas ${i.icon}"></i> ${i.name}
-                    </div>
-                `).join('');
-            }
+            // แก้ไขฟังก์ชัน loadMenu ใน index.html ของคุณ
+async loadMenu(role) {
+    const menuBox = document.getElementById('dynamic-menu');
+    
+    // 1. ดึงรายการเมนูที่อนุญาตจาก Firestore (Collection: permission)
+    const permDoc = await getDoc(doc(db, "permission", role)); // ใช้ชื่อ collection ให้ตรงกับในรูป
+    
+    if (permDoc.exists()) {
+        const allowedIds = permDoc.data().menus; // นี่คือ Array ["report", "track", ...]
+        
+        // 2. คลังข้อมูลไอคอนและชื่อ (Mapping)
+        const menuData = {
+            'report': { name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
+            'track': { name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' },
+            'close': { name: '3. ปิด Ticket', icon: 'fa-circle-check' },
+            'admin_all': { name: '4. รวมงาน Admin', icon: 'fa-list-check' },
+            'dashboard_main': { name: '5. Dashboard', icon: 'fa-chart-pie' },
+            'ticket_mgmt': { name: '6. จัดการหัวข้อ', icon: 'fa-tags' },
+            'user_mgmt': { name: '7. จัดการ User', icon: 'fa-users-gear' },
+            'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
+            'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
         };
+
+        // 3. สร้าง HTML เฉพาะเมนูที่มีชื่ออยู่ใน Array ของ Firebase
+        menuBox.innerHTML = allowedIds.map(id => {
+            const item = menuData[id];
+            if (!item) return ''; // ถ้าใน Firebase ใส่ชื่อผิดจนหาใน menuData ไม่เจอให้ข้ามไป
+            return `
+                <div class="nav-item" onclick="app.navigate('${id}')">
+                    <i class="fas ${item.icon}"></i> ${item.name}
+                </div>`;
+        }).join('');
+        
+    } else {
+        menuBox.innerHTML = '<p style="padding:10px; color:red;">ไม่พบสิทธิ์การใช้งาน</p>';
+    }
+}
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
