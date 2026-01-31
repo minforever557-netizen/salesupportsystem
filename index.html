@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sale Support System</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.2">
 </head>
 <body>
 
     <div id="auth-page">
-        <div class="card" style="width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-            <h2 style="color: var(--green); margin-bottom: 20px;">SALE SUPPORT</h2>
+        <div class="card" style="width: 380px; text-align: center;">
+            <h2 style="color: var(--green);">SALE SUPPORT</h2>
             <div id="auth-form-content">
                 <input type="email" id="login-email" placeholder="Email">
                 <input type="password" id="login-pass" placeholder="Password">
@@ -28,11 +27,10 @@
     </div>
 
     <header class="topbar">
-        <div style="font-weight: bold; color: var(--green); font-size: 1.2rem;"><i class="fas fa-headset"></i> SALE Support</div>
+        <div style="font-weight: bold; color: var(--green);"><i class="fas fa-headset"></i> SALE Support</div>
         <div style="display: flex; align-items: center; gap: 15px;">
-            <i class="fas fa-bell" style="color: var(--orange);"></i>
             <span id="display-user">Loading...</span>
-            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--light-green); border: 1px solid var(--green);"></div>
+            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--light-green);"></div>
         </div>
     </header>
 
@@ -43,126 +41,9 @@
             <div class="nav-item" onclick="app.navigate('home')"><i class="fas fa-house"></i> หน้าแรก</div>
             <div class="nav-item logout" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</div>
         </aside>
-
         <main class="content-area" id="main-content"></main>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCsUhBsWjZfQuJo5lgprYt3xikQUyf8iiw",
-            authDomain: "sale-support-system.firebaseapp.com",
-            projectId: "sale-support-system",
-            storageBucket: "sale-support-system.firebasestorage.app",
-            messagingSenderId: "640337786680",
-            appId: "1:640337786680:web:fd80699ac291b8d7a7b3cd"
-        };
-
-        const fApp = initializeApp(firebaseConfig);
-        const auth = getAuth(fApp);
-        const db = getFirestore(fApp);
-
-        window.app = {
-            async login() {
-                const e = document.getElementById('login-email')?.value;
-                const p = document.getElementById('login-pass')?.value;
-                if (!e || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
-                try { await signInWithEmailAndPassword(auth, e, p); } 
-                catch (err) { alert("Error: " + err.message); }
-            },
-
-            async register() {
-                const name = document.getElementById('reg-name').value;
-                const e = document.getElementById('reg-email').value;
-                const p = document.getElementById('reg-pass').value;
-                try {
-                    const res = await createUserWithEmailAndPassword(auth, e, p);
-                    await setDoc(doc(db, "users", res.user.uid), {
-                        name: name, email: e, role: "users", status: "active"
-                    });
-                    alert("สมัครสมาชิกสำเร็จ!");
-                    window.location.reload();
-                } catch (err) { alert("Error: " + err.message); }
-            },
-
-            async resetPassword() {
-                const email = prompt("ระบุ Email ของคุณ:");
-                if (email) {
-                    try {
-                        await sendPasswordResetEmail(auth, email);
-                        alert("ส่งลิงก์รีเซ็ตไปที่ Email แล้ว");
-                    } catch (err) { alert("Error: " + err.message); }
-                }
-            },
-
-            showRegister() {
-                document.getElementById('auth-form-content').innerHTML = `
-                    <input type="text" id="reg-name" placeholder="ชื่อ-นามสกุล">
-                    <input type="email" id="reg-email" placeholder="Email">
-                    <input type="password" id="reg-pass" placeholder="Password (6+ ตัว)">
-                    <button class="btn btn-green" onclick="app.register()">ยืนยันสมัครสมาชิก</button>
-                    <p style="margin-top:15px; font-size:0.85rem; color:#666; cursor:pointer;" onclick="window.location.reload()">กลับหน้า Login</p>
-                `;
-            },
-
-            logout() { signOut(auth).then(() => window.location.reload()); },
-
-            async loadMenu(role) {
-                const menuBox = document.getElementById('dynamic-menu');
-                try {
-                    const permDoc = await getDoc(doc(db, "permission", role.toLowerCase()));
-                    if (permDoc.exists()) {
-                        const allowedIds = permDoc.data().menus;
-                        const menuData = {
-                            'report': { name: '1. แจ้งปัญหา', icon: 'fa-paper-plane' },
-                            'track': { name: '2. ติดตาม Ticket', icon: 'fa-magnifying-glass' },
-                            'close': { name: '3. ปิด Ticket', icon: 'fa-circle-check' },
-                            'admin_all': { name: '4. รวมงาน Admin', icon: 'fa-list-check' },
-                            'dashboard_main': { name: '5. Dashboard', icon: 'fa-chart-pie' },
-                            'ticket_mgmt': { name: '6. จัดการหัวข้อ', icon: 'fa-tags' },
-                            'user_mgmt': { name: '7. จัดการ User', icon: 'fa-users-gear' },
-                            'permission_mgmt': { name: '8. จัดการสิทธิ์', icon: 'fa-shield-halved' },
-                            'logs': { name: '9. Log ประวัติ', icon: 'fa-clock-rotate-left' }
-                        };
-                        menuBox.innerHTML = allowedIds.map(id => {
-                            const item = menuData[id];
-                            return item ? `<div class="nav-item" onclick="app.navigate('${id}')"><i class="fas ${item.icon}"></i> ${item.name}</div>` : '';
-                        }).join('');
-                    }
-                } catch (err) { console.error(err); }
-            },
-
-            navigate(pageId) {
-                const content = document.getElementById('main-content');
-                const view = this.views[pageId] || this.views['home'];
-                content.innerHTML = typeof view === 'function' ? view() : view;
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    el.classList.toggle('active', el.innerText.includes(pageId));
-                });
-            },
-
-            views: {
-                'home': `<h2>หน้าแรก</h2><div class="card">ยินดีต้อนรับสู่ระบบ Sale Support</div>`,
-                'report': `<h2>แจ้งปัญหา</h2><div class="card"><input type="text" placeholder="Internet No."><button class="btn btn-green">ส่ง Ticket</button></div>`,
-                // เพิ่มหน้าอื่นๆ ที่นี่...
-            }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('auth-page').style.display = 'none';
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const userData = userDoc.exists() ? userDoc.data() : { role: 'users', name: user.email };
-                document.getElementById('display-user').innerText = userData.name || user.email;
-                app.loadMenu(userData.role);
-                app.navigate('home');
-            } else {
-                document.getElementById('auth-page').style.display = 'flex';
-            }
-        });
-    </script>
+    <script type="module" src="app.js?v=1.2"></script>
 </body>
 </html>
