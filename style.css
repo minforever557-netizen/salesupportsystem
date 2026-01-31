@@ -1,694 +1,88 @@
-/* ======================================================
-   GLOBAL SETUP
-====================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
-
 :root {
-    --green-main: #22c55e;
-    --green-dark: #065f46;
-    --green-soft: #ecfdf5;
-
-    --orange-soft: #fed7aa;
-    --orange-dark: #9a3412;
-
-    --text-main: #111827;
-    --text-muted: #6b7280;
-
+    --primary-green: #e8f5e9; /* เขียวอ่อน */
+    --accent-orange: #fff3e0; /* ส้มอ่อน */
+    --deep-green: #4caf50;
+    --deep-orange: #ff9800;
     --white: #ffffff;
-    --border: #e5e7eb;
-
-    --shadow-sm: 0 4px 12px rgba(0,0,0,.06);
-    --shadow-md: 0 12px 28px rgba(0,0,0,.12);
+    --text-dark: #333;
+    --radius: 20px; /* ความมน */
 }
 
-* {
-    box-sizing: border-box;
-    font-family: 'Sarabun', sans-serif;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: var(--green-soft);
-    color: var(--text-main);
-}
-
-/* ======================================================
-   APP LAYOUT
-====================================================== */
-.app-layout {
-    flex: 1;
-    display: flex;
-}
-}
-/* ======================================================
-   APP WRAPPER
-====================================================== */
 body {
-    display: flex;
-    flex-direction: column;
-}
-
-/* ======================================================
-   SIDEBAR
-====================================================== */
-.dashboard-sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #064635, #043f30);
-    color: #fff;
-    padding: 20px;
-}
-
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    margin-bottom: 30px;
-}
-
-.sidebar-logo img {
-    width: 36px;
-    height: 36px;
-}
-
-.dashboard-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.dashboard-nav a {
-    color: #d1fae5;
-    text-decoration: none;
-    padding: 12px 14px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all .2s ease;
-}
-
-.dashboard-nav a.active,
-.dashboard-nav a:hover {
-    background: rgba(255,255,255,.15);
-}
-
-.dashboard-nav a.logout {
-    margin-top: 20px;
-    color: #fca5a5;
-}
-
-/* ======================================================
-   MAIN AREA
-====================================================== */
-.main-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* ======================================================
-   TOP BAR
-====================================================== */
-.topbar {
-    height: 60px;
-    background: #064635;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    font-size: 20px;
-    font-weight: bold;
-    flex-shrink: 0;
-}
-
-.topbar-center {
-    flex: 1;
-    text-align: center;
-    font-weight: 600;
-    color: var(--green-dark);
-}
-
-.topbar-right {
-    display: flex;
-    align-items: center;
-}
-
-.user-box {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-}
-
-.user-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.icon-bell {
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.user-bottom {
-    display: flex;
-    gap: 10px;
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.btn-logout {
-    background: var(--orange-soft);
-    color: var(--orange-dark);
-    border: none;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-/* ======================================================
-   CONTENT
-====================================================== */
-.content-area {
-    padding: 24px;
-    flex: 1;
-}
-
-/* ======================================================
-   CARD
-====================================================== */
-.card {
-    background: var(--white);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: var(--shadow-md);
-}
-
-.card + .card {
-    margin-top: 16px;
-}
-
-/* ======================================================
-   DASHBOARD STATS
-====================================================== */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-    gap: 16px;
-}
-
-.stat-card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
-}
-
-.stat-card small {
-    color: var(--text-muted);
-}
-
-.stat-card h2 {
-    margin: 8px 0 0;
-}
-
-/* ======================================================
-   TABLE / TICKET CARD
-====================================================== */
-.ticket-card {
-    background: var(--white);
-    padding: 18px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    transition: transform .2s ease;
-}
-
-.ticket-card:hover {
-    transform: translateY(-3px);
-}
-
-.ticket-status {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.status-open { background: #fde68a; color: #92400e; }
-.status-pending { background: #bfdbfe; color: #1e40af; }
-.status-done { background: #bbf7d0; color: #065f46; }
-
-/* ======================================================
-   FORM
-====================================================== */
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    font-size: 14px;
-    display: block;
-    margin-bottom: 6px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    font-size: 14px;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--green-main);
-    box-shadow: 0 0 0 3px rgba(34,197,94,.2);
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* ======================================================
-   BUTTON
-====================================================== */
-.btn-primary {
-    background: linear-gradient(135deg, var(--green-main), #16a34a);
-    border: none;
-    color: white;
-    padding: 12px;
-    width: 100%;
-    border-radius: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-secondary {
-    background: #e5e7eb;
-    border: none;
-    padding: 12px;
-    width: 100%;
-    border-radius: 14px;
-    margin-top: 10px;
-}
-
-/* ======================================================
-   MODAL
-====================================================== */
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-card {
-    background: var(--white);
-    padding: 24px;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: var(--shadow-md);
-    animation: slideUp .35s ease;
-}
-
-@keyframes slideUp {
-    from { transform: translateY(40px); opacity: 0; }
-    to { transform: none; opacity: 1; }
-}
-
-/* ======================================================
-   TOAST
-====================================================== */
-.toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--green-main);
-    color: white;
-    padding: 14px 22px;
-    border-radius: 14px;
-    box-shadow: var(--shadow-md);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all .3s ease;
-    z-index: 1000;
-}
-
-.toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ======================================================
-   RESPONSIVE
-====================================================== */
-.hamburger {
-    display: none;
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.4);
-    z-index: 40;
-}
-
-@media (max-width: 768px) {
-
-    .dashboard-sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        height: 100%;
-        z-index: 50;
-        transition: left .3s ease;
-    }
-
-    .dashboard-sidebar.show {
-        left: 0;
-    }
-
-    .sidebar-overlay.show {
-        display: block;
-    }
-
-    .hamburger {
-        display: block;
-        font-size: 20px;
-        background: none;
-        border: none;
-    }
-
-    .dashboard-stats {
-        grid-template-columns: 1fr;
-    }
-}
-/* ================= LOGIN PAGE ================= */
-
-* {
-    box-sizing: border-box;
-    font-family: 'Prompt', sans-serif;
-}
-
-body.login-page {
+    font-family: 'Kanit', sans-serif;
     margin: 0;
+    background-color: #f9f9f9;
+    color: var(--text-dark);
+}
+
+/* Layout Structure */
+#app-container {
+    display: flex;
     height: 100vh;
-    background: linear-gradient(135deg, #1e9f61, #3cb371);
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.login-container {
-    width: 100%;
-    max-width: 420px;
+/* Sidebar */
+#sidebar {
+    width: 260px;
+    background: var(--white);
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
     padding: 20px;
+    transition: all 0.3s;
 }
 
-.login-card {
-    background: #fff;
-    border-radius: 18px;
-    padding: 35px 30px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-.login-icon {
-    width: 70px;
-    height: 70px;
-    background: #e8f7ef;
-    color: #1e9f61;
-    border-radius: 50%;
+.nav-item {
+    padding: 12px 20px;
+    margin-bottom: 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: 0.3s;
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px;
-    font-size: 30px;
-}
-
-.login-card h1 {
-    margin: 0;
-    font-size: 26px;
-    color: #222;
-}
-.login-links {
-    margin-top: 18px;
-    font-size: 14px;
-}
-
-.login-links a {
-    color: #1e9f61;
     text-decoration: none;
-    margin: 0 6px;
+    color: var(--text-dark);
 }
 
-.login-links a:hover {
-    text-decoration: underline;
+.nav-item:hover, .nav-item.active {
+    background-color: var(--primary-green);
+    color: var(--deep-green);
 }
 
-
-.subtitle {
-    margin: 8px 0 25px;
-    color: #666;
-    font-size: 14px;
+/* Top Bar */
+#topbar {
+    height: 60px;
+    background: var(--white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.input-group {
-    position: relative;
-    margin-bottom: 15px;
-}
-
-.input-group i {
-    position: absolute;
-    top: 50%;
-    left: 14px;
-    transform: translateY(-50%);
-    color: #999;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 12px 12px 12px 42px;
-    border-radius: 10px;
+/* Buttons & Inputs */
+button, input, select, textarea {
+    border-radius: var(--radius) !important;
     border: 1px solid #ddd;
-    font-size: 14px;
-}
-
-.input-group input:focus {
-    outline: none;
-    border-color: #1e9f61;
+    padding: 10px 15px;
 }
 
 .btn-primary {
-    width: 100%;
-    padding: 13px;
-    background: #1e9f61;
+    background-color: var(--deep-green);
+    color: white;
     border: none;
-    color: #fff;
-    font-size: 15px;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-top: 10px;
 }
 
-.btn-primary i {
-    margin-right: 6px;
+.btn-orange {
+    background-color: var(--deep-orange);
+    color: white;
+    border: none;
 }
 
-.btn-primary:hover {
-    background: #178a53;
-}
-
-.msg {
-    margin-top: 15px;
-    font-size: 14px;
-    color: #d9534f;
-}
-
-/* 🔄 Loading Overlay */
-.login-loading {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-
-.login-loading.show {
-    display: flex;
-}
-
-.loading-card {
-    background: #fff;
-    padding: 30px 40px;
-    border-radius: 14px;
-    text-align: center;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #eee;
-    border-top: 4px solid #1e9f61;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 12px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-
-@keyframes pop {
-    from {
-        transform: scale(.9);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-/* ========== FIX SELECT STYLE (SAFE) ========== */
-
-.input-group select.styled-select {
-    width: 100%;
-    height: 48px;
-    padding: 14px 42px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    font-size: 15px;
-    font-family: 'Prompt', sans-serif;
+/* Content Area */
+#main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 25px;
     background-color: #fff;
-    appearance: none;
-    box-sizing: border-box;
-}
-
-/* ลูกศร select */
-.input-group select.styled-select {
-    background-image:
-        linear-gradient(45deg, transparent 50%, #999 50%),
-        linear-gradient(135deg, #999 50%, transparent 50%);
-    background-position:
-        calc(100% - 20px) 50%,
-        calc(100% - 15px) 50%;
-    background-size: 5px 5px;
-    background-repeat: no-repeat;
-}
-
-/* icon ซ้ายใน input */
-.input-group > i {
-    pointer-events: none; /* ⭐ สำคัญมาก */
-}
-
-
-/* ===== PASSWORD GROUP ===== */
-.password-group {
-    position: relative;
-}
-
-/* input */
-.password-group input {
-    width: 100%;
-    padding-right: 48px; /* เว้นที่ให้รูปตา */
-    position: relative;
-    z-index: 1;
-}
-
-/* 👁 eye button */
-.toggle-password {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
-
-    z-index: 10;          /* 🔑 ต้องมากกว่า input */
-    pointer-events: auto; /* 🔑 บังคับให้รับ click */
-}
-
-/* ===== POPUP OVERLAY ===== */
-.popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-/* ===== POPUP BOX ===== */
-.popup-box {
-    background: #fff;
-    width: 320px;
-    padding: 28px 22px;
-    border-radius: 16px;
-    text-align: center;
-
-    animation: popupScale 0.3s ease;
-}
-
-/* icon */
-.popup-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
-
-.popup-icon.error {
-    color: #ef4444;
-}
-
-/* button */
-.btn-popup {
-    margin-top: 18px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    background: #16a34a;
-    color: #fff;
-    font-size: 15px;
-    cursor: pointer;
-}
-
-.btn-popup:hover {
-    background: #15803d;
-}
-
-/* ===== ANIMATION ===== */
-@keyframes popupScale {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-
-.toggle-password:hover {
-    color: #22c55e;
 }
