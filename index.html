@@ -8,12 +8,18 @@
 <link rel="stylesheet" href="assets/css/main.css">
 
 <style>
+:root{
+  --green:#e8f5e9;
+  --orange:#fff3e0;
+  --main:#43a047;
+}
+body{margin:0;font-family:system-ui}
 .login-wrapper{
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#e8f5e9,#fff3e0);
+  background:linear-gradient(135deg,var(--green),var(--orange));
 }
 .login-card{
   width:100%;
@@ -22,12 +28,32 @@
   padding:32px;
   border-radius:24px;
   box-shadow:0 20px 40px rgba(0,0,0,.15);
-  animation:fade .5s ease;
+  animation:fadeIn .5s ease;
 }
-@keyframes fade{
+@keyframes fadeIn{
   from{opacity:0;transform:translateY(20px)}
   to{opacity:1;transform:none}
 }
+h2{text-align:center;margin-bottom:20px}
+input{
+  width:100%;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  margin-bottom:14px;
+  font-size:15px;
+}
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  background:var(--main);
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
 .field{position:relative}
 .eye{
   position:absolute;
@@ -38,12 +64,12 @@
   user-select:none;
 }
 .error{
+  display:none;
   background:#ffebee;
   color:#c62828;
   padding:10px;
   border-radius:12px;
   margin-bottom:14px;
-  display:none;
   animation:shake .4s;
 }
 @keyframes shake{
@@ -55,7 +81,7 @@
 }
 .loading{opacity:.6;pointer-events:none}
 .links{text-align:center;margin-top:16px}
-.links a{text-decoration:none;font-size:14px}
+.links a{text-decoration:none;font-size:14px;color:#555}
 </style>
 </head>
 
@@ -63,6 +89,7 @@
 
 <div class="login-wrapper">
   <div class="login-card" id="card">
+
     <h2>🔐 Sale Support</h2>
 
     <div id="errorBox" class="error"></div>
@@ -80,55 +107,56 @@
       <a href="register.html">Create Account</a> |
       <a href="reset.html">Reset Password</a>
     </div>
+
   </div>
 </div>
 
 <script type="module">
-import { auth } from "./assets/js/firebase.js";
+import { auth } from "./js/firebase.js";
 import { signInWithEmailAndPassword } from
   "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
+const emailEl = document.getElementById("email");
+const passwordEl = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
 const errorBox = document.getElementById("errorBox");
 const card = document.getElementById("card");
 const eye = document.getElementById("eye");
 
 /* 👁️ toggle password */
-eye.addEventListener("click", () => {
-  passwordInput.type =
-    passwordInput.type === "password" ? "text" : "password";
+eye.addEventListener("click",()=>{
+  passwordEl.type =
+    passwordEl.type === "password" ? "text" : "password";
 });
 
-/* 🔐 Login */
-loginBtn.addEventListener("click", async () => {
-  errorBox.style.display = "none";
+/* 🔐 login */
+loginBtn.addEventListener("click", async ()=>{
+  errorBox.style.display="none";
 
-  if (!emailInput.value || !passwordInput.value) {
+  if(!emailEl.value || !passwordEl.value){
     showError("กรุณากรอก Email และ Password");
     return;
   }
 
   card.classList.add("loading");
 
-  try {
+  try{
     await signInWithEmailAndPassword(
       auth,
-      emailInput.value,
-      passwordInput.value
+      emailEl.value,
+      passwordEl.value
     );
-    window.location.href = "home.html";
-  } catch (error) {
+    window.location.href="home.html";
+  }catch(err){
     showError("Email หรือ Password ไม่ถูกต้อง");
   }
 
   card.classList.remove("loading");
 });
 
-function showError(msg) {
+function showError(msg){
   errorBox.innerText = msg;
-  errorBox.style.display = "block";
+  errorBox.style.display="block";
 }
 </script>
 
