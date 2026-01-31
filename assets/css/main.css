@@ -83,6 +83,42 @@ button:hover{
 
 .card{
   background:#fff;
+  .topbar-right{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.user-box{
+  text-align:right;
+}
+
+.user-box .name{
+  font-weight:600;
+}
+
+.user-box .email{
+  font-size:12px;
+  color:#666;
+}
+
+.notify{
+  position:relative;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.badge{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:#ff7043;
+  color:#fff;
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:20px;
+}
+
   padding:20px;
   border-radius:20px;
   box-shadow:0 10px 20px rgba(0,0,0,.05);
