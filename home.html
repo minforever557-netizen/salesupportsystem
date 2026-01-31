@@ -3,92 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <title>Sale Support | Home</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- CSS กลาง -->
 <link rel="stylesheet" href="assets/css/main.css">
-</head>
 
+</head>
 <body>
 
-<!-- layout.js จะ render ทุกอย่างใส่ตรงนี้ -->
-<div id="app"></div>
+<div class="layout">
 
-<!-- Layout + Auth + Permission -->
-<script type="module" src="assets/js/layout.js"></script>
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="logo">🟢 Sale Support</div>
 
-<!-- Page Script -->
+    <nav class="menu">
+      <a href="home.html" data-role="Admin,Supervisor,User">🏠 Home</a>
+      <a href="ticket-create.html" data-role="User">📝 แจ้งปัญหา</a>
+      <a href="ticket-my.html" data-role="User">📄 Ticket ของฉัน</a>
+      <a href="ticket-close.html" data-role="Supervisor,Admin">✅ ปิด Ticket</a>
+      <a href="admin-all.html" data-role="Admin">📊 งานทั้งหมด</a>
+      <a href="dashboard.html" data-role="Admin,Supervisor">📈 Dashboard</a>
+      <a href="ticket-management.html" data-role="Admin">⚙️ Ticket Management</a>
+      <a href="user-management.html" data-role="Admin">👤 User Management</a>
+      <a href="permission.html" data-role="Admin">🔐 Permission</a>
+    </nav>
+
+    <div class="bottom">
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </aside>
+
+  <!-- ================= CONTENT ================= -->
+  <main class="content">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <h2>Home</h2>
+      <div id="userInfo">Loading...</div>
+    </div>
+
+    <!-- DASHBOARD USER -->
+    <div class="card">
+      <h3>📌 สรุป Ticket ของคุณ</h3>
+      <p id="summaryText">กำลังโหลดข้อมูล...</p>
+    </div>
+
+  </main>
+</div>
+
+<!-- ================= SCRIPT ================= -->
 <script type="module">
+
 import { auth, db } from "./assets/js/firebase.js";
-import {
-  collection,
-  query,
-  where,
-  getCountFromServer
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { onAuthStateChanged } from
+import { onAuthStateChanged, signOut } from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { collection, query, where, getDocs } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* =========================
-   LOAD HOME DASHBOARD
-========================= */
-onAuthStateChanged(auth, async user=>{
-  if(!user) return;
+const userInfo = document.getElementById("userInfo");
+const summaryText = document.getElementById("summaryText");
+const logoutBtn = document.getElementById("logoutBtn");
+const menus = document.querySelectorAll(".menu a");
 
-  // รอ layout render ก่อน
-  setTimeout(async ()=>{
-    const content = document.getElementById("pageContent");
-    if(!content) return;
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    location.href="index.html";
+    return;
+  }
 
-    content.innerHTML = `
-      <div class="card">
-        <h2>👋 ยินดีต้อนรับ</h2>
-        <p>ระบบแจ้งปัญหาและติดตามงาน Sale Support</p>
-      </div>
+  const roleSnap = await fetch(`https://firestore.googleapis.com/v1/projects/sale-support-system/databases/(default)/documents/users/${user.uid}`);
+  const roleData = await roleSnap.json();
+  const role = roleData.fields.role.stringValue;
+  const fullname = roleData.fields.fullname.stringValue;
 
-      <div class="stat">
-        <div class="card">
-          Open<br><b id="openCount">0</b>
-        </div>
-        <div class="card">
-          Pending<br><b id="pendingCount">0</b>
-        </div>
-        <div class="card">
-          Closed<br><b id="closedCount">0</b>
-        </div>
-      </div>
+  userInfo.innerText = `${fullname} (${role})`;
+
+  /* ===== Show menu by role ===== */
+  menus.forEach(m=>{
+    const allow = m.dataset.role.split(",");
+    if(!allow.includes(role)) m.style.display="none";
+  });
+
+  /* ===== Load ticket summary ===== */
+  if(role === "User"){
+    const q = query(
+      collection(db,"tickets"),
+      where("uid","==",user.uid)
+    );
+    const snap = await getDocs(q);
+    summaryText.innerHTML = `
+      🎫 Ticket ทั้งหมด: <b>${snap.size}</b> ใบ
     `;
-
-    // ===== Query นับ Ticket ของ User =====
-    const openQ = query(
-      collection(db,"tickets"),
-      where("uid","==",user.uid),
-      where("status","==","Open")
-    );
-
-    const pendingQ = query(
-      collection(db,"tickets"),
-      where("uid","==",user.uid),
-      where("status","==","Pending")
-    );
-
-    const closedQ = query(
-      collection(db,"tickets"),
-      where("uid","==",user.uid),
-      where("status","==","Closed")
-    );
-
-    document.getElementById("openCount").innerText =
-      (await getCountFromServer(openQ)).data().count;
-
-    document.getElementById("pendingCount").innerText =
-      (await getCountFromServer(pendingQ)).data().count;
-
-    document.getElementById("closedCount").innerText =
-      (await getCountFromServer(closedQ)).data().count;
-
-  },300);
+  }else{
+    summaryText.innerHTML = "ยินดีต้อนรับเข้าสู่ระบบจัดการ Ticket";
+  }
 });
+
+/* ===== Logout ===== */
+logoutBtn.addEventListener("click",()=>{
+  signOut(auth).then(()=>{
+    location.href="index.html";
+  });
+});
+
 </script>
 
 </body>
